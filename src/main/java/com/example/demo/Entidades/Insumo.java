@@ -1,5 +1,6 @@
 package com.example.demo.Entidades;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class Insumo {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int idIsumo;
+    private Long idIsumo;
     private String nombre;
     private double stockActual;
     private double stockMinimo;
@@ -23,5 +24,6 @@ public class Insumo {
     private UnidadDeMedida unidadDeMedida;
     @ManyToOne
     @JoinColumn(name = "idRubroInsumo")
+    @JsonBackReference
     private RubroInsumo rubroInsumo;
 }

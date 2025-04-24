@@ -1,19 +1,25 @@
 package com.example.demo.Entidades;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.List;
 
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
 @Entity @Table
 public class Categoria {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int idCategoria;
+    private Long idCategoria;
     private String nombre;
     private boolean activo;
+
+    @OneToMany(mappedBy = "categoria")
+    @JsonManagedReference
+    private List<Articulo> articulos;
 
     @OneToOne
     @JoinColumn(name = "idCategoriaPadre")

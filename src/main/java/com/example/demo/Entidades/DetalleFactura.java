@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 public class DetalleFactura {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int idDetalleFactura;
+    private Long idDetalleFactura;
     private int cantidad;
     private double subTotal;
 

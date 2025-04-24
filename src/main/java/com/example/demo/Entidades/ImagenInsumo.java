@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 public class ImagenInsumo {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int idImagenInsumo;
+    private Long idImagenInsumo;
     private String url;
 
     @OneToOne

@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class ActualizacionCosto {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int idActualizacionCosto;
+    private Long idActualizacionCosto;
     private double nuevoCosto;
     private LocalDateTime fechaActualizacion;
 

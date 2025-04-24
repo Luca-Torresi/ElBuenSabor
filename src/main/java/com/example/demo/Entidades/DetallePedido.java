@@ -1,5 +1,6 @@
 package com.example.demo.Entidades;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,11 +12,12 @@ import lombok.NoArgsConstructor;
 public class DetallePedido {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int idDetallePedido;
+    private Long idDetallePedido;
     private int cantidad;
 
     @ManyToOne
     @JoinColumn(name = "idPedido")
+    @JsonBackReference
     private Pedido pedido;
     @ManyToOne
     @JoinColumn(name = "idArticulo")

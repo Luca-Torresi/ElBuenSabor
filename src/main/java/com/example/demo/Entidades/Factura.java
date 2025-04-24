@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class Factura {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int idFactura;
+    private Long idFactura;
     private LocalDateTime fechaYHora;
     private double total;
 
