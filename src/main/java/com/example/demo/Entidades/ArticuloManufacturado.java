@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+import java.time.LocalDate;
 import java.util.List;
 
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
@@ -18,9 +18,10 @@ public class ArticuloManufacturado {
     private Long idArticulo;
     private String nombre;
     private String descripcion;
+    private double precioVenta;
     private String receta;
-    private boolean activo;
     private int tiempoDeCocina;
+    private LocalDate fechaBaja;
 
     @OneToMany(mappedBy = "articuloManufacturado")
     @JsonManagedReference

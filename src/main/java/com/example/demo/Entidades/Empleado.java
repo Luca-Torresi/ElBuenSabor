@@ -9,15 +9,8 @@ import lombok.NoArgsConstructor;
 
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
 @Entity @Table
-public class Empleado {
-
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idEmpleado;
+public class Empleado extends Usuario {
 
     @Enumerated(EnumType.STRING)
     private Rol rol;
-
-    @OneToOne
-    @JoinColumn(name = "idUsuario")
-    private Usuario usuario;
 }

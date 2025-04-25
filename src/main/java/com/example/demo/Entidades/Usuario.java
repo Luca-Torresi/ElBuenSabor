@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
-@Entity @Table
+@Entity @Table @Inheritance(strategy = InheritanceType.JOINED)
 public class Usuario {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

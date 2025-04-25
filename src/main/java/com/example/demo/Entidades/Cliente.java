@@ -10,15 +10,9 @@ import java.util.List;
 
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
 @Entity @Table
-public class Cliente {
+public class Cliente extends Usuario {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idCliente;
     private String direccion;
-
-    @OneToOne
-    @JoinColumn(name = "idUsuario")
-    private Usuario usuario;
 
     @OneToMany(mappedBy = "cliente")
     @JsonManagedReference

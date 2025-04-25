@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
 @Entity @Table
-public class ImagenArticulo {
+public class ImagenManufacturado {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idImagenArticulo;
+    private Long idImagenManufacturado;
     private String url;
 
     @OneToOne
