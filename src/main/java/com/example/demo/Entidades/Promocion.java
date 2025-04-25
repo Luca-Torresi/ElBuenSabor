@@ -16,12 +16,12 @@ public class Promocion {
     private String nombre;
     private String titulo;
     private String descripcion;
-    private String descuento;
+    private double descuento;
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
     private String url;
 
     @ManyToOne
-    @JoinColumn(name = "idArticulo")
-    private Articulo articulo;
+    @JoinColumn(name = "idArticuloManufacturado")
+    private ArticuloManufacturado articuloManufacturado;
 }

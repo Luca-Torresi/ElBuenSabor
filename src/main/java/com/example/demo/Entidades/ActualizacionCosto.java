@@ -17,6 +17,6 @@ public class ActualizacionCosto {
     private LocalDateTime fechaActualizacion;
 
     @ManyToOne
-    @JoinColumn(name = "idInsumo")
-    private Insumo insumo;
+    @JoinColumn(name = "idArticuloInsumo")
+    private ArticuloInsumo articuloInsumo;
 }

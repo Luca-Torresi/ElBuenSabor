@@ -19,9 +19,9 @@ public class RubroInsumo {
 
     @OneToMany(mappedBy = "rubroInsumo")
     @JsonManagedReference
-    private List<Insumo> insumos;
+    private List<ArticuloInsumo> listaInsumos;
 
     @ManyToOne
-    @JoinColumn(name = "idRubroPadre")
-    private RubroInsumo rubroPadre;
+    @JoinColumn(name = "idRubroIsumoPadre")
+    private RubroInsumo rubroInsumoPadre;
 }

@@ -13,12 +13,11 @@ public class Empleado {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idEmpleado;
-    private String email;
-    private String password;
-    private String nombre;
-    private String apellido;
-    private String telefono;
 
     @Enumerated(EnumType.STRING)
     private Rol rol;
+
+    @OneToOne
+    @JoinColumn(name = "idUsuario")
+    private Usuario usuario;
 }

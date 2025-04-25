@@ -13,13 +13,12 @@ import java.util.List;
 public class Cliente {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String email;
-    private String nombre;
-    private String apellido;
-    private String telefono;
+    private Long idCliente;
     private String direccion;
-    private String password;
-    private String imagen;
+
+    @OneToOne
+    @JoinColumn(name = "idUsuario")
+    private Usuario usuario;
 
     @OneToMany(mappedBy = "cliente")
     @JsonManagedReference

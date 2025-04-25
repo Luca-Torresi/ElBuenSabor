@@ -9,17 +9,21 @@ import lombok.NoArgsConstructor;
 
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
 @Entity @Table
-public class Ingrediente {
+public class ArticuloInsumo {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idIngrediente;
-    private double cantidad;
+    private Long idIsumo;
+    private String nombre;
+    private double stockActual;
+    private double stockMinimo;
+    private double stockMaximo;
+    private boolean activo;
 
     @ManyToOne
-    @JoinColumn(name = "idArticulo")
-    @JsonBackReference
-    private Articulo articulo;
+    @JoinColumn(name = "idUnidadDeMedida")
+    private UnidadDeMedida unidadDeMedida;
     @ManyToOne
-    @JoinColumn(name = "idInsumo")
-    private Insumo insumo;
+    @JoinColumn(name = "idRubroInsumo")
+    @JsonBackReference
+    private RubroInsumo rubroInsumo;
 }

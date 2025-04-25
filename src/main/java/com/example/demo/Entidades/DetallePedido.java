@@ -20,6 +20,6 @@ public class DetallePedido {
     @JsonBackReference
     private Pedido pedido;
     @ManyToOne
-    @JoinColumn(name = "idArticulo")
-    private Articulo articulo;
+    @JoinColumn(name = "idArticuloManufacturado")
+    private ArticuloManufacturado articuloManufacturado;
 }

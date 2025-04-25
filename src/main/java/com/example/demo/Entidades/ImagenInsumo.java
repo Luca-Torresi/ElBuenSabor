@@ -15,6 +15,6 @@ public class ImagenInsumo {
     private String url;
 
     @OneToOne
-    @JoinColumn(name = "idInsumo")
-    private Insumo insumo;
+    @JoinColumn(name = "idArticuloInsumo")
+    private ArticuloInsumo articuloInsumo;
 }

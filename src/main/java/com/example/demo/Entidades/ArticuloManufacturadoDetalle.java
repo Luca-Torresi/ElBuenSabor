@@ -1,5 +1,6 @@
 package com.example.demo.Entidades;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,13 +9,17 @@ import lombok.NoArgsConstructor;
 
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
 @Entity @Table
-public class ImagenArticulo {
+public class ArticuloManufacturadoDetalle {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idImagenArticulo;
-    private String url;
+    private Long idArticuloManufacturadoDetalle;
+    private double cantidad;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "idArticuloManufacturado")
+    @JsonBackReference
     private ArticuloManufacturado articuloManufacturado;
+    @ManyToOne
+    @JoinColumn(name = "idArticuloInsumo")
+    private ArticuloInsumo articuloInsumo;
 }
