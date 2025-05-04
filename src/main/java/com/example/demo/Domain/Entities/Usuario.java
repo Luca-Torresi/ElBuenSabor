@@ -12,6 +12,10 @@ public class Usuario {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idUsuario;
+
+    @Column(unique = true)
+    private String idAuth0;
+
     private String email;
     private String password;
     private String nombre;

@@ -7,7 +7,8 @@ import com.example.demo.Domain.Entities.Empleado;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface ClienteMapper {
-    PerfilClienteDto ClienteToPerfilClienteDto(Cliente cliente);
-    PerfilEmpleadoDto EmpleadoToPerfilEmpleadoDto(Empleado empleado);
+public interface UsuarioMapper {
+    PerfilClienteDto clienteToPerfilClienteDto(Cliente cliente);
+
+    PerfilEmpleadoDto empleadoToPerfilEmpleadoDto(Empleado empleado);
 }
