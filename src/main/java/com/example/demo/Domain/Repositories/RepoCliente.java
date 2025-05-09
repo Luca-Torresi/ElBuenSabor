@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
 public interface RepoCliente extends JpaRepository<Cliente, Long> {
     @Query(value = "SELECT * FROM cliente WHERE email = :email", nativeQuery = true)
     Cliente findByEmail(@Param("email") String email);
+
+    boolean existsByIdAuth0(String idAuth0);
 }

@@ -1,7 +1,10 @@
 package com.example.demo.Presentation.Controllers;
 
-import com.example.demo.Application.DTO.Usuario.PerfilClienteDto;
+import com.example.demo.Application.DTO.Usuario.PerfilUsuarioDto;
+import com.example.demo.Application.DTO.Usuario.RegistroClienteDto;
+import com.example.demo.Domain.Exceptions.ClienteNoRegistradoException;
 import com.example.demo.Domain.Service.ServiceCliente;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -17,19 +20,22 @@ public class ControllerCliente {
         this.serviceCliente = serviceCliente;
     }
 
-    @GetMapping("/datos")
-    public ResponseEntity<PerfilClienteDto> datos(@AuthenticationPrincipal OidcUser _cliente) {
-        return ResponseEntity.ok(
-            serviceCliente.datos(_cliente)
-        );
+    //Registro de un nuevo cliente
+    @PostMapping("/registro")
+    public ResponseEntity<PerfilUsuarioDto> registroNuevoCliente(@AuthenticationPrincipal OidcUser _cliente, @RequestBody RegistroClienteDto registroClienteDto){
+        PerfilUsuarioDto perfilUsuarioDto = serviceCliente.registro(_cliente, registroClienteDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(perfilUsuarioDto);
+    }
+
+    //Verifica si el cliente se encuentra registrado
+    @GetMapping("/verificacion")
+    public ResponseEntity<?> verificacionCliente(@AuthenticationPrincipal OidcUser _cliente) {
+        try{
+            //Si se encuentra registrado, el método devuelve los datos del perfil
+            return ResponseEntity.ok(serviceCliente.verificacionCliente(_cliente));
+        } catch (ClienteNoRegistradoException e){
+            //Si no se encuentra registrado,
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 }
-
-/*
-@PreAuthorize("isAuthenticated()") → Indica qye se debe estar loggeado para acceder al endpoint correspondiente
-                                     En caso de no estar loggeado, deberá redirigir a la página para iniciar sesión.
-
-@PreAuthorize("permitAll()") → Indica que se puede acceder al endpoint correspondiente sin necesidad de estar loggeado
-
-@AuthenticationPrincipal → Sirve para inyectar automáticamente los datos del usuario autenticado
-*/

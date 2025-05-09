@@ -15,7 +15,7 @@ import java.util.List;
 public class ArticuloManufacturado {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idArticulo;
+    private Long idArticuloManufacturado;
     private String nombre;
     private String descripcion;
     private double precioVenta;

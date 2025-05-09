@@ -24,8 +24,8 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/swagger-resources/**",
-                                "/usuario/prueba").permitAll()
+                                "/swagger-resources/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 // Ruta a la cual el usuario es redirigido en caso que el LogIn sea exitoso
