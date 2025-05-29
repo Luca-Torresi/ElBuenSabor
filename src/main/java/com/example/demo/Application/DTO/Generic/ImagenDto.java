@@ -1,12 +1,11 @@
-package com.example.demo.Application.DTO.Insumo;
+package com.example.demo.Application.DTO.Generic;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.util.List;
 
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
-public class ArregloActualizacionCostoDto {
-    private List<ActualizacionCostoDto> detalles;
+public class ImagenDto {
+    private String url;
 }

@@ -13,8 +13,4 @@ public class ImagenInsumo {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idImagenInsumo;
     private String url;
-
-    @OneToOne
-    @JoinColumn(name = "idArticuloInsumo")
-    private ArticuloInsumo articuloInsumo;
 }

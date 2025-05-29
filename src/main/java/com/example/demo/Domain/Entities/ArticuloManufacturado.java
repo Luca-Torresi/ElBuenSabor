@@ -23,12 +23,16 @@ public class ArticuloManufacturado {
     private int tiempoDeCocina;
     private LocalDate fechaBaja;
 
-    @OneToMany(mappedBy = "articuloManufacturado")
-    @JsonManagedReference
-    private List<ArticuloManufacturadoDetalle> detalles;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "idImagenManufacturado")
+    private ImagenManufacturado imagenManufacturado;
 
     @ManyToOne
     @JoinColumn(name = "idCategoria")
     @JsonBackReference
     private Categoria categoria;
+
+    @OneToMany(mappedBy = "articuloManufacturado", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<ArticuloManufacturadoDetalle> detalles;
 }

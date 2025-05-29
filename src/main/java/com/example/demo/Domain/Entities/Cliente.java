@@ -4,16 +4,19 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data @SuperBuilder @AllArgsConstructor @NoArgsConstructor
 @Entity @Table
 public class Cliente extends Usuario {
 
-    private String direccion;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "idDireccion")
+    private Direccion direccion;
 
     @OneToMany(mappedBy = "cliente")
     @JsonManagedReference

@@ -19,16 +19,10 @@ public class Sucursal {
     private LocalTime horarioApertura;
     private LocalTime horarioCierre;
 
-    @ManyToOne
-    @JoinColumn(name = "idEmpresa")
+    @OneToOne @JoinColumn(name = "idDireccion")
+    private Direccion direccion;
+
+    @ManyToOne @JoinColumn(name = "idEmpresa")
     @JsonBackReference
     private Empresa empresa;
-
-    @ManyToMany
-    @JoinTable(
-            name = "sucursal_categoria",
-            joinColumns = @JoinColumn(name = "id_sucursal"),
-            inverseJoinColumns = @JoinColumn(name = "id_categoria")
-    )
-    private List<Categoria> categorias;
 }

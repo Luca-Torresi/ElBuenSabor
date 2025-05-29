@@ -1,5 +1,5 @@
 package com.example.demo.Domain.Enums;
 
 public enum Rol {
-    ADMINISTRADOR, CAJERO, COCINERO, REPARTIDOR;
+    ADMININSTRADOR, CAJERO, COCINERO, REPARTIDOR;
 }

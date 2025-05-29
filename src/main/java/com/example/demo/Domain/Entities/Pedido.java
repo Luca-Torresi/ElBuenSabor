@@ -1,6 +1,7 @@
 package com.example.demo.Domain.Entities;
 
 import com.example.demo.Domain.Enums.EstadoPedido;
+import com.example.demo.Domain.Enums.MetodoDePago;
 import com.example.demo.Domain.Enums.TipoEnvio;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -20,7 +21,7 @@ public class Pedido {
     private Long idPedido;
     private LocalDateTime fechaYHora;
 
-    @OneToMany(mappedBy = "pedido")
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<DetallePedido> detalles;
 
@@ -28,21 +29,22 @@ public class Pedido {
     private TipoEnvio tipoEnvio;
     @Enumerated(EnumType.STRING)
     private EstadoPedido estadoPedido;
+    @Enumerated(EnumType.STRING)
+    private MetodoDePago metodoDePago;
 
-    @ManyToOne
-    @JoinColumn(name = "idCliente")
+    @ManyToOne @JoinColumn(name = "idCliente")
     @JsonBackReference
     private Cliente cliente;
-    @ManyToOne
-    @JoinColumn(name = "idAdministrador")
+
+    @ManyToOne @JoinColumn(name = "idAdministrador")
     private Empleado administrador;
-    @ManyToOne
-    @JoinColumn(name = "idCajero")
+
+    @ManyToOne @JoinColumn(name = "idCajero")
     private Empleado cajero;
-    @ManyToOne
-    @JoinColumn(name = "idCocinero")
+
+    @ManyToOne @JoinColumn(name = "idCocinero")
     private Empleado cocinero;
-    @ManyToOne
-    @JoinColumn(name = "idRepartidor")
+
+    @ManyToOne @JoinColumn(name = "idRepartidor")
     private Empleado repartidor;
 }

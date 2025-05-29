@@ -12,5 +12,5 @@ public class RegistroClienteDto {
     private String apellido;
     private String telefono;
     private String urlImagen;
-    private String direccion;
+    private DireccionDto direccionDto;
 }

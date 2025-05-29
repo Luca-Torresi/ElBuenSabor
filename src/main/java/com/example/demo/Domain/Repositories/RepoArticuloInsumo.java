@@ -8,6 +8,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RepoArticuloInsumo extends JpaRepository<ArticuloInsumo, Long> {
-    @Query(value = "SELECT * FROM articuloInsumo WHERE idArticuloInsumo = :idArticuloInsumo", nativeQuery = true)
-    ArticuloInsumo findByIdArticuloInsumo(@Param("idArticuloInsumo") Long idArticuloInsumo);
 }

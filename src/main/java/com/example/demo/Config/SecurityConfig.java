@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -17,6 +19,10 @@ public class SecurityConfig {
         http
                 // Acá deben ir todas las rutas públicas, a las que se puede acceder sin necesidad de estar loggeado
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/admininstrador/**").hasRole("ADMINISTRADOR")
+                        .requestMatchers("/cajero/**").hasAnyRole("CAJERO", "ADMINISTRADOR")
+                        .requestMatchers("/cocinero/**").hasRole("COCINERO")
+                        .requestMatchers("/repartidor/**").hasRole("REPARTIDOR")
                         .requestMatchers(
                                 "/",
                                 "/public/**",
@@ -27,6 +33,12 @@ public class SecurityConfig {
                                 "/swagger-resources/**"
                         ).permitAll()
                         .anyRequest().authenticated()
+                )
+                // Valida tokens y extrae roles
+                .oauth2ResourceServer(oauth -> oauth
+                        .jwt(jwt -> jwt
+                                .decoder(jwtDecoder())
+                        )
                 )
                 // Ruta a la cual el usuario es redirigido en caso que el LogIn sea exitoso
                 .oauth2Login(oauth -> oauth
@@ -40,5 +52,11 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID")
                 );
         return http.build();
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        return NimbusJwtDecoder.withJwkSetUri("https://tu-dominio.auth0.com/.well-known/jwks.json")
+                .build();
     }
 }

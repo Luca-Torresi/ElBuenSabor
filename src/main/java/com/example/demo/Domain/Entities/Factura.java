@@ -20,7 +20,7 @@ public class Factura {
     private LocalDateTime fechaYHora;
     private double total;
 
-    @OneToMany(mappedBy = "factura")
+    @OneToMany(mappedBy = "factura", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<DetalleFactura> detalles;
 

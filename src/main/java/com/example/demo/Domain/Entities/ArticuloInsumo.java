@@ -13,18 +13,23 @@ import java.time.LocalDate;
 public class ArticuloInsumo {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idIsumo;
+    private Long idArticuloInsumo;
     private String nombre;
     private double stockActual;
     private double stockMinimo;
     private double stockMaximo;
     private LocalDate fechaBaja;
 
-    @ManyToOne
-    @JoinColumn(name = "idUnidadDeMedida")
-    private UnidadDeMedida unidadDeMedida;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "idImagenInsumo")
+    private ImagenInsumo imagenInsumo;
+
     @ManyToOne
     @JoinColumn(name = "idRubroInsumo")
     @JsonBackReference
     private RubroInsumo rubroInsumo;
+
+    @ManyToOne
+    @JoinColumn(name = "idUnidadDeMedida")
+    private UnidadDeMedida unidadDeMedida;
 }

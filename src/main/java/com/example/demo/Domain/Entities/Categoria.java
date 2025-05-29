@@ -19,6 +19,10 @@ public class Categoria {
     private double margenGanancia;
     private LocalDate fechaBaja;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "idImagenCategoria")
+    private ImagenCategoria imagenCategoria;
+
     @OneToMany(mappedBy = "categoria")
     @JsonManagedReference
     private List<ArticuloManufacturado> listaManufacturados;

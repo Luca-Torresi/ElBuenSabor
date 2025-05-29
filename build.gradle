@@ -36,9 +36,8 @@ dependencies {
 	//Auth0 & Security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-
-	// Validación de JWT (opcional, si manejas tokens manualmente):
-	//implementation 'com.auth0:java-jwt:4.4.0'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+	implementation 'com.auth0:java-jwt:4.4.0'
 
 	//MySQL
 	runtimeOnly 'com.mysql:mysql-connector-j'
@@ -49,6 +48,7 @@ dependencies {
 	//Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 
 	//developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

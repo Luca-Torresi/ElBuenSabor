@@ -13,7 +13,6 @@ public class Promocion {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idPromocion;
-    private String nombre;
     private String titulo;
     private String descripcion;
     private double descuento;
