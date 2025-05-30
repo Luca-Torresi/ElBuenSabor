@@ -18,6 +18,7 @@ public class InformacionArticuloManufacturadoDto {
     private ImagenDto imagenDto;
     private Long idCategoria;
     private String nombreCategoria;
+    private double precioVenta;
     private boolean dadoDeAlta;
     private List<InformacionDetalleDto> detalles;
 }
