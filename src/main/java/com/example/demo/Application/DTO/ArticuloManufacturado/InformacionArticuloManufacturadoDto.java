@@ -10,6 +10,7 @@ import java.util.List;
 //Envía la información correspondiente a un artículo manufacturado para ser editado o para ver los detalles en el ABM
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
 public class InformacionArticuloManufacturadoDto {
+    private Long idArticuloManufacturado;
     private String nombre;
     private String descripcion;
     private String receta;

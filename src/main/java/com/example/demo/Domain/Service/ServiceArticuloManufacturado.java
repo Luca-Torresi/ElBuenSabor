@@ -9,6 +9,7 @@ import com.example.demo.Domain.Entities.*;
 import com.example.demo.Domain.Repositories.RepoArticuloInsumo;
 import com.example.demo.Domain.Repositories.RepoArticuloManufacturado;
 import com.example.demo.Domain.Repositories.RepoCategoria;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +27,7 @@ public class ServiceArticuloManufacturado {
     private final ManufacturadoMapper manufacturadoMapper;
     private final RepoArticuloInsumo repoArticuloInsumo;
     private final ImagenMapper imagenMapper;
+    private final EntityManager entityManager;
 
     //Persiste en la base de datos un nuevo artículo manufacturado
     public void nuevoArticulo(NuevoArticuloManufacturadoDto nuevoArticulomanufacturadoDto) {
@@ -48,7 +50,11 @@ public class ServiceArticuloManufacturado {
         }
         articuloManufacturado.setDetalles(detalles);
 
-        repoArticuloManufacturado.save(articuloManufacturado);
+        articuloManufacturado = repoArticuloManufacturado.save(articuloManufacturado);
+
+        entityManager.createNativeQuery("CALL modificarPrecioVenta(:_idArticulo)")
+                .setParameter("_idArticulo", articuloManufacturado.getIdArticuloManufacturado())
+                .executeUpdate();
     }
 
     //Dar de alta o baja a un artículo

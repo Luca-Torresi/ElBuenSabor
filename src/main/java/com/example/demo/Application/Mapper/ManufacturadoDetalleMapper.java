@@ -8,6 +8,5 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface ManufacturadoDetalleMapper {
     @Mapping(source = "articuloInsumo.idArticuloInsumo", target = "idArticuloInsumo")
-    @Mapping(source = "articuloInsumo.nombre", target = "nombreInsumo")
     InformacionDetalleDto detalleToInformacionDetalleDto(ArticuloManufacturadoDetalle detalle);
 }
