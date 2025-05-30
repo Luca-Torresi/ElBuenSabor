@@ -39,4 +39,10 @@ public class ControllerCategoria {
     public List<CategoriaDto> listarCategorias(){
         return serviceCategoria.listarCategoriasCatalogo();
     }
+
+    //Devuelve los datos de una categoría única
+    @GetMapping("/nombre/{idCategoria}")
+    public CategoriaDto buscarCategoria(@PathVariable Long idCategoria){
+        return serviceCategoria.buscarCategoriaPorId(idCategoria);
+    }
 }

@@ -2,20 +2,18 @@ package com.example.demo.Presentation.Controllers;
 
 import com.example.demo.Application.DTO.ArticuloInsumo.ArregloActualizacionCostoDto;
 import com.example.demo.Application.DTO.ArticuloInsumo.ArregloRecargaInsumoDto;
+import com.example.demo.Application.DTO.ArticuloInsumo.InsumoDto;
 import com.example.demo.Application.DTO.ArticuloInsumo.NuevoArticuloInsumoDto;
 import com.example.demo.Domain.Service.ServiceArticuloInsumo;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/insumo")
 public class ControllerArticuloInsumo {
-    private ServiceArticuloInsumo serviceArticuloInsumo;
+    private final ServiceArticuloInsumo serviceArticuloInsumo;
 
     //Recibe los detalles del nuevo insumo
     @PostMapping("/nuevo")
@@ -37,7 +35,7 @@ public class ControllerArticuloInsumo {
 
     //Lista todos los artículos insumo
     @GetMapping("/lista")
-    public void listaInsumos(){
-
+    public List<InsumoDto> listaInsumos(){
+        return serviceArticuloInsumo.listaInsumos();
     }
 }
