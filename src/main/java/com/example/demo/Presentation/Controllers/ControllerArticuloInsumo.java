@@ -38,4 +38,10 @@ public class ControllerArticuloInsumo {
     public List<InsumoDto> listaInsumos(){
         return serviceArticuloInsumo.listaInsumos();
     }
+
+    //Devuelve el nombre de un insumo
+    @GetMapping("/obtenerNombre/{idArticuloInsumo}")
+    public String obtenerNombre(@PathVariable Long idArticuloInsumo){
+        return serviceArticuloInsumo.obtenerNombreInsumo(idArticuloInsumo);
+    }
 }

@@ -76,4 +76,10 @@ public class ServiceArticuloInsumo {
         }
         return insumoDtos;
     }
+
+    //Devuelve el nombre de un artículo insumo
+    public String obtenerNombreInsumo(Long idArticuloInsumo){
+        ArticuloInsumo articuloInsumo = repoArticuloInsumo.findById(idArticuloInsumo).get();
+        return articuloInsumo.getNombre();
+    }
 }

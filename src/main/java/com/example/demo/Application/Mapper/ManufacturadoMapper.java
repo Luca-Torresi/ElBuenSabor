@@ -18,5 +18,6 @@ public interface ManufacturadoMapper {
 
     @Mapping(source = "imagenManufacturado", target = "imagenDto")
     @Mapping(source = "categoria.idCategoria", target = "idCategoria")
+    @Mapping(source = "categoria.nombre", target = "nombreCategoria")
     InformacionArticuloManufacturadoDto articuloManufacturadoToInformacionArticuloManufacturadoDto(ArticuloManufacturado articuloManufacturado);
 }

@@ -56,8 +56,8 @@ public class ServiceCategoria {
     }
 
     //Devuelve los datos de una categoría única
-    public CategoriaDto buscarCategoriaPorId(Long id) {
+    public String buscarCategoriaPorId(Long id) {
         Categoria categoria = repoCategoria.findById(id).get();
-        return categoriaMapper.categoriaToCategoriaDto(categoria);
+        return categoria.getNombre();
     }
 }

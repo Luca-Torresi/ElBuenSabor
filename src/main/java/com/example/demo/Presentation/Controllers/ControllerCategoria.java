@@ -7,7 +7,6 @@ import com.example.demo.Application.DTO.Generic.AltaBajaDto;
 import com.example.demo.Domain.Service.ServiceCategoria;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -41,8 +40,8 @@ public class ControllerCategoria {
     }
 
     //Devuelve los datos de una categoría única
-    @GetMapping("/nombre/{idCategoria}")
-    public CategoriaDto buscarCategoria(@PathVariable Long idCategoria){
+    @GetMapping("/obtenerNombre/{idCategoria}")
+    public String buscarCategoria(@PathVariable Long idCategoria){
         return serviceCategoria.buscarCategoriaPorId(idCategoria);
     }
 }
