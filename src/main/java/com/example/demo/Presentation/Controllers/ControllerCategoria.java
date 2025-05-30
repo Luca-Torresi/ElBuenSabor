@@ -1,11 +1,14 @@
 package com.example.demo.Presentation.Controllers;
 
+import com.example.demo.Application.DTO.Categoria.CategoriaDto;
 import com.example.demo.Application.DTO.Categoria.NuevaCategoriaDto;
 import com.example.demo.Application.DTO.Categoria.NuevoMargenGananciaDto;
 import com.example.demo.Application.DTO.Generic.AltaBajaDto;
 import com.example.demo.Domain.Service.ServiceCategoria;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,7 +36,7 @@ public class ControllerCategoria {
 
     //Mostrar categorías en el catálogo
     @GetMapping("/lista")
-    public void listarCategorias(){
-
+    public List<CategoriaDto> listarCategorias(){
+        return serviceCategoria.listarCategoriasCatalogo();
     }
 }

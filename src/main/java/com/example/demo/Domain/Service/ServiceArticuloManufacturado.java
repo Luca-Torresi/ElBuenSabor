@@ -73,22 +73,15 @@ public class ServiceArticuloManufacturado {
     }
 
     //Devuelve las páginas con la información de los artículos manufacturados para el ABM
-    public Page<ManufacturadoAbmDto> mostrarArticulosAbm(int page, int size) {
+    public Page<InformacionArticuloManufacturadoDto> mostrarArticulosAbm(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<ArticuloManufacturado> paginaArticulosAbm = repoArticuloManufacturado.findAll(pageable);
 
         return paginaArticulosAbm.map(articulo -> {
-            ManufacturadoAbmDto dto = manufacturadoMapper.articuloManufacturadoToManufacturadoAbmDto(articulo);
+            InformacionArticuloManufacturadoDto dto = manufacturadoMapper.articuloManufacturadoToInformacionArticuloManufacturadoDto(articulo);
             dto.setDadoDeAlta(articulo.getFechaBaja() != null ? false : true);
             return dto;
         });
-    }
-
-    //Devuelve la información necesaria para el ABM 'ver' y 'modificar'
-    public InformacionArticuloManufacturadoDto obtenerInformacionArticulo(Long id) {
-        ArticuloManufacturado articulo = repoArticuloManufacturado.findById(id).get();
-
-        return manufacturadoMapper.articuloManufacturadoToInformacionArticuloManufacturadoDto(articulo);
     }
 
     //Modifica un artículo manufacturado
