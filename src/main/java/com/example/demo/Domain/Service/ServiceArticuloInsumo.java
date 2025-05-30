@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -58,5 +60,20 @@ public class ServiceArticuloInsumo {
             articuloInsumo.setStockActual(articuloInsumo.getStockActual() + insumo.getCantidad());
             repoArticuloInsumo.save(articuloInsumo);
         }
+    }
+
+    //Devuelve una lista con todos los nombres de los insumos
+    public List<InsumoDto> listaInsumos(){
+        List<ArticuloInsumo> articuloInsumos = repoArticuloInsumo.findAll();
+
+        List<InsumoDto> insumoDtos = new ArrayList<>();
+        for(ArticuloInsumo insumo : articuloInsumos){
+            InsumoDto insumoDto = InsumoDto.builder()
+                    .idArticuloInsumo(insumo.getIdArticuloInsumo())
+                    .nombre(insumo.getNombre())
+                    .build();
+            insumoDtos.add(insumoDto);
+        }
+        return insumoDtos;
     }
 }
