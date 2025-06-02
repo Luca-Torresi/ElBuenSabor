@@ -10,6 +10,7 @@ import com.example.demo.Domain.Repositories.RepoArticuloInsumo;
 import com.example.demo.Domain.Repositories.RepoArticuloManufacturado;
 import com.example.demo.Domain.Repositories.RepoCategoria;
 import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,12 +31,13 @@ public class ServiceArticuloManufacturado {
     private final EntityManager entityManager;
 
     //Persiste en la base de datos un nuevo artículo manufacturado
+    @Transactional
     public void nuevoArticulo(NuevoArticuloManufacturadoDto nuevoArticulomanufacturadoDto) {
         Categoria categoria = repoCategoria.findById(nuevoArticulomanufacturadoDto.getIdCategoria()).get();
 
         ArticuloManufacturado articuloManufacturado = manufacturadoMapper.nuevoArticuloManufacturadoDtoToArticuloManufacturado(nuevoArticulomanufacturadoDto);
         articuloManufacturado.setCategoria(categoria);
-        articuloManufacturado.setFechaBaja(nuevoArticulomanufacturadoDto.isDadoDeBaja() ? null : LocalDate.now());
+        articuloManufacturado.setFechaBaja(nuevoArticulomanufacturadoDto.isDadoDeBaja() ? LocalDate.now() : null);
 
         List<ArticuloManufacturadoDetalle> detalles = new ArrayList<>();
         for(ArticuloManufacturadoDetalleDto detalle : nuevoArticulomanufacturadoDto.getDetalles()){
@@ -52,9 +54,11 @@ public class ServiceArticuloManufacturado {
 
         articuloManufacturado = repoArticuloManufacturado.save(articuloManufacturado);
 
-        entityManager.createNativeQuery("CALL modificarPrecioVenta(:_idArticulo)")
-                .setParameter("_idArticulo", articuloManufacturado.getIdArticuloManufacturado())
-                .executeUpdate();
+        if(articuloManufacturado.getPrecioVenta() == 0){
+            entityManager.createNativeQuery("CALL modificarPrecioVenta(:_idArticulo)")
+                    .setParameter("_idArticulo", articuloManufacturado.getIdArticulo())
+                    .executeUpdate();
+        }
     }
 
     //Dar de alta o baja a un artículo
@@ -72,7 +76,7 @@ public class ServiceArticuloManufacturado {
 
         return paginaArticulos.map(articulo -> {
             ArticuloManufacturadoDto dto = manufacturadoMapper.articuloManufacturadoToArticuloManufacturadoDto(articulo);
-            boolean puedeElaborarse = repoArticuloManufacturado.sePuedeElaborar(articulo.getIdArticuloManufacturado());
+            boolean puedeElaborarse = repoArticuloManufacturado.sePuedeElaborar(articulo.getIdArticulo());
             dto.setPuedeElaborarse(puedeElaborarse);
             return dto;
         });
@@ -91,6 +95,7 @@ public class ServiceArticuloManufacturado {
     }
 
     //Modifica un artículo manufacturado
+    @Transactional
     public void actualizarArticulo(Long id, InformacionArticuloManufacturadoDto dto) {
         ArticuloManufacturado articulo = repoArticuloManufacturado.findById(id).get();
 
@@ -119,7 +124,20 @@ public class ServiceArticuloManufacturado {
             articulo.getDetalles().add(detalle);
         }
 
-        repoArticuloManufacturado.save(articulo);
+        articulo = repoArticuloManufacturado.save(articulo);
+
+        if(!dto.isPrecioModificado()){
+            entityManager.createNativeQuery("CALL modificarPrecioVenta(:_idManufacturado)")
+                    .setParameter("_idManufacturado", articulo.getIdArticulo())
+                    .executeUpdate();
+        }
+
     }
 
+    //Actualiza los precios de todos los artículos manufacturados
+    @Transactional
+    public void actualizarPrecios(){
+        entityManager.createNativeQuery("CALL actualizarPreciosArticulos()")
+                .executeUpdate();
+    }
 }

@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 //Detalles sobre nuevo pedido
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
 public class DetallePedidoDto {
-    private Long idArticuloManufacturado;
+    private Long idArticulo;
     private int cantidad;
 }

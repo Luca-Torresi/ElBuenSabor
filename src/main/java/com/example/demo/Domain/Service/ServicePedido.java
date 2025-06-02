@@ -51,10 +51,10 @@ public class ServicePedido {
 
             List<DetallePedido> detalles = new ArrayList<>();
             for(DetallePedidoDto detalle : pedidoDto.getDetalles()){
-                Optional<ArticuloManufacturado> articuloOpt = repoArticuloManufacturado.findById(detalle.getIdArticuloManufacturado());
+                Optional<ArticuloManufacturado> articuloOpt = repoArticuloManufacturado.findById(detalle.getIdArticulo());
 
                 DetallePedido detallePedido = DetallePedido.builder()
-                        .articuloManufacturado(articuloOpt.get())
+                        .articulo(articuloOpt.get())
                         .cantidad(detalle.getCantidad())
                         .pedido(pedido)
                         .build();
@@ -77,10 +77,10 @@ public class ServicePedido {
 
         List<DetallePedidoPendiente> detalles = new ArrayList<>();
         for(DetallePedidoDto detalle : pedidoDto.getDetalles()){
-            Optional<ArticuloManufacturado> articuloOpt = repoArticuloManufacturado.findById(detalle.getIdArticuloManufacturado());
+            Optional<ArticuloManufacturado> articuloOpt = repoArticuloManufacturado.findById(detalle.getIdArticulo());
 
             DetallePedidoPendiente detallePedidoPendiente = DetallePedidoPendiente.builder()
-                    .articuloManufacturado(articuloOpt.get())
+                    .articulo(articuloOpt.get())
                     .cantidad(detalle.getCantidad())
                     .pedidoPendiente(pedidoPendiente)
                     .build();

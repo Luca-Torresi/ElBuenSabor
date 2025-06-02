@@ -13,6 +13,7 @@ public class NuevoArticuloManufacturadoDto {
     private String nombre;
     private String descripcion;
     private String receta;
+    private double precioVenta;
     private int tiempoDeCocina;
     private boolean dadoDeBaja;
     private Long idCategoria;

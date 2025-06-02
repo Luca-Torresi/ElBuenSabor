@@ -19,6 +19,7 @@ public class ArticuloManufacturadoDetalle {
     @JoinColumn(name = "idArticuloManufacturado")
     @JsonBackReference
     private ArticuloManufacturado articuloManufacturado;
+
     @ManyToOne
     @JoinColumn(name = "idArticuloInsumo")
     private ArticuloInsumo articuloInsumo;

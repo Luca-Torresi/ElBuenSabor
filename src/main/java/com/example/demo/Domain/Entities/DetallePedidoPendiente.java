@@ -14,8 +14,8 @@ public class DetallePedidoPendiente {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idDetallePedidoPendiente;
 
-    @ManyToOne @JoinColumn(name = "idArticuloManufacturado")
-    private ArticuloManufacturado articuloManufacturado;
+    @ManyToOne @JoinColumn(name = "idArticulo")
+    private Articulo articulo;
     private int cantidad;
 
     @ManyToOne @JoinColumn(name = "idPedidoPendiente")

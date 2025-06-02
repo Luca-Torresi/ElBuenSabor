@@ -17,7 +17,7 @@ public class ControllerArticuloInsumo {
 
     //Recibe los detalles del nuevo insumo
     @PostMapping("/nuevo")
-    public void nuevoInsumo(@RequestBody NuevoArticuloInsumoDto nuevoArticuloInsumoDto){
+    public void nuevoArticuloInsumo(@RequestBody NuevoArticuloInsumoDto nuevoArticuloInsumoDto){
         serviceArticuloInsumo.cargarNuevoInsumo(nuevoArticuloInsumoDto);
     }
 

@@ -48,4 +48,10 @@ public class ControllerArticuloManufacturado {
         serviceArticuloManufacturado.actualizarArticulo(id, dto);
         return ResponseEntity.noContent().build();
     }
+
+    //Ejecuta el procedimiento almacenado de la base de datos el cual actualiza los precios de todos los artículos
+    @PostMapping("/actualizarPrecios")
+    public void actualizarPreciosArticulos(){
+
+    }
 }

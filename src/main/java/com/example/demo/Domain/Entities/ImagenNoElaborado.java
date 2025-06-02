@@ -5,22 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.time.LocalDate;
 
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
 @Entity @Table
-public class Promocion {
+public class ImagenNoElaborado {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idPromocion;
-    private String titulo;
-    private String descripcion;
-    private double descuento;
-    private LocalDate fechaInicio;
-    private LocalDate fechaFin;
+    private Long idImagenNoElaborado;
     private String url;
-
-    @ManyToOne
-    @JoinColumn(name = "idArticulo")
-    private Articulo articulo;
 }

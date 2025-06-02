@@ -9,5 +9,6 @@ import org.mapstruct.Mapping;
 public interface ManufacturadoDetalleMapper {
     @Mapping(source = "articuloInsumo.idArticuloInsumo", target = "idArticuloInsumo")
     @Mapping(source = "articuloInsumo.nombre", target = "nombreInsumo")
+    @Mapping(source = "articuloInsumo.unidadDeMedida.nombre", target = "unidadDeMedida")
     InformacionDetalleDto detalleToInformacionDetalleDto(ArticuloManufacturadoDetalle detalle);
 }

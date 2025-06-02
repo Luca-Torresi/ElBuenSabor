@@ -9,5 +9,6 @@ import lombok.NoArgsConstructor;
 public class InformacionDetalleDto {
     private Long idArticuloInsumo;
     private String nombreInsumo;
+    private String unidadDeMedida;
     private double cantidad;
 }

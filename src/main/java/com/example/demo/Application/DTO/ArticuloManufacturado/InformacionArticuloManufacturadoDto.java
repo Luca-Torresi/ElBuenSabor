@@ -13,12 +13,13 @@ public class InformacionArticuloManufacturadoDto {
     private Long idArticuloManufacturado;
     private String nombre;
     private String descripcion;
+    private double precioVenta;
+    private boolean precioModificado;
     private String receta;
     private int tiempoDeCocina;
-    private ImagenDto imagenDto;
+    private boolean dadoDeAlta;
     private Long idCategoria;
     private String nombreCategoria;
-    private double precioVenta;
-    private boolean dadoDeAlta;
+    private ImagenDto imagenDto;
     private List<InformacionDetalleDto> detalles;
 }

@@ -21,7 +21,7 @@ public class ServicePromocion {
         Promocion promocion = promocionMapper.promocionDtoToPromocion(promocionDto);
 
         ArticuloManufacturado articuloManufacturado = repoArticuloManufacturado.findById(promocionDto.getIdArticuloManufacturado()).get();
-        promocion.setArticuloManufacturado(articuloManufacturado);
+        promocion.setArticulo(articuloManufacturado);
 
         repoPromocion.save(promocion);
     }

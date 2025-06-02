@@ -25,9 +25,9 @@ public class Categoria {
 
     @OneToMany(mappedBy = "categoria")
     @JsonManagedReference
-    private List<ArticuloManufacturado> listaManufacturados;
+    private List<Articulo> articulos;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "idCategoriaPadre")
     private Categoria categoriaPadre;
 }
