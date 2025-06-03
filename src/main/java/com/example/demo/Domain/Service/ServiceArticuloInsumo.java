@@ -71,6 +71,7 @@ public class ServiceArticuloInsumo {
             InsumoDto insumoDto = InsumoDto.builder()
                     .idArticuloInsumo(insumo.getIdArticuloInsumo())
                     .nombre(insumo.getNombre())
+                    .unidadDeMedida(insumo.getUnidadDeMedida().getNombre())
                     .build();
             insumoDtos.add(insumoDto);
         }

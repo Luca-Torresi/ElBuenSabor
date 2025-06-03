@@ -8,5 +8,6 @@ import lombok.NoArgsConstructor;
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
 public class InsumoDto {
     private Long idArticuloInsumo;
+    private String unidadDeMedida;
     private String nombre;
 }
