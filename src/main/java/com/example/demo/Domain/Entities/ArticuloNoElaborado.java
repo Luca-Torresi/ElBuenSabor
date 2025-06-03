@@ -11,7 +11,7 @@ public class ArticuloNoElaborado extends Articulo {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "idImagenNoElaborado")
-    private ImagenNoElaborado imagenNoElaborado;
+    private ImagenNoElaborado imagen;
 
     private double costo;
 }

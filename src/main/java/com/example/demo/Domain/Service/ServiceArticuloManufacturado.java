@@ -2,7 +2,6 @@ package com.example.demo.Domain.Service;
 
 import com.example.demo.Application.DTO.ArticuloManufacturado.*;
 import com.example.demo.Application.DTO.Generic.AltaBajaDto;
-import com.example.demo.Application.DTO.Generic.ImagenDto;
 import com.example.demo.Application.Mapper.ImagenMapper;
 import com.example.demo.Application.Mapper.ManufacturadoMapper;
 import com.example.demo.Domain.Entities.*;
@@ -37,7 +36,7 @@ public class ServiceArticuloManufacturado {
 
         ArticuloManufacturado articuloManufacturado = manufacturadoMapper.nuevoArticuloManufacturadoDtoToArticuloManufacturado(nuevoArticulomanufacturadoDto);
         articuloManufacturado.setCategoria(categoria);
-        articuloManufacturado.setFechaBaja(nuevoArticulomanufacturadoDto.isDadoDeBaja() ? LocalDate.now() : null);
+        articuloManufacturado.setFechaBaja(nuevoArticulomanufacturadoDto.isDadoDeAlta() ? null : LocalDate.now());
 
         List<ArticuloManufacturadoDetalle> detalles = new ArrayList<>();
         for(ArticuloManufacturadoDetalleDto detalle : nuevoArticulomanufacturadoDto.getDetalles()){
@@ -69,19 +68,6 @@ public class ServiceArticuloManufacturado {
         repoArticuloManufacturado.save(articuloManufacturado);
     }
 
-    //Devuelve una lista con todos los artículos manufacturados para ser mostrados en el catálogo
-    public Page<ArticuloManufacturadoDto> listarArticulosCatalogo(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<ArticuloManufacturado> paginaArticulos = repoArticuloManufacturado.findByFechaBajaIsNull(pageable);
-
-        return paginaArticulos.map(articulo -> {
-            ArticuloManufacturadoDto dto = manufacturadoMapper.articuloManufacturadoToArticuloManufacturadoDto(articulo);
-            boolean puedeElaborarse = repoArticuloManufacturado.sePuedeElaborar(articulo.getIdArticulo());
-            dto.setPuedeElaborarse(puedeElaborarse);
-            return dto;
-        });
-    }
-
     //Devuelve las páginas con la información de los artículos manufacturados para el ABM
     public Page<InformacionArticuloManufacturadoDto> mostrarArticulosAbm(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -109,7 +95,7 @@ public class ServiceArticuloManufacturado {
 
         if (dto.getImagenDto() != null) {
             ImagenManufacturado imagenManufacturado = imagenMapper.imagenDtoToImagenManufacturado(dto.getImagenDto());
-            articulo.setImagenManufacturado(imagenManufacturado);
+            articulo.setImagen(imagenManufacturado);
         }
 
         articulo.getDetalles().clear();
@@ -131,12 +117,5 @@ public class ServiceArticuloManufacturado {
                     .setParameter("_idManufacturado", articulo.getIdArticulo())
                     .executeUpdate();
         }
-    }
-
-    //Actualiza los precios de todos los artículos manufacturados
-    @Transactional
-    public void actualizarPrecios(){
-        entityManager.createNativeQuery("CALL actualizarPreciosArticulos()")
-                .executeUpdate();
     }
 }

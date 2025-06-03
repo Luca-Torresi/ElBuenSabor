@@ -1,4 +1,4 @@
-package com.example.demo.Application.DTO.ArticuloManufacturado;
+package com.example.demo.Application.DTO.Articulo;
 
 import com.example.demo.Application.DTO.Generic.ImagenDto;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 //Contiene la información necesaria de los artículos que van a ser mostrados en el catálogo
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
-public class ArticuloManufacturadoDto {
+public class ArticuloDto {
     private Long idArticulo;
     private String nombre;
     private String descripcion;

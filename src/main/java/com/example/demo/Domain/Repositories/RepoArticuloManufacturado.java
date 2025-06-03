@@ -10,8 +10,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RepoArticuloManufacturado extends JpaRepository<ArticuloManufacturado, Long> {
-    Page<ArticuloManufacturado> findByFechaBajaIsNull(Pageable pageable);
-
-    @Query(value = "SELECT sePuedeElaborar(:_idArticulo)", nativeQuery = true)
-    boolean sePuedeElaborar(@Param("_idArticulo") Long idArticuloManufacturado);
 }

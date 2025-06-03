@@ -28,13 +28,6 @@ public class ControllerArticuloManufacturado {
         serviceArticuloManufacturado.darDeAltaBaja(altaBajaDto);
     }
 
-    //Devuelve los artículos para ser mostrados en el catálogo
-    @GetMapping("/catalogo")
-    public Page<ArticuloManufacturadoDto> mostrarArticulos(@RequestParam(defaultValue = "0") int page,
-                                                           @RequestParam(defaultValue = "9") int size){
-        return serviceArticuloManufacturado.listarArticulosCatalogo(page, size);
-    }
-
     //Lista los artículos en el ABM
     @GetMapping("/abm")
     public Page<InformacionArticuloManufacturadoDto> articulosAbm(@RequestParam(defaultValue = "0") int page,
@@ -43,15 +36,9 @@ public class ControllerArticuloManufacturado {
     }
 
     //Recibe los datos necesarios para la modificación de un artículo manufacturado
-    @PutMapping("/articulos/{id}")
+    @PutMapping("/modificar/{id}")
     public ResponseEntity<Void> actualizarArticulo(@PathVariable Long id, @RequestBody InformacionArticuloManufacturadoDto dto) {
         serviceArticuloManufacturado.actualizarArticulo(id, dto);
         return ResponseEntity.noContent().build();
-    }
-
-    //Ejecuta el procedimiento almacenado de la base de datos el cual actualiza los precios de todos los artículos
-    @PostMapping("/actualizarPrecios")
-    public void actualizarPreciosArticulos(){
-        serviceArticuloManufacturado.actualizarPrecios();
     }
 }

@@ -13,7 +13,7 @@ public class ArticuloManufacturado extends Articulo {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "idImagenManufacturado")
-    private ImagenManufacturado imagenManufacturado;
+    private ImagenManufacturado imagen;
 
     @OneToMany(mappedBy = "articuloManufacturado", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
