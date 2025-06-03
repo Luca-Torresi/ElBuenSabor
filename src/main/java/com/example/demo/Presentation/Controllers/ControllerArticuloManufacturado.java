@@ -35,7 +35,7 @@ public class ControllerArticuloManufacturado {
         return serviceArticuloManufacturado.listarArticulosCatalogo(page, size);
     }
 
-    //Lista los artículos manufacturados en el ABM
+    //Lista los artículos en el ABM
     @GetMapping("/abm")
     public Page<InformacionArticuloManufacturadoDto> articulosAbm(@RequestParam(defaultValue = "0") int page,
                                                                   @RequestParam(defaultValue = "12") int size){
@@ -52,6 +52,6 @@ public class ControllerArticuloManufacturado {
     //Ejecuta el procedimiento almacenado de la base de datos el cual actualiza los precios de todos los artículos
     @PostMapping("/actualizarPrecios")
     public void actualizarPreciosArticulos(){
-
+        serviceArticuloManufacturado.actualizarPrecios();
     }
 }

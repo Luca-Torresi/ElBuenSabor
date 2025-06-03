@@ -131,7 +131,6 @@ public class ServiceArticuloManufacturado {
                     .setParameter("_idManufacturado", articulo.getIdArticulo())
                     .executeUpdate();
         }
-
     }
 
     //Actualiza los precios de todos los artículos manufacturados
