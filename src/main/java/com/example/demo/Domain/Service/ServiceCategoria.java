@@ -25,7 +25,7 @@ public class ServiceCategoria {
 
         Categoria categoria = categoriaMapper.nuevaCategoriaDtoToCategoria(nuevaCategoriaDto);
         categoria.setCategoriaPadre(categoriaPadre);
-        categoria.setFechaBaja(nuevaCategoriaDto.isDadoDeBaja() ? null : LocalDate.now());
+        categoria.setFechaBaja(nuevaCategoriaDto.isDadoDeAlta() ? null : LocalDate.now());
 
         repoCategoria.save(categoria);
     }

@@ -94,8 +94,8 @@ public class ServiceArticuloManufacturado {
         articulo.setCategoria(categoria);
 
         if (dto.getImagenDto() != null) {
-            ImagenManufacturado imagenManufacturado = imagenMapper.imagenDtoToImagenManufacturado(dto.getImagenDto());
-            articulo.setImagen(imagenManufacturado);
+            ImagenArticulo imagen = imagenMapper.imagenDtoToImagenArticulo(dto.getImagenDto());
+            articulo.setImagen(imagen);
         }
 
         articulo.getDetalles().clear();
@@ -113,8 +113,8 @@ public class ServiceArticuloManufacturado {
         articulo = repoArticuloManufacturado.save(articulo);
 
         if(!dto.isPrecioModificado()){
-            entityManager.createNativeQuery("CALL modificarPrecioVenta(:_idManufacturado)")
-                    .setParameter("_idManufacturado", articulo.getIdArticulo())
+            entityManager.createNativeQuery("CALL modificarPrecioVenta(:_idArticulo)")
+                    .setParameter("_idArticulo", articulo.getIdArticulo())
                     .executeUpdate();
         }
     }

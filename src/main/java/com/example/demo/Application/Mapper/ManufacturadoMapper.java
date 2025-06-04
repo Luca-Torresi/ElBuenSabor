@@ -1,6 +1,5 @@
 package com.example.demo.Application.Mapper;
 
-import com.example.demo.Application.DTO.ArticuloManufacturado.ArticuloManufacturadoDto;
 import com.example.demo.Application.DTO.ArticuloManufacturado.InformacionArticuloManufacturadoDto;
 import com.example.demo.Application.DTO.ArticuloManufacturado.NuevoArticuloManufacturadoDto;
 import com.example.demo.Domain.Entities.ArticuloManufacturado;

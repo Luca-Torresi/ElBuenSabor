@@ -52,6 +52,7 @@ public class ServiceArticuloNoElaborado {
         repoArticuloNoElaborado.save(articuloNoElaborado);
     }
 
+    //Modifica un artículo no elaborado existente
     @Transactional
     public void actualizarArticulo(Long id, InformacionArticuloNoElaboradoDto dto) {
         ArticuloNoElaborado articulo = repoArticuloNoElaborado.findById(id).get();
@@ -63,15 +64,15 @@ public class ServiceArticuloNoElaborado {
         articulo.setCategoria(categoria);
 
         if (dto.getImagenDto() != null) {
-            ImagenNoElaborado imagenNoElaborado = imagenMapper.imagenDtoToImagenNoElaborado(dto.getImagenDto());
-            articulo.setImagen(imagenNoElaborado);
+            ImagenArticulo imagenArticulo = imagenMapper.imagenDtoToImagenArticulo(dto.getImagenDto());
+            articulo.setImagen(imagenArticulo);
         }
 
         articulo = repoArticuloNoElaborado.save(articulo);
 
         if(!dto.isPrecioModificado()){
-            entityManager.createNativeQuery("CALL modificarPrecioVenta(:_idManufacturado)")
-                    .setParameter("_idManufacturado", articulo.getIdArticulo())
+            entityManager.createNativeQuery("CALL modificarPrecioVenta(:_idArticulo)")
+                    .setParameter("_idArticulo", articulo.getIdArticulo())
                     .executeUpdate();
         }
     }

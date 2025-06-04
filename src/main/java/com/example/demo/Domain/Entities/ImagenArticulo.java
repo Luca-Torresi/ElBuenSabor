@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
 @Entity @Table
-public class ImagenManufacturado {
+public class ImagenArticulo {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idImagenManufacturado;
+    private Long idImagen;
     private String url;
 }

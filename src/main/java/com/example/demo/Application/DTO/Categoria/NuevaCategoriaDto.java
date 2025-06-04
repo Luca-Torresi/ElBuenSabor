@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 public class NuevaCategoriaDto {
     private String nombre;
     private double margenGanancia;
-    private boolean dadoDeBaja;
+    private boolean dadoDeAlta;
     private Long idCategoriaPadre;
     private ImagenDto imagenDto;
 }

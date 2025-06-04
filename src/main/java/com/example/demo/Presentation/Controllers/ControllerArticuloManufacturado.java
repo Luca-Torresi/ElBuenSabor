@@ -1,6 +1,5 @@
 package com.example.demo.Presentation.Controllers;
 
-import com.example.demo.Application.DTO.ArticuloManufacturado.ArticuloManufacturadoDto;
 import com.example.demo.Application.DTO.ArticuloManufacturado.InformacionArticuloManufacturadoDto;
 import com.example.demo.Application.DTO.ArticuloManufacturado.NuevoArticuloManufacturadoDto;
 import com.example.demo.Application.DTO.Generic.AltaBajaDto;

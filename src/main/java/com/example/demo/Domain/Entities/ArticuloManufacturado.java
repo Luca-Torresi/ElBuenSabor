@@ -11,10 +11,6 @@ import java.util.List;
 @Entity @Table
 public class ArticuloManufacturado extends Articulo {
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "idImagenManufacturado")
-    private ImagenManufacturado imagen;
-
     @OneToMany(mappedBy = "articuloManufacturado", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<ArticuloManufacturadoDetalle> detalles;
