@@ -8,12 +8,12 @@ import lombok.NoArgsConstructor;
 
 //Recibe la información necesaria para la creación de un nuevo artículo insumo
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
-public class NuevoArticuloInsumoDto {
+public class NuevoInsumoDto {
     private String nombre;
     private double stockActual;
     private double stockMinimo;
     private double stockMaximo;
-    private boolean dadoDeBaja;
+    private boolean dadoDeAlta;
     private Long idUnidadDeMedida;
     private Long idRubroInsumo;
     private ImagenDto imagenDto;

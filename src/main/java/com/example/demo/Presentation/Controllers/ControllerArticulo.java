@@ -4,6 +4,7 @@ import com.example.demo.Application.DTO.Articulo.ArticuloDto;
 import com.example.demo.Domain.Service.ServiceArticulo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,9 +15,17 @@ public class ControllerArticulo {
 
     //Devuelve los artículos para ser mostrados en el catálogo
     @GetMapping("/catalogo")
-    public Page<ArticuloDto> mostrarArticulos(@RequestParam(defaultValue = "0") int page,
+    public Page<ArticuloDto> mostrarArticulosCatalogo(@RequestParam(defaultValue = "0") int page,
                                               @RequestParam(defaultValue = "9") int size){
         return serviceArticulo.listarArticulosCatalogo(page, size);
+    }
+
+    //Dar de alta o baja un artículo
+    @PostMapping("/altaBaja/{idArticulo}")
+    public ResponseEntity darDeAltaBajaLogica(@PathVariable Long idArticulo) {
+        serviceArticulo.darDeAltaBaja(idArticulo);
+
+        return ResponseEntity.ok().build();
     }
 
     //Ejecuta el procedimiento almacenado de la base de datos el cual actualiza los precios de todos los artículos

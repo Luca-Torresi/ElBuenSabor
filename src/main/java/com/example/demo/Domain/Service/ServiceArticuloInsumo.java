@@ -25,31 +25,17 @@ public class ServiceArticuloInsumo {
     private final RepoRubroInsumo repoRubroInsumo;
     private final InsumoMapper insumoMapper;
 
-    //Realiza un 'insert' de los registros con el nuevo costo por cada insumo recibido
-    public void actualizarCostos(ArregloActualizacionCostoDto arregloActualizacionCostoDto){
-        for(ActualizacionCostoDto detalle: arregloActualizacionCostoDto.getDetalles()){
-            Optional<ArticuloInsumo> articuloInsumoOpt = repoArticuloInsumo.findById(detalle.getArticuloInsumo());
-
-            ActualizacionCosto actualizacionCosto = ActualizacionCosto.builder()
-                    .articuloInsumo(articuloInsumoOpt.get())
-                    .costo(detalle.getCosto())
-                    .fechaActualizacion(LocalDateTime.now())
-                    .build();
-            repoActualizacionCosto.save(actualizacionCosto);
-        }
-    }
-
     //Persiste un nuevo artículo insumo
-    public void cargarNuevoInsumo(NuevoArticuloInsumoDto nuevoArticuloInsumoDto){
-        Optional<UnidadDeMedida> unidaDeMedidaOpt = repoUnidadDeMedida.findById(nuevoArticuloInsumoDto.getIdUnidadDeMedida());
-        Optional<RubroInsumo> rubroInsumoOpt = repoRubroInsumo.findById(nuevoArticuloInsumoDto.getIdRubroInsumo());
+    public ArticuloInsumo cargarNuevoInsumo(NuevoInsumoDto nuevoInsumoDto){
+        Optional<UnidadDeMedida> unidaDeMedidaOpt = repoUnidadDeMedida.findById(nuevoInsumoDto.getIdUnidadDeMedida());
+        Optional<RubroInsumo> rubroInsumoOpt = repoRubroInsumo.findById(nuevoInsumoDto.getIdRubroInsumo());
 
-        ArticuloInsumo articuloInsumo = insumoMapper.articuloInsumoDtoToArticuloInsumo(nuevoArticuloInsumoDto);
+        ArticuloInsumo articuloInsumo = insumoMapper.articuloInsumoDtoToArticuloInsumo(nuevoInsumoDto);
         articuloInsumo.setUnidadDeMedida(unidaDeMedidaOpt.get());
         articuloInsumo.setRubroInsumo(rubroInsumoOpt.get());
-        articuloInsumo.setFechaBaja(nuevoArticuloInsumoDto.isDadoDeBaja() ? LocalDate.now() : null);
+        articuloInsumo.setFechaBaja(nuevoInsumoDto.isDadoDeAlta() ? null : LocalDate.now());
 
-        repoArticuloInsumo.save(articuloInsumo);
+        return repoArticuloInsumo.save(articuloInsumo);
     }
 
     //Para cada insumo del arreglo se suma al stock actual la cantidad ingresada
@@ -63,19 +49,25 @@ public class ServiceArticuloInsumo {
     }
 
     //Devuelve una lista con todos los nombres de los insumos
-    public List<InsumoDto> listaInsumos(){
-        List<ArticuloInsumo> articuloInsumos = repoArticuloInsumo.findAll();
+    public ArregloInsumoDto listaInsumos(){
+        List<ArticuloInsumo> articulosInsumo = repoArticuloInsumo.findAll();
 
-        List<InsumoDto> insumoDtos = new ArrayList<>();
-        for(ArticuloInsumo insumo : articuloInsumos){
+        List<InsumoDto> insumos = new ArrayList<>();
+        for(ArticuloInsumo insumo : articulosInsumo){
+            ActualizacionCosto actualizacionCosto = repoActualizacionCosto.findTopByArticuloInsumoOrderByFechaActualizacionDesc(insumo);
+
             InsumoDto insumoDto = InsumoDto.builder()
                     .idArticuloInsumo(insumo.getIdArticuloInsumo())
                     .nombre(insumo.getNombre())
                     .unidadDeMedida(insumo.getUnidadDeMedida().getNombre())
+                    .costo(actualizacionCosto.getCosto())
                     .build();
-            insumoDtos.add(insumoDto);
+            insumos.add(insumoDto);
         }
-        return insumoDtos;
+        ArregloInsumoDto arregloInsumoDto = new ArregloInsumoDto();
+        arregloInsumoDto.setInsumos(insumos);
+
+        return arregloInsumoDto;
     }
 
     //Devuelve el nombre de un artículo insumo
@@ -83,4 +75,20 @@ public class ServiceArticuloInsumo {
         ArticuloInsumo articuloInsumo = repoArticuloInsumo.findById(idArticuloInsumo).get();
         return articuloInsumo.getNombre();
     }
+
+    /*
+    //Realiza un 'insert' de los registros con el nuevo costo por cada insumo recibido
+    public void actualizarCostos(ArregloActualizacionCostoDto arregloActualizacionCostoDto){
+        for(ActualizacionCostoDto detalle: arregloActualizacionCostoDto.getDetalles()){
+            Optional<ArticuloInsumo> articuloInsumoOpt = repoArticuloInsumo.findById(detalle.getArticuloInsumo());
+
+            ActualizacionCosto actualizacionCosto = ActualizacionCosto.builder()
+                    .articuloInsumo(articuloInsumoOpt.get())
+                    .costo(detalle.getCosto())
+                    .fechaActualizacion(LocalDateTime.now())
+                    .build();
+            repoActualizacionCosto.save(actualizacionCosto);
+        }
+    }
+    */
 }

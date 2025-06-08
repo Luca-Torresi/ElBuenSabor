@@ -20,29 +20,22 @@ public class ServiceCategoria {
     private final CategoriaMapper categoriaMapper;
 
     //Persiste la nueva categoría en la base de datos
-    public void cargarNuevaCategoria(NuevaCategoriaDto nuevaCategoriaDto) {
+    public Categoria cargarNuevaCategoria(NuevaCategoriaDto nuevaCategoriaDto) {
         Categoria categoriaPadre = repoCategoria.findById(nuevaCategoriaDto.getIdCategoriaPadre()).get();
 
         Categoria categoria = categoriaMapper.nuevaCategoriaDtoToCategoria(nuevaCategoriaDto);
         categoria.setCategoriaPadre(categoriaPadre);
         categoria.setFechaBaja(nuevaCategoriaDto.isDadoDeAlta() ? null : LocalDate.now());
 
-        repoCategoria.save(categoria);
-    }
-
-    //Actualiza el margen de ganancia de la categoría correspondiente pasada como parámetro
-    public void modificarMargenGanancia(NuevoMargenGananciaDto nuevoMargenGananciaDto) {
-        Categoria categoria = repoCategoria.findById(nuevoMargenGananciaDto.getIdCategoria()).get();
-
-        categoria.setMargenGanancia(nuevoMargenGananciaDto.getMargenGanancia());
-        repoCategoria.save(categoria);
+        return repoCategoria.save(categoria);
     }
 
     //Dar de alta o baja a una categoría
-    public void darDeAltaBaja(AltaBajaDto altaBajaDto) {
-        Categoria categoria = repoCategoria.findById(altaBajaDto.getId()).get();
-
-        categoria.setFechaBaja(altaBajaDto.isDadoDeAlta() ? null : LocalDate.now());
+    public void darDeAltaBaja(Long idCategoria) {
+        Categoria categoria = repoCategoria.findById(idCategoria).get();
+        categoria.setFechaBaja(
+                categoria.getFechaBaja() != null ? null : LocalDate.now()
+        );
         repoCategoria.save(categoria);
     }
 
@@ -60,4 +53,14 @@ public class ServiceCategoria {
         Categoria categoria = repoCategoria.findById(id).get();
         return categoria.getNombre();
     }
+
+     /*
+    //Actualiza el margen de ganancia de la categoría correspondiente pasada como parámetro
+    public void modificarMargenGanancia(NuevoMargenGananciaDto nuevoMargenGananciaDto) {
+        Categoria categoria = repoCategoria.findById(nuevoMargenGananciaDto.getIdCategoria()).get();
+
+        categoria.setMargenGanancia(nuevoMargenGananciaDto.getMargenGanancia());
+        repoCategoria.save(categoria);
+    }
+    */
 }

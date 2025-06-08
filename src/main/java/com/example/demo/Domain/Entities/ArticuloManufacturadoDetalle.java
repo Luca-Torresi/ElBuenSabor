@@ -16,7 +16,7 @@ public class ArticuloManufacturadoDetalle {
     private double cantidad;
 
     @ManyToOne
-    @JoinColumn(name = "idArticuloManufacturado")
+    @JoinColumn(name = "idArticulo")
     @JsonBackReference
     private ArticuloManufacturado articuloManufacturado;
 

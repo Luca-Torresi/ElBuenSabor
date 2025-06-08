@@ -4,8 +4,10 @@ import com.example.demo.Application.DTO.Categoria.CategoriaDto;
 import com.example.demo.Application.DTO.Categoria.NuevaCategoriaDto;
 import com.example.demo.Application.DTO.Categoria.NuevoMargenGananciaDto;
 import com.example.demo.Application.DTO.Generic.AltaBajaDto;
+import com.example.demo.Domain.Entities.Categoria;
 import com.example.demo.Domain.Service.ServiceCategoria;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -17,20 +19,18 @@ public class ControllerCategoria {
 
     //Recibe la información necesaria para la creación de una nueva categoría
     @PostMapping("/nueva")
-    public void nuevaCategoria(@RequestBody NuevaCategoriaDto nuevaCategoriaDto){
-        serviceCategoria.cargarNuevaCategoria(nuevaCategoriaDto);
-    }
+    public ResponseEntity<Categoria> nuevaCategoria(@RequestBody NuevaCategoriaDto nuevaCategoriaDto){
+        Categoria categoria = serviceCategoria.cargarNuevaCategoria(nuevaCategoriaDto);
 
-    //Recibe los datos necesarios para actualizar el margen de ganancia de una categorías
-    @PostMapping("/modificarMargenGanancia")
-    public void nuevoMargen(@RequestBody NuevoMargenGananciaDto nuevoMargenGananciaDto){
-        serviceCategoria.modificarMargenGanancia(nuevoMargenGananciaDto);
+        return ResponseEntity.ok(categoria);
     }
 
     //Dar de alta o baja a una categoría
-    @PostMapping("/altaBajaLogica")
-    public void darDeAltaBajaLogica(@RequestBody AltaBajaDto altaBajaDto){
-        serviceCategoria.darDeAltaBaja(altaBajaDto);
+    @PostMapping("/altaBaja/{idCategoria}")
+    public ResponseEntity darDeAltaBajaLogica(@PathVariable Long idCategoria){
+        serviceCategoria.darDeAltaBaja(idCategoria);
+
+        return ResponseEntity.ok().build();
     }
 
     //Mostrar categorías en el catálogo
@@ -44,4 +44,12 @@ public class ControllerCategoria {
     public String buscarCategoria(@PathVariable Long idCategoria){
         return serviceCategoria.buscarCategoriaPorId(idCategoria);
     }
+
+    /*
+    //Recibe los datos necesarios para actualizar el margen de ganancia de una categorías
+    @PostMapping("/modificarMargenGanancia")
+    public void nuevoMargen(@RequestBody NuevoMargenGananciaDto nuevoMargenGananciaDto){
+        serviceCategoria.modificarMargenGanancia(nuevoMargenGananciaDto);
+    }
+    */
 }

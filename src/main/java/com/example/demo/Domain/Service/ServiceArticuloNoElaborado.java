@@ -2,7 +2,6 @@ package com.example.demo.Domain.Service;
 
 import com.example.demo.Application.DTO.ArticuloNoElaborado.InformacionArticuloNoElaboradoDto;
 import com.example.demo.Application.DTO.ArticuloNoElaborado.NuevoArticuloNoElaboradoDto;
-import com.example.demo.Application.DTO.Generic.AltaBajaDto;
 import com.example.demo.Application.Mapper.ImagenMapper;
 import com.example.demo.Application.Mapper.NoElaboradoMapper;
 import com.example.demo.Domain.Entities.*;
@@ -42,14 +41,6 @@ public class ServiceArticuloNoElaborado {
                     .setParameter("_idArticulo", articulo.getIdArticulo())
                     .executeUpdate();
         }
-    }
-
-    //Dar de alta o baja a un artículo
-    public void darDeAltaBaja(AltaBajaDto altaBajaDto) {
-        ArticuloNoElaborado articuloNoElaborado = repoArticuloNoElaborado.findById(altaBajaDto.getId()).get();
-
-        articuloNoElaborado.setFechaBaja(altaBajaDto.isDadoDeAlta() ? null : LocalDate.now());
-        repoArticuloNoElaborado.save(articuloNoElaborado);
     }
 
     //Modifica un artículo no elaborado existente

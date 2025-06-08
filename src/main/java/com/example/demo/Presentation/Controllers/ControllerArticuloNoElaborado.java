@@ -2,7 +2,6 @@ package com.example.demo.Presentation.Controllers;
 
 import com.example.demo.Application.DTO.ArticuloNoElaborado.InformacionArticuloNoElaboradoDto;
 import com.example.demo.Application.DTO.ArticuloNoElaborado.NuevoArticuloNoElaboradoDto;
-import com.example.demo.Application.DTO.Generic.AltaBajaDto;
 import com.example.demo.Domain.Service.ServiceArticuloNoElaborado;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,20 +20,14 @@ public class ControllerArticuloNoElaborado {
         serviceArticuloNoElaborado.nuevoArticulo(nuevoArticuloNoElaboradoDto);
     }
 
-    //Dar de alta o baja un artículo
-    @PostMapping("/altaBajaLogica")
-    public void darDeAltaBajaLogica(@RequestBody AltaBajaDto altaBajaDto){
-        serviceArticuloNoElaborado.darDeAltaBaja(altaBajaDto);
-    }
-
-    //Recibe los datos necesarios para la modificación de un artículo manufacturado
+    //Recibe los datos necesarios para la modificación de un artículo no elaborado
     @PutMapping("/modificar/{id}")
     public ResponseEntity<Void> actualizarArticulo(@PathVariable Long id, @RequestBody InformacionArticuloNoElaboradoDto dto) {
         serviceArticuloNoElaborado.actualizarArticulo(id, dto);
         return ResponseEntity.noContent().build();
     }
 
-    //Lista los artículos en el ABM
+    //Lista los artículos no elaborados en el ABM
     @GetMapping("/abm")
     public Page<InformacionArticuloNoElaboradoDto> articulosAbm(@RequestParam(defaultValue = "0") int page,
                                                                 @RequestParam(defaultValue = "12") int size){

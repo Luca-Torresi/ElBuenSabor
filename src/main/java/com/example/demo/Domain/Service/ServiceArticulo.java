@@ -11,13 +11,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
 public class ServiceArticulo {
-    private final EntityManager entityManager;
     private final RepoArticulo repoArticulo;
     private final ArticuloMapper articuloMapper;
+    private final EntityManager entityManager;
 
     //Devuelve una lista con todos los artículos para ser mostrados en el catálogo
     public Page<ArticuloDto> listarArticulosCatalogo(int page, int size) {
@@ -37,5 +38,14 @@ public class ServiceArticulo {
     public void actualizarPrecios(){
         entityManager.createNativeQuery("CALL actualizarPreciosArticulos()")
                 .executeUpdate();
+    }
+
+    //Dar de alta o baja a un artículo
+    public void darDeAltaBaja(Long idArticulo) {
+        Articulo articulo = repoArticulo.findById(idArticulo).get();
+        articulo.setFechaBaja(
+                articulo.getFechaBaja() != null ? null : LocalDate.now()
+        );
+        repoArticulo.save(articulo);
     }
 }

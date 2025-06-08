@@ -31,7 +31,7 @@ public class ServiceArticuloManufacturado {
 
     //Persiste en la base de datos un nuevo artículo manufacturado
     @Transactional
-    public void nuevoArticulo(NuevoArticuloManufacturadoDto nuevoArticulomanufacturadoDto) {
+    public ArticuloManufacturado nuevoArticulo(NuevoArticuloManufacturadoDto nuevoArticulomanufacturadoDto) {
         Categoria categoria = repoCategoria.findById(nuevoArticulomanufacturadoDto.getIdCategoria()).get();
 
         ArticuloManufacturado articuloManufacturado = manufacturadoMapper.nuevoArticuloManufacturadoDtoToArticuloManufacturado(nuevoArticulomanufacturadoDto);
@@ -58,14 +58,8 @@ public class ServiceArticuloManufacturado {
                     .setParameter("_idArticulo", articuloManufacturado.getIdArticulo())
                     .executeUpdate();
         }
-    }
 
-    //Dar de alta o baja a un artículo
-    public void darDeAltaBaja(AltaBajaDto altaBajaDto) {
-        ArticuloManufacturado articuloManufacturado = repoArticuloManufacturado.findById(altaBajaDto.getId()).get();
-
-        articuloManufacturado.setFechaBaja(altaBajaDto.isDadoDeAlta() ? null : LocalDate.now());
-        repoArticuloManufacturado.save(articuloManufacturado);
+        return articuloManufacturado;
     }
 
     //Devuelve las páginas con la información de los artículos manufacturados para el ABM

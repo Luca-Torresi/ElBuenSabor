@@ -3,9 +3,12 @@ package com.example.demo.Presentation.Controllers;
 import com.example.demo.Application.DTO.ArticuloManufacturado.InformacionArticuloManufacturadoDto;
 import com.example.demo.Application.DTO.ArticuloManufacturado.NuevoArticuloManufacturadoDto;
 import com.example.demo.Application.DTO.Generic.AltaBajaDto;
+import com.example.demo.Domain.Entities.Articulo;
+import com.example.demo.Domain.Entities.ArticuloManufacturado;
 import com.example.demo.Domain.Service.ServiceArticuloManufacturado;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,16 +18,12 @@ import org.springframework.web.bind.annotation.*;
 public class ControllerArticuloManufacturado {
     private final ServiceArticuloManufacturado serviceArticuloManufacturado;
 
-    //Recibe los datos necesarios para crear un nuevo artículo
+    //Recibe los datos necesarios para la creación de un nuevo artículo manufacturado
     @PostMapping("/nuevo")
-    public void nuevoArticuloManufacturado(@RequestBody NuevoArticuloManufacturadoDto nuevoArticuloManufacturadoDto) {
-        serviceArticuloManufacturado.nuevoArticulo(nuevoArticuloManufacturadoDto);
-    }
+    public ResponseEntity<ArticuloManufacturado> nuevoArticuloManufacturado(@RequestBody NuevoArticuloManufacturadoDto nuevoArticuloManufacturadoDto) {
+        ArticuloManufacturado articuloManufacturado = serviceArticuloManufacturado.nuevoArticulo(nuevoArticuloManufacturadoDto);
 
-    //Dar de alta o baja un artículo
-    @PostMapping("/altaBajaLogica")
-    public void darDeAltaBajaLogica(@RequestBody AltaBajaDto altaBajaDto){
-        serviceArticuloManufacturado.darDeAltaBaja(altaBajaDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(articuloManufacturado);
     }
 
     //Lista los artículos en el ABM
@@ -38,6 +37,7 @@ public class ControllerArticuloManufacturado {
     @PutMapping("/modificar/{id}")
     public ResponseEntity<Void> actualizarArticulo(@PathVariable Long id, @RequestBody InformacionArticuloManufacturadoDto dto) {
         serviceArticuloManufacturado.actualizarArticulo(id, dto);
+
         return ResponseEntity.noContent().build();
     }
 }

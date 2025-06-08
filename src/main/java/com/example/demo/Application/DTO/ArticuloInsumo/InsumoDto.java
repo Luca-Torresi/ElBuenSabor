@@ -10,4 +10,5 @@ public class InsumoDto {
     private Long idArticuloInsumo;
     private String unidadDeMedida;
     private String nombre;
+    private double costo;
 }

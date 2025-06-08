@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
-public class ListaInsumosDto {
+public class ArregloInsumoDto {
     private List<InsumoDto> insumos;
 }
