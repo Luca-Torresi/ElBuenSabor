@@ -4,10 +4,7 @@ import com.example.demo.Application.DTO.Generic.AltaBajaDto;
 import com.example.demo.Application.DTO.Usuario.NuevoEmpleadoDto;
 import com.example.demo.Domain.Service.ServiceEmpleado;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,8 +19,8 @@ public class ControllerEmpleado {
     }
 
     //Recibe la información para dar de alta o baja a un empleado
-    @PostMapping("/altaBajaLogica")
-    public void altaBajaLogica(@RequestBody AltaBajaDto altaBajaDto) {
-        serviceEmpleado.altaBajaEmpleado(altaBajaDto);
+    @PostMapping("/altaBaja")
+    public void altaBajaLogica(@PathVariable Long idEmpleado) {
+        serviceEmpleado.altaBajaEmpleado(idEmpleado);
     }
 }

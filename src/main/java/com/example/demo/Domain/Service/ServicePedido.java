@@ -89,7 +89,6 @@ public class ServicePedido {
         pedidoPendiente.setDetalles(detalles);
 
         PedidoPendiente nuevoPedido = repoPedidoPendiente.save(pedidoPendiente);
-
         return repoPedidoPendiente.evaluarStockParaPedido(nuevoPedido.getIdPedidoPendiente());
     }
 

@@ -10,4 +10,5 @@ import lombok.experimental.SuperBuilder;
 public class ArticuloNoElaborado extends Articulo {
 
     private double costo;
+    private int stock;
 }

@@ -23,10 +23,11 @@ public class ServiceEmpleado {
     }
 
     //Dar de alta o baja a un empleado
-    public void altaBajaEmpleado(AltaBajaDto altaBajaDto){
-        Empleado empleado = repoEmpleado.findById(altaBajaDto.getId()).get();
-
-        empleado.setFechaBaja(altaBajaDto.isDadoDeAlta() ? null : LocalDate.now());
+    public void altaBajaEmpleado(Long idEmpleado){
+        Empleado empleado = repoEmpleado.findById(idEmpleado).get();
+        empleado.setFechaBaja(
+                empleado.getFechaBaja() != null ? null : LocalDate.now()
+        );
         repoEmpleado.save(empleado);
     }
 }
