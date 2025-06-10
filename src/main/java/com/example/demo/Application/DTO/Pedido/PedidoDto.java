@@ -10,7 +10,6 @@ import java.util.List;
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
 public class PedidoDto {
     private String tipoEnvio;
-    private String estadoPedido;
     private String metodoDePago;
     private List<DetallePedidoDto> detalles;
 }

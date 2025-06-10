@@ -7,7 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.List;
 
-//Envía la información correspondiente a un artículo manufacturado para ser editado o para ver los detalles en el ABM
+//Envía y recibe la información necesaria de un artículo manufacturado para ser modificado
+//Como también para mostrar sus detalles en el ABM
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
 public class InformacionArticuloManufacturadoDto {
     private Long idArticulo;

@@ -16,6 +16,7 @@ public class DetalleFactura {
     private int cantidad;
     private double precioUnitario;
     private double subTotal;
+    private String nombreArticulo;
 
     @ManyToOne
     @JoinColumn(name = "idFactura")
