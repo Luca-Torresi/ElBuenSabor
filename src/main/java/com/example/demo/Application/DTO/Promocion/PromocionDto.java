@@ -1,5 +1,6 @@
 package com.example.demo.Application.DTO.Promocion;
 
+import com.example.demo.Application.DTO.Generic.ImagenModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,6 +15,6 @@ public class PromocionDto {
     private double descuento;
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
-    private String url;
+    private ImagenModel imagenModel;
     private Long idArticuloManufacturado;
 }

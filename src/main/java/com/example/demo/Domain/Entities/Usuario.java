@@ -20,5 +20,8 @@ public class Usuario {
     private String nombre;
     private String apellido;
     private String telefono;
-    private String urlImagen;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "idImagen")
+    private Imagen imagen;
 }

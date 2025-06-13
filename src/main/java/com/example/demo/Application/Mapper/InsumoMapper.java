@@ -7,6 +7,6 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", uses = ImagenMapper.class)
 public interface InsumoMapper {
-    @Mapping(source = "imagenDto", target = "imagenInsumo")
+    @Mapping(source = "imagenModel", target = "imagen")
     ArticuloInsumo articuloInsumoDtoToArticuloInsumo(NuevoInsumoDto nuevoInsumoDto);
 }

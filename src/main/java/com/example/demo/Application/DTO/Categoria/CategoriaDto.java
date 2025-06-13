@@ -1,6 +1,6 @@
 package com.example.demo.Application.DTO.Categoria;
 
-import com.example.demo.Application.DTO.Generic.ImagenDto;
+import com.example.demo.Application.DTO.Generic.ImagenModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,5 +11,5 @@ public class CategoriaDto {
     private Long idCategoria;
     private String nombre;
     private Long idCategoriaPadre;
-    private ImagenDto imagenDto;
+    private ImagenModel imagenModel;
 }

@@ -8,10 +8,10 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", uses = ImagenMapper.class)
 public interface CategoriaMapper {
-    @Mapping(source = "imagenDto", target = "imagenCategoria")
+    @Mapping(source = "imagenModel", target = "imagen")
     Categoria nuevaCategoriaDtoToCategoria(NuevaCategoriaDto nuevaCategoriaDto);
 
-    @Mapping(source = "imagenCategoria", target = "imagenDto")
+    @Mapping(source = "imagen", target = "imagenModel")
     @Mapping(source = "categoriaPadre.idCategoria", target = "idCategoriaPadre")
     CategoriaDto categoriaToCategoriaDto(Categoria categoria);
 }

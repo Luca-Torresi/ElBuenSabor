@@ -87,8 +87,8 @@ public class ServiceArticuloManufacturado {
         Categoria categoria = repoCategoria.findById(dto.getIdCategoria()).get();
         articulo.setCategoria(categoria);
 
-        if (dto.getImagenDto() != null) {
-            ImagenArticulo imagen = imagenMapper.imagenDtoToImagenArticulo(dto.getImagenDto());
+        if (dto.getImagenModel() != null) {
+            Imagen imagen = imagenMapper.imagenModelToImagen(dto.getImagenModel());
             articulo.setImagen(imagen);
         }
 

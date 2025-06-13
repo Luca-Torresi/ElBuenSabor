@@ -1,6 +1,6 @@
 package com.example.demo.Application.DTO.ArticuloManufacturado;
 
-import com.example.demo.Application.DTO.Generic.ImagenDto;
+import com.example.demo.Application.DTO.Generic.ImagenModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +17,6 @@ public class NuevoArticuloManufacturadoDto {
     private int tiempoDeCocina;
     private boolean dadoDeAlta;
     private Long idCategoria;
-    private ImagenDto imagenDto;
+    private ImagenModel imagenModel;
     private List<ArticuloManufacturadoDetalleDto> detalles;
 }

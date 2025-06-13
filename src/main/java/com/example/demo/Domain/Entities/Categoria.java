@@ -20,8 +20,8 @@ public class Categoria {
     private LocalDate fechaBaja;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "idImagenCategoria")
-    private ImagenCategoria imagenCategoria;
+    @JoinColumn(name = "idImagen")
+    private Imagen imagen;
 
     @OneToMany(mappedBy = "categoria")
     @JsonManagedReference

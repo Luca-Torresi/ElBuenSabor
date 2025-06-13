@@ -8,11 +8,11 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", uses = ImagenMapper.class)
 public interface NoElaboradoMapper {
-    @Mapping(source = "imagen", target = "imagenDto")
+    @Mapping(source = "imagen", target = "imagenModel")
     @Mapping(source = "categoria.idCategoria", target = "idCategoria")
     @Mapping(source = "categoria.nombre", target = "nombreCategoria")
     InformacionArticuloNoElaboradoDto articuloNoElaboradoToDto(ArticuloNoElaborado articuloNoElaborado);
 
-    @Mapping(source = "imagenDto", target = "imagen")
+    @Mapping(source = "imagenModel", target = "imagen")
     ArticuloNoElaborado nuevoArticuloNoElaboradoDtoToArticuloNoElaborado(NuevoArticuloNoElaboradoDto articuloNoElaboradoDto);
 }

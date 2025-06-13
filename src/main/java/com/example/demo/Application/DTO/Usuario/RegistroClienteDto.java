@@ -1,5 +1,6 @@
 package com.example.demo.Application.DTO.Usuario;
 
+import com.example.demo.Application.DTO.Generic.ImagenModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +12,6 @@ public class RegistroClienteDto {
     private String nombre;
     private String apellido;
     private String telefono;
-    private String urlImagen;
+    private ImagenModel imagenModel;
     private DireccionDto direccionDto;
 }

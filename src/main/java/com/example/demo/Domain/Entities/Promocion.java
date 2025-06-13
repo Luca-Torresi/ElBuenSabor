@@ -18,7 +18,10 @@ public class Promocion {
     private double descuento;
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
-    private String url;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "idImagen")
+    private Imagen imagen;
 
     @ManyToOne
     @JoinColumn(name = "idArticulo")

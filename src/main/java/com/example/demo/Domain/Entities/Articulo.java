@@ -23,7 +23,7 @@ public class Articulo {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "idImagen")
-    private ImagenArticulo imagen;
+    private Imagen imagen;
 
     @ManyToOne
     @JoinColumn(name = "idCategoria")

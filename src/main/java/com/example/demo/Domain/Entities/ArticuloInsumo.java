@@ -21,8 +21,8 @@ public class ArticuloInsumo {
     private LocalDate fechaBaja;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "idImagenInsumo")
-    private ImagenInsumo imagenInsumo;
+    @JoinColumn(name = "idImagen")
+    private Imagen imagen;
 
     @ManyToOne
     @JoinColumn(name = "idRubroInsumo")

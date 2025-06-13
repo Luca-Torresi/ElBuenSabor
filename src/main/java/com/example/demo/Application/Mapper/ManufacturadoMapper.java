@@ -8,10 +8,10 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", uses = {ImagenMapper.class, ManufacturadoDetalleMapper.class})
 public interface ManufacturadoMapper {
-    @Mapping(source = "imagenDto", target = "imagen")
+    @Mapping(source = "imagenModel", target = "imagen")
     ArticuloManufacturado nuevoArticuloManufacturadoDtoToArticuloManufacturado(NuevoArticuloManufacturadoDto nuevoArticuloManufacturadoDto);
 
-    @Mapping(source = "imagen", target = "imagenDto")
+    @Mapping(source = "imagen", target = "imagenModel")
     @Mapping(source = "categoria.idCategoria", target = "idCategoria")
     @Mapping(source = "categoria.nombre", target = "nombreCategoria")
     InformacionArticuloManufacturadoDto articuloManufacturadoToInformacionArticuloManufacturadoDto(ArticuloManufacturado articuloManufacturado);

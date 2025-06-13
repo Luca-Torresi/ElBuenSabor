@@ -54,9 +54,9 @@ public class ServiceArticuloNoElaborado {
         Categoria categoria = repoCategoria.findById(dto.getIdCategoria()).get();
         articulo.setCategoria(categoria);
 
-        if (dto.getImagenDto() != null) {
-            ImagenArticulo imagenArticulo = imagenMapper.imagenDtoToImagenArticulo(dto.getImagenDto());
-            articulo.setImagen(imagenArticulo);
+        if (dto.getImagenModel() != null) {
+            Imagen imagen = imagenMapper.imagenModelToImagen(dto.getImagenModel());
+            articulo.setImagen(imagen);
         }
 
         articulo = repoArticuloNoElaborado.save(articulo);
