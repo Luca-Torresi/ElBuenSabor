@@ -6,17 +6,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-// Recibe los datos necesarios para registrar un nuevo empleado
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class NuevoEmpleadoDto {
-    private String email;
+@Data @Builder @AllArgsConstructor @NoArgsConstructor
+public class ActualizarEmpleadoDto {
     private String nombre;
     private String apellido;
+    private String email;
     private String telefono;
-    private String password;
     private Rol rol;
     private DireccionDto direccion;
 }

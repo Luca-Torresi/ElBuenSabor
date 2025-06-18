@@ -5,12 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-//Utilizado para el registro de un nuevo cliente, como para la modificación de su dirección
-@Data @Builder @AllArgsConstructor @NoArgsConstructor
+// DTO para la dirección del empleado
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class DireccionDto {
+    private Long idDireccion;
     private String calle;
     private String numero;
-    private String piso;
-    private String dpto;
+    private String piso;    // Opcional
+    private String dpto;    // Opcional
     private Long idDepartamento;
 }
