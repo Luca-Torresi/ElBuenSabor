@@ -55,6 +55,9 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	//mercado pago
+	implementation 'com.mercadopago:sdk-java:2.4.0'
 }
 
 tasks.named('test') {
