@@ -8,6 +8,7 @@ import com.example.demo.Domain.Entities.Categoria;
 import com.example.demo.Domain.Service.ServiceCategoria;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -18,6 +19,7 @@ public class ControllerCategoria {
     private final ServiceCategoria serviceCategoria;
 
     //Recibe la información necesaria para la creación de una nueva categoría
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PostMapping("/nueva")
     public ResponseEntity<Categoria> nuevaCategoria(@RequestBody NuevaCategoriaDto nuevaCategoriaDto){
         Categoria categoria = serviceCategoria.cargarNuevaCategoria(nuevaCategoriaDto);
@@ -26,6 +28,7 @@ public class ControllerCategoria {
     }
 
     //Dar de alta o baja a una categoría
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PostMapping("/altaBaja/{idCategoria}")
     public ResponseEntity darDeAltaBajaLogica(@PathVariable Long idCategoria){
         serviceCategoria.darDeAltaBaja(idCategoria);

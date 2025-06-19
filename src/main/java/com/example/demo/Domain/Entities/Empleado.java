@@ -1,6 +1,5 @@
 package com.example.demo.Domain.Entities;
 
-import com.example.demo.Domain.Enums.Rol;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -8,22 +7,16 @@ import lombok.experimental.SuperBuilder;
 import java.time.LocalDate;
 
 @EqualsAndHashCode(callSuper = true)
-@Data
-@SuperBuilder
-@AllArgsConstructor
-@NoArgsConstructor
-@Entity
-@Table
+@Data @SuperBuilder @AllArgsConstructor @NoArgsConstructor
+@Entity @Table(name = "empleados") // <-- AGREGADO: Nombre explícito para la tabla
 public class Empleado extends Usuario {
 
-    @Enumerated(EnumType.STRING)
-    private Rol rol;
-
+    // Si 'fechaBaja' es la fecha en que el empleado *dejó de trabajar* (historial laboral), está bien aquí.
+    // Si es para la baja lógica de la cuenta de usuario, ya lo tenemos en 'activo' en Usuario.
+    @Column(name = "fecha_baja_laboral") // <-- Opcional: nombre más descriptivo si es diferente a la baja de cuenta
     private LocalDate fechaBaja;
 
-    @ManyToOne
-    @JoinColumn(name = "idDireccion")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_direccion") // <-- AGREGADO: Nombre de columna
     private Direccion direccion;
-
-    private String password;  // Agregamos password temporal asignado por el admin
 }

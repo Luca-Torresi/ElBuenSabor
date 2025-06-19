@@ -5,6 +5,7 @@ import com.example.demo.Domain.Service.ServiceArticulo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,6 +22,7 @@ public class ControllerArticulo {
     }
 
     //Dar de alta o baja un artículo
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PostMapping("/altaBaja/{idArticulo}")
     public ResponseEntity darDeAltaBajaLogica(@PathVariable Long idArticulo) {
         serviceArticulo.darDeAltaBaja(idArticulo);
@@ -29,6 +31,7 @@ public class ControllerArticulo {
     }
 
     //Ejecuta el procedimiento almacenado de la base de datos el cual actualiza los precios de todos los artículos
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PostMapping("/actualizarPrecios")
     public void actualizarPreciosArticulos(){
         serviceArticulo.actualizarPrecios();

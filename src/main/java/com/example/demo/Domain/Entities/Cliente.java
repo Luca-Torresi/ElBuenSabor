@@ -11,14 +11,14 @@ import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data @SuperBuilder @AllArgsConstructor @NoArgsConstructor
-@Entity @Table
+@Entity @Table(name = "clientes") // <-- AGREGADO: Nombre explícito para la tabla
 public class Cliente extends Usuario {
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "idDireccion")
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_direccion") // <-- AGREGADO: Nombre de columna
     private Direccion direccion;
 
-    @OneToMany(mappedBy = "cliente")
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Pedido> pedidos;
 }

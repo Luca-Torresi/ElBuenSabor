@@ -1,22 +1,24 @@
 package com.example.demo.Application.DTO.Usuario;
 
-import com.example.demo.Domain.Enums.Rol;
+// import com.example.demo.Domain.Enums.Rol; // Ya no necesario si no se usa directamente
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-// Recibe los datos necesarios para registrar un nuevo empleado
+import java.util.List;
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class NuevoEmpleadoDto {
     private String email;
+    private String password; // Para crear la cuenta en Auth0
     private String nombre;
     private String apellido;
     private String telefono;
-    private String password;
-    private Rol rol;
-    private DireccionDto direccion;
+    private String nickName; // Si lo usas en Auth0
+    private List<String> rolesAuth0Ids; // IDs de los roles en Auth0
+    private NuevaDireccionDto direccion; // Dirección para el nuevo empleado
 }

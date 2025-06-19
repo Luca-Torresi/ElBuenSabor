@@ -1,4 +1,3 @@
-// src/main/java/com/example/demo/Application/DTO/Departamento/DepartamentoDto.java
 package com.example.demo.Application.DTO.Departamento;
 
 import lombok.AllArgsConstructor;
@@ -10,8 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DepartamentoDto {
-    private Long id;
+public class NuevoDepartamentoDto {
     private String nombre;
-    private String nombreProvincia; // Este es el DTO de respuesta y sí incluye la provincia
 }
