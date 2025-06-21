@@ -18,7 +18,7 @@ public class ControllerArticuloManufacturado {
     private final ServiceArticuloManufacturado serviceArticuloManufacturado;
 
     //Recibe los datos necesarios para la creación de un nuevo artículo manufacturado
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @PostMapping("/nuevo")
     public ResponseEntity<ArticuloManufacturado> nuevoArticuloManufacturado(@RequestBody NuevoArticuloManufacturadoDto nuevoArticuloManufacturadoDto) {
         ArticuloManufacturado articuloManufacturado = serviceArticuloManufacturado.nuevoArticulo(nuevoArticuloManufacturadoDto);
@@ -27,7 +27,7 @@ public class ControllerArticuloManufacturado {
     }
 
     //Lista los artículos en el ABM
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @GetMapping("/abm")
     public Page<InformacionArticuloManufacturadoDto> articulosAbm(@RequestParam(defaultValue = "0") int page,
                                                                   @RequestParam(defaultValue = "12") int size){
@@ -35,7 +35,7 @@ public class ControllerArticuloManufacturado {
     }
 
     //Recibe los datos necesarios para la modificación de un artículo manufacturado
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @PutMapping("/modificar/{id}")
     public ResponseEntity<Void> actualizarArticulo(@PathVariable Long id, @RequestBody InformacionArticuloManufacturadoDto dto) {
         serviceArticuloManufacturado.actualizarArticulo(id, dto);

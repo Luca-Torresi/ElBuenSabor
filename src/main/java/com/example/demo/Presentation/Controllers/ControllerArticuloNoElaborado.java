@@ -16,14 +16,14 @@ public class ControllerArticuloNoElaborado {
     private final ServiceArticuloNoElaborado serviceArticuloNoElaborado;
 
     //Recibe los datos necesarios para crear un nuevo artículo
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @PostMapping("/nuevo")
     public void nuevoArticuloManufacturado(@RequestBody NuevoArticuloNoElaboradoDto nuevoArticuloNoElaboradoDto) {
         serviceArticuloNoElaborado.nuevoArticulo(nuevoArticuloNoElaboradoDto);
     }
 
     //Recibe los datos necesarios para la modificación de un artículo no elaborado
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @PutMapping("/modificar/{id}")
     public ResponseEntity<Void> actualizarArticulo(@PathVariable Long id, @RequestBody InformacionArticuloNoElaboradoDto dto) {
         serviceArticuloNoElaborado.actualizarArticulo(id, dto);
@@ -31,7 +31,7 @@ public class ControllerArticuloNoElaborado {
     }
 
     //Lista los artículos no elaborados en el ABM
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @GetMapping("/abm")
     public Page<InformacionArticuloNoElaboradoDto> articulosAbm(@RequestParam(defaultValue = "0") int page,
                                                                 @RequestParam(defaultValue = "12") int size){

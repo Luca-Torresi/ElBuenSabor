@@ -22,7 +22,7 @@ public class ControllerArticulo {
     }
 
     //Dar de alta o baja un artículo
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @PostMapping("/altaBaja/{idArticulo}")
     public ResponseEntity darDeAltaBajaLogica(@PathVariable Long idArticulo) {
         serviceArticulo.darDeAltaBaja(idArticulo);
@@ -31,7 +31,7 @@ public class ControllerArticulo {
     }
 
     //Ejecuta el procedimiento almacenado de la base de datos el cual actualiza los precios de todos los artículos
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @PostMapping("/actualizarPrecios")
     public void actualizarPreciosArticulos(){
         serviceArticulo.actualizarPrecios();

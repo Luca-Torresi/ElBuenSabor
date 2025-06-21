@@ -11,7 +11,7 @@ import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data @SuperBuilder @AllArgsConstructor @NoArgsConstructor
-@Entity @Table(name = "clientes") // <-- AGREGADO: Nombre explícito para la tabla
+@Entity // <-- AGREGADO: Nombre explícito para la tabla
 public class Cliente extends Usuario {
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)

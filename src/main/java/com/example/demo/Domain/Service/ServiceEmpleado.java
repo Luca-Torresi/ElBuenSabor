@@ -1,218 +1,148 @@
-// src/main/java/com/example/demo/Domain/Service/ServiceEmpleado.java
 package com.example.demo.Domain.Service;
 
-import com.auth0.json.mgmt.users.User;
 import com.example.demo.Application.DTO.Departamento.DepartamentoDto;
-import com.example.demo.Application.DTO.Usuario.ActualizarEmpleadoDto;
-import com.example.demo.Application.DTO.Usuario.DireccionDto;
-import com.example.demo.Application.DTO.Usuario.DireccionResponseDto;
-import com.example.demo.Application.DTO.Usuario.EmpleadoResponseDto;
-import com.example.demo.Application.DTO.Usuario.NuevoEmpleadoDto;
-import com.example.demo.Application.DTO.Usuario.NuevaDireccionDto;
-import com.example.demo.Application.DTO.Usuario.UsuarioDTO;
-import com.example.demo.Domain.Entities.Departamento;
-import com.example.demo.Domain.Entities.Direccion;
-import com.example.demo.Domain.Entities.Empleado;
-import com.example.demo.Domain.Entities.Provincia;
-import com.example.demo.Domain.Entities.Roles;
-import com.example.demo.Domain.Repositories.RepoDepartamento;
-import com.example.demo.Domain.Repositories.RepoDireccion;
-import com.example.demo.Domain.Repositories.RepoEmpleado;
-import com.example.demo.Domain.Repositories.RepoRoles;
+import com.example.demo.Application.DTO.Usuario.*;
+import com.example.demo.Domain.Entities.*;
+import com.example.demo.Domain.Repositories.*;
 import com.example.demo.Domain.Service.Auth.UserAuth0Service;
+import com.example.demo.Domain.Service.Auth.UserBBDDService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
-public class ServiceEmpleado {
+public class ServiceEmpleado extends ServiceUsuario<Empleado> {
 
     private final RepoEmpleado repoEmpleado;
-    private final RepoRoles repoRoles;
-    private final UserAuth0Service userAuth0Service;
     private final RepoDireccion repoDireccion;
     private final RepoDepartamento repoDepartamento;
 
-    @Transactional
-    public void cargarNuevoEmpleado(NuevoEmpleadoDto nuevoEmpleadoDto) {
-        String auth0UserId = null; // Variable para almacenar el ID de Auth0
-
-        try {
-            // 1. Crear usuario en Auth0
-            User auth0User = userAuth0Service.createUser(
-                    UsuarioDTO.builder()
-                            .email(nuevoEmpleadoDto.getEmail())
-                            .password(nuevoEmpleadoDto.getPassword())
-                            .nombre(nuevoEmpleadoDto.getNombre())
-                            .apellido(nuevoEmpleadoDto.getApellido())
-                            .nickName(nuevoEmpleadoDto.getNickName())
-                            .build()
-            );
-
-            auth0UserId = auth0User.getId(); // Almacenar el ID de Auth0
-
-            // 2. Asignar roles en Auth0
-            if (nuevoEmpleadoDto.getRolesAuth0Ids() != null && !nuevoEmpleadoDto.getRolesAuth0Ids().isEmpty()) {
-                userAuth0Service.assignRoles(auth0UserId, nuevoEmpleadoDto.getRolesAuth0Ids());
-            }
-
-            // 3. Obtener los objetos Roles para la base de datos local
-            Set<Roles> rolesAsignadosBD = new HashSet<>();
-            if (nuevoEmpleadoDto.getRolesAuth0Ids() != null && !nuevoEmpleadoDto.getRolesAuth0Ids().isEmpty()) {
-                rolesAsignadosBD = nuevoEmpleadoDto.getRolesAuth0Ids().stream()
-                        .map(auth0RoleId -> repoRoles.findByAuth0RoleId(auth0RoleId)
-                                .orElseThrow(() -> new RuntimeException("Rol de Auth0 no encontrado en BD local: " + auth0RoleId)))
-                        .collect(Collectors.toSet());
-            }
-
-            // --- 4. Manejar la Dirección de CREACIÓN (usa NuevaDireccionDto) ---
-            Direccion direccionEmpleado = null;
-            if (nuevoEmpleadoDto.getDireccion() != null) {
-                NuevaDireccionDto nuevaDireccionDto = nuevoEmpleadoDto.getDireccion();
-
-                if (nuevaDireccionDto.getIdDepartamento() == null) {
-                    throw new IllegalArgumentException("El ID del departamento es obligatorio para crear una nueva dirección.");
-                }
-                Departamento departamento = repoDepartamento.findById(nuevaDireccionDto.getIdDepartamento())
-                        .orElseThrow(() -> new RuntimeException("Departamento con ID " + nuevaDireccionDto.getIdDepartamento() + " no encontrado."));
-
-                direccionEmpleado = Direccion.builder()
-                        .calle(nuevaDireccionDto.getCalle())
-                        .numero(nuevaDireccionDto.getNumero())
-                        .piso(nuevaDireccionDto.getPiso())
-                        .dpto(nuevaDireccionDto.getDpto())
-                        .departamento(departamento)
-                        .build();
-                direccionEmpleado = repoDireccion.save(direccionEmpleado); // Guarda la nueva dirección
-            }
-            // ------------------------------------------------------------------
-
-            // 5. Guardar empleado en la base de datos local
-            Empleado nuevoEmpleado = Empleado.builder()
-                    .idAuth0(auth0UserId)
-                    .email(nuevoEmpleadoDto.getEmail())
-                    .nombre(nuevoEmpleadoDto.getNombre())
-                    .apellido(nuevoEmpleadoDto.getApellido())
-                    .telefono(nuevoEmpleadoDto.getTelefono())
-                    .roles(rolesAsignadosBD)
-                    .activo(true)
-                    .direccion(direccionEmpleado)
-                    .build();
-
-            repoEmpleado.save(nuevoEmpleado);
-
-        } catch (Exception e) {
-            System.err.println("Error al cargar nuevo empleado: " + e.getMessage());
-            // Si hubo un error después de crear el usuario en Auth0, intentar eliminarlo de Auth0
-            if (auth0UserId != null) {
-                try {
-                    userAuth0Service.deleteUser(auth0UserId);
-                    System.err.println("Usuario de Auth0 con ID " + auth0UserId + " eliminado debido a un error en la BD local.");
-                } catch (Exception auth0DeleteException) {
-                    System.err.println("Error crítico: No se pudo eliminar el usuario de Auth0 con ID " + auth0UserId + " después de un fallo en la BD local: " + auth0DeleteException.getMessage());
-                    // Considerar loguear esto en un sistema de monitoreo o alerta
-                }
-            }
-            throw new RuntimeException("Error al cargar nuevo empleado: " + e.getMessage(), e);
-        }
+    // Constructor inyectando repositorios y servicios, pasando a la superclase los servicios comunes
+    public ServiceEmpleado(UserAuth0Service userAuth0Service,
+                           UserBBDDService userBBDDService,
+                           RepoRoles repoRoles,
+                           RepoEmpleado repoEmpleado,
+                           RepoDireccion repoDireccion,
+                           RepoDepartamento repoDepartamento) {
+        super(userAuth0Service, userBBDDService, repoRoles);
+        this.repoEmpleado = repoEmpleado;
+        this.repoDireccion = repoDireccion;
+        this.repoDepartamento = repoDepartamento;
     }
 
+    // Método para crear empleado, reutilizando crearUsuarioDesdeDTO y agregando lógica de dirección
     @Transactional
-    public void altaBajaEmpleado(Long idEmpleado) {
-        Empleado empleado = repoEmpleado.findById(idEmpleado)
-                .orElseThrow(() -> new RuntimeException("Empleado no encontrado con ID: " + idEmpleado));
+    public Empleado cargarNuevoEmpleado(NuevoEmpleadoDto nuevoEmpleadoDto) {
+        return crearUsuarioDesdeDTO(
+                // Convertimos UsuarioDTO desde NuevoEmpleadoDto (sin dirección aún)
+                UsuarioDTO.builder()
+                        .email(nuevoEmpleadoDto.getEmail())
+                        .password(nuevoEmpleadoDto.getPassword())
+                        .nombre(nuevoEmpleadoDto.getNombre())
+                        .apellido(nuevoEmpleadoDto.getApellido())
+                        .telefono(nuevoEmpleadoDto.getTelefono())
+                        .rolesAuth0Ids(nuevoEmpleadoDto.getRolesAuth0Ids())
+                        .build(),
 
-        empleado.setActivo(!empleado.getActivo());
-        // Establece fechaBaja si se desactiva
-        if (!empleado.getActivo()) {
-            empleado.setFechaBaja(LocalDate.now());
-        } else {
-            empleado.setFechaBaja(null); // Resetea si se activa de nuevo
-        }
-        repoEmpleado.save(empleado);
+                // Factory para crear entidad Empleado a partir del DTO UsuarioDTO
+                dto -> {
+                    Empleado empleado = Empleado.builder()
+                            .email(dto.getEmail())
+                            .nombre(dto.getNombre())
+                            .apellido(dto.getApellido())
+                            .telefono(dto.getTelefono())
+                            .activo(true)
+                            .build();
 
-        try {
-            userAuth0Service.blockUser(empleado.getIdAuth0(), !empleado.getActivo());
-        } catch (Exception e) {
-            System.err.println("Error al sincronizar estado de bloqueo en Auth0 para empleado " + empleado.getIdAuth0() + ": " + e.getMessage());
-            throw new RuntimeException("Error al actualizar estado del empleado en Auth0.", e);
-        }
+                    // Manejo de dirección si viene en nuevoEmpleadoDto
+                    if (nuevoEmpleadoDto.getDireccion() != null) {
+                        NuevaDireccionDto nuevaDir = nuevoEmpleadoDto.getDireccion();
+                        if (nuevaDir.getIdDepartamento() == null) {
+                            throw new IllegalArgumentException("El ID del departamento es obligatorio para crear una nueva dirección.");
+                        }
+                        Departamento departamento = repoDepartamento.findById(nuevaDir.getIdDepartamento())
+                                .orElseThrow(() -> new RuntimeException("Departamento con ID " + nuevaDir.getIdDepartamento() + " no encontrado."));
+                        Direccion direccion = Direccion.builder()
+                                .calle(nuevaDir.getCalle())
+                                .numero(nuevaDir.getNumero())
+                                .piso(nuevaDir.getPiso())
+                                .dpto(nuevaDir.getDpto())
+                                .departamento(departamento)
+                                .build();
+                        empleado.setDireccion(repoDireccion.save(direccion));
+                    }
+                    return empleado;
+                }
+        );
     }
 
+    // Modificar empleado con DTO específico (con dirección)
     @Transactional
-    public void modificarEmpleado(Long id, ActualizarEmpleadoDto dto) {
+    public Empleado modificarEmpleado(Long id, ActualizarEmpleadoDto dto) {
         Empleado empleadoExistente = repoEmpleado.findById(id)
                 .orElseThrow(() -> new RuntimeException("Empleado no encontrado con ID: " + id));
 
-        try {
-            userAuth0Service.modifyUser(UsuarioDTO.builder()
-                    .auth0Id(empleadoExistente.getIdAuth0())
-                    .email(dto.getEmail())
-                    .nombre(dto.getNombre())
-                    .apellido(dto.getApellido())
-                    .nickName(dto.getNickName())
-                    .build());
+        // Modificar usuario básico (Auth0 y BD) usando método de la superclase
+        UsuarioDTO usuarioDto = UsuarioDTO.builder()
+                .auth0Id(empleadoExistente.getIdAuth0())
+                .email(dto.getEmail())
+                .nombre(dto.getNombre())
+                .apellido(dto.getApellido())
+                .telefono(dto.getTelefono())
+                .rolesAuth0Ids(dto.getRolesAuth0Ids())
+                .build();
 
-            if (dto.getRolesAuth0Ids() != null) {
-                userAuth0Service.updateRoles(empleadoExistente.getIdAuth0(), dto.getRolesAuth0Ids());
+        Empleado actualizado = modificarUsuario(empleadoExistente.getIdAuth0(), usuarioDto);
+
+        // Manejar actualización o reasignación de dirección
+        if (dto.getDireccion() != null) {
+            DireccionDto dirDto = dto.getDireccion();
+            if (dirDto.getIdDireccion() == null || dirDto.getIdDireccion() <= 0) {
+                throw new IllegalArgumentException("Para actualizar o reasignar una dirección, 'idDireccion' es obligatorio.");
             }
+            Direccion direccionAUsar = repoDireccion.findById(dirDto.getIdDireccion())
+                    .orElseThrow(() -> new RuntimeException("Dirección con ID " + dirDto.getIdDireccion() + " no encontrada."));
 
-            empleadoExistente.setEmail(dto.getEmail());
-            empleadoExistente.setNombre(dto.getNombre());
-            empleadoExistente.setApellido(dto.getApellido());
-            empleadoExistente.setTelefono(dto.getTelefono());
-
-            if (dto.getRolesAuth0Ids() != null) {
-                Set<Roles> nuevosRolesBD = dto.getRolesAuth0Ids().stream()
-                        .map(auth0RoleId -> repoRoles.findByAuth0RoleId(auth0RoleId)
-                                .orElseThrow(() -> new RuntimeException("Rol de Auth0 no encontrado en BD local: " + auth0RoleId)))
-                        .collect(Collectors.toSet());
-                empleadoExistente.setRoles(nuevosRolesBD);
-            }
-
-            // --- Manejar la actualización de la Dirección (usa DireccionDto para actualización) ---
-            if (dto.getDireccion() != null) {
-                DireccionDto direccionUpdateDto = dto.getDireccion();
-
-                if (direccionUpdateDto.getIdDireccion() == null || direccionUpdateDto.getIdDireccion() <= 0) {
-                    throw new IllegalArgumentException("Para actualizar o reasignar una dirección, 'idDireccion' es obligatorio en el DTO de dirección.");
-                }
-
-                Direccion direccionAUsar = repoDireccion.findById(direccionUpdateDto.getIdDireccion())
-                        .orElseThrow(() -> new RuntimeException("Dirección con ID " + direccionUpdateDto.getIdDireccion() + " no encontrada."));
-
-                if (empleadoExistente.getDireccion() != null && empleadoExistente.getDireccion().getIdDireccion().equals(direccionAUsar.getIdDireccion())) {
-                    Departamento departamento = repoDepartamento.findById(direccionUpdateDto.getIdDepartamento())
-                            .orElseThrow(() -> new RuntimeException("Departamento con ID " + direccionUpdateDto.getIdDepartamento() + " no encontrado."));
-                    empleadoExistente.getDireccion().setCalle(direccionUpdateDto.getCalle());
-                    empleadoExistente.getDireccion().setNumero(direccionUpdateDto.getNumero());
-                    empleadoExistente.getDireccion().setPiso(direccionUpdateDto.getPiso());
-                    empleadoExistente.getDireccion().setDpto(direccionUpdateDto.getDpto());
-                    empleadoExistente.getDireccion().setDepartamento(departamento);
-                    repoDireccion.save(empleadoExistente.getDireccion());
-                } else {
-                    empleadoExistente.setDireccion(direccionAUsar);
-                }
+            if (actualizado.getDireccion() != null && actualizado.getDireccion().getIdDireccion().equals(direccionAUsar.getIdDireccion())) {
+                Departamento departamento = repoDepartamento.findById(dirDto.getIdDepartamento())
+                        .orElseThrow(() -> new RuntimeException("Departamento con ID " + dirDto.getIdDepartamento() + " no encontrado."));
+                actualizado.getDireccion().setCalle(dirDto.getCalle());
+                actualizado.getDireccion().setNumero(dirDto.getNumero());
+                actualizado.getDireccion().setPiso(dirDto.getPiso());
+                actualizado.getDireccion().setDpto(dirDto.getDpto());
+                actualizado.getDireccion().setDepartamento(departamento);
+                repoDireccion.save(actualizado.getDireccion());
             } else {
-                empleadoExistente.setDireccion(null);
+                actualizado.setDireccion(direccionAUsar);
             }
-            // -------------------------------------------------------------
-
-            repoEmpleado.save(empleadoExistente);
-
-        } catch (Exception e) {
-            System.err.println("Error al modificar empleado " + id + ": " + e.getMessage());
-            throw new RuntimeException("Error al modificar empleado en Auth0 o DB.", e);
+        } else {
+            actualizado.setDireccion(null);
         }
+
+        return repoEmpleado.save(actualizado);
     }
 
+    // Alta/baja empleado con manejo de fechaBaja y sincronización Auth0
+    @Transactional
+    public void altaBajaEmpleado(Long idEmpleado) throws Exception {
+        Empleado empleado = repoEmpleado.findById(idEmpleado)
+                .orElseThrow(() -> new RuntimeException("Empleado no encontrado con ID: " + idEmpleado));
+
+        boolean nuevoEstado = !empleado.getActivo();
+        empleado.setActivo(nuevoEstado);
+        empleado.setFechaBaja(nuevoEstado ? null : LocalDate.now());
+
+        repoEmpleado.save(empleado);
+
+        // Bloquear/desbloquear usuario en Auth0 (usa método del padre)
+        userAuth0Service.blockUser(empleado.getIdAuth0(), !nuevoEstado);
+    }
+
+    // Métodos para obtener DTOs para la UI, sin tocar lógica Auth0
     public List<EmpleadoResponseDto> obtenerEmpleadosFormateados() {
         return repoEmpleado.findByActivoTrue().stream()
                 .map(this::mapToEmpleadoResponseDto)
@@ -228,10 +158,7 @@ public class ServiceEmpleado {
     private EmpleadoResponseDto mapToEmpleadoResponseDto(Empleado empleado) {
         DireccionResponseDto direccionResponseDto = null;
         if (empleado.getDireccion() != null) {
-            Direccion d = empleado.getDireccion();
-            Departamento dep = d.getDepartamento();
-            Provincia prov = (dep != null) ? dep.getProvincia() : null;
-
+            Departamento dep = empleado.getDireccion().getDepartamento();
             DepartamentoDto departamentoDto = null;
             if (dep != null) {
                 departamentoDto = DepartamentoDto.builder()
@@ -241,11 +168,11 @@ public class ServiceEmpleado {
             }
 
             direccionResponseDto = DireccionResponseDto.builder()
-                    .idDireccion(d.getIdDireccion())
-                    .calle(d.getCalle())
-                    .numero(d.getNumero())
-                    .piso(d.getPiso())
-                    .dpto(d.getDpto())
+                    .idDireccion(empleado.getDireccion().getIdDireccion())
+                    .calle(empleado.getDireccion().getCalle())
+                    .numero(empleado.getDireccion().getNumero())
+                    .piso(empleado.getDireccion().getPiso())
+                    .dpto(empleado.getDireccion().getDpto())
                     .departamento(departamentoDto)
                     .build();
         }
@@ -259,9 +186,7 @@ public class ServiceEmpleado {
                 .telefono(empleado.getTelefono())
                 .activo(empleado.getActivo())
                 .fechaBaja(empleado.getFechaBaja())
-                .roles(empleado.getRoles().stream()
-                        .map(Roles::getName)
-                        .collect(Collectors.toList()))
+                .roles(empleado.getRoles().stream().map(Roles::getName).collect(Collectors.toList()))
                 .direccion(direccionResponseDto)
                 .build();
     }

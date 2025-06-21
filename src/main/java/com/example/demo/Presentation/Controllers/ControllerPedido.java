@@ -19,14 +19,14 @@ public class ControllerPedido {
     private final ServicePedido servicePedido;
 
     //Recibe la información correspondiente a un nuevo pedido
-    @PreAuthorize("hasRole('CLIENTE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'CLIENTE')")
     @PostMapping("/nuevo")
     public String nuevoPedido(@AuthenticationPrincipal OidcUser _cliente, @RequestBody PedidoDto pedidoDto) {
         return servicePedido.generarNuevoPedido(_cliente, pedidoDto);
     }
 
     //El cliente cancela el pedido
-    @PreAuthorize("hasRole('CLIENTE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'CLIENTE')")
     @PatchMapping("/cancelado/{idPedido}")
     public ResponseEntity cancelarPedido(@PathVariable Long idPedido) {
         servicePedido.cancelarPedido(idPedido);
@@ -34,7 +34,7 @@ public class ControllerPedido {
     }
 
     //El cajero confirma el pedido y pasa al estado 'EN_PREPARACION'
-    @PreAuthorize("hasRole('CAJERO', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'CAJERO')")
     @PatchMapping("/confirmado/{idPedido}")
     public ResponseEntity confirmarPedido(@PathVariable Long idPedido) {
         servicePedido.confirmarPedido(idPedido);
@@ -42,7 +42,7 @@ public class ControllerPedido {
     }
 
     //El cajero rechaza el pedido
-    @PreAuthorize("hasRole('CAJERO', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'CAJERO')")
     @PatchMapping("/rechazado/{idPedido}")
     public ResponseEntity rechazarPedido(@PathVariable Long idPedido) {
         servicePedido.rechazarPedido(idPedido);
@@ -50,7 +50,7 @@ public class ControllerPedido {
     }
 
     //El cocinero marca el pedido como 'listo'
-    @PreAuthorize("hasRole('COCINERO', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'COCINERO')")
     @PatchMapping("/listo/{idPedido}")
     public ResponseEntity pedidoListoParaEntrega(@PathVariable Long idPedido){
         servicePedido.pedidoListo(idPedido);
@@ -58,7 +58,7 @@ public class ControllerPedido {
     }
 
     //Devuelve el historial de pedidos realizados por un cliente
-    @PreAuthorize("hasRole('CLIENTE', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'CLIENTE')")
     @GetMapping("/pedidosRealizados/{idCliente}")
     public ResponseEntity<HistorialDePedidosDto> pedidosRealizados(@PathVariable Long idCliente){
         HistorialDePedidosDto historialDePedidosDto = servicePedido.mostrarHistorialDePedidos(idCliente);

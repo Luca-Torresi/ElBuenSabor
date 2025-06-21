@@ -33,91 +33,50 @@ public class ControllerCliente {
         throw new IllegalStateException("Usuario no autenticado o ID de Auth0 no disponible.");
     }
 
-    // --- Endpoints para el Cliente Autenticado ---
-
     @PreAuthorize("hasAuthority('CLIENTE')")
     @GetMapping("/perfil")
-    public ResponseEntity<?> obtenerMiPerfil() {
-        try {
-            String auth0Id = getAuth0IdFromAuthenticatedUser();
-            Optional<Cliente> clienteOptional = serviceCliente.obtenerMiPerfil(auth0Id);
-
-            if (clienteOptional.isPresent()) {
-                return ResponseEntity.ok().body(clienteOptional.get());
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Perfil de cliente no encontrado.");
-            }
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error al obtener el perfil: " + e.getMessage());
-        }
+    public ResponseEntity<Cliente> obtenerMiPerfil() {
+        String auth0Id = getAuth0IdFromAuthenticatedUser();
+        return serviceCliente.obtenerMiPerfil(auth0Id)
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new RuntimeException("Perfil de cliente no encontrado."));
     }
 
     @PreAuthorize("hasAuthority('CLIENTE')")
     @PutMapping("/perfil")
     public ResponseEntity<Cliente> actualizarMiPerfil(@RequestBody UsuarioDTO usuarioDTO) {
-        try {
-            String auth0Id = getAuth0IdFromAuthenticatedUser();
-            Cliente clienteActualizado = serviceCliente.actualizarMiPerfil(auth0Id, usuarioDTO);
-            return ResponseEntity.ok(clienteActualizado);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
+        String auth0Id = getAuth0IdFromAuthenticatedUser();
+        Cliente clienteActualizado = serviceCliente.actualizarMiPerfil(auth0Id, usuarioDTO);
+        return ResponseEntity.ok(clienteActualizado);
     }
-
-    // --- Endpoints para el Registro de Clientes (Público, para crear cuenta inicial) ---
 
     @PostMapping("/registrar")
     public ResponseEntity<Cliente> registrarCliente(@RequestBody UsuarioDTO usuarioDTO) {
-        try {
-            if (usuarioDTO.getAuth0Id() == null || usuarioDTO.getAuth0Id().isEmpty()) {
-                return ResponseEntity.badRequest().build();
-            }
-            Cliente nuevoCliente = serviceCliente.registrarNuevoCliente(usuarioDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(nuevoCliente);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
+        if (usuarioDTO.getAuth0Id() == null || usuarioDTO.getAuth0Id().isEmpty()) {
+            throw new IllegalArgumentException("El campo auth0Id es obligatorio para registrar un cliente.");
         }
+        Cliente nuevoCliente = serviceCliente.registrarNuevoCliente(usuarioDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoCliente);
     }
-
-    // --- Endpoints para la Gestión de Clientes por un Administrador ---
 
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @GetMapping("/todos-activos")
     public ResponseEntity<List<Cliente>> obtenerTodosLosClientesActivos() {
-        List<Cliente> clientes = serviceCliente.obtenerTodosLosClientesActivos();
-        return ResponseEntity.ok(clientes);
+        return ResponseEntity.ok(serviceCliente.obtenerTodosLosClientesActivos());
     }
 
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @GetMapping("/{id}")
-    public ResponseEntity<?> obtenerClientePorId(@PathVariable Long id) {
-        Optional<Cliente> clienteOptional = serviceCliente.obtenerClientePorId(id);
-
-        if (clienteOptional.isPresent()) {
-            return ResponseEntity.ok().body(clienteOptional.get());
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cliente no encontrado.");
-        }
+    public ResponseEntity<Cliente> obtenerClientePorId(@PathVariable Long id) {
+        return serviceCliente.obtenerClientePorId(id)
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado."));
     }
 
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @PutMapping("/alta-baja-logica/{idCliente}")
     public ResponseEntity<String> altaBajaLogicaCliente(@PathVariable Long idCliente) {
-        try {
-            serviceCliente.altaBajaLogicaCliente(idCliente);
-            return ResponseEntity.ok("Estado del cliente actualizado correctamente.");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error al actualizar estado del cliente: " + e.getMessage());
-        }
+        serviceCliente.altaBajaLogicaCliente(idCliente);
+        return ResponseEntity.ok("Estado del cliente actualizado correctamente.");
     }
 }

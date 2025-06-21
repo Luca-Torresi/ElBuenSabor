@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 @EqualsAndHashCode(callSuper = true)
 @Data @SuperBuilder @AllArgsConstructor @NoArgsConstructor
-@Entity @Table(name = "empleados") // <-- AGREGADO: Nombre explícito para la tabla
+@Entity
 public class Empleado extends Usuario {
 
     // Si 'fechaBaja' es la fecha en que el empleado *dejó de trabajar* (historial laboral), está bien aquí.

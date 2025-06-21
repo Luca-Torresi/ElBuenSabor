@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data @SuperBuilder @AllArgsConstructor @NoArgsConstructor
-@Entity @Table(name = "usuarios")
+@Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Usuario {
 

@@ -16,7 +16,7 @@ public class ControllerArticuloInsumo {
     private final ServiceArticuloInsumo serviceArticuloInsumo;
 
     //Recibe los detalles para la creación de un nuevo insumo
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @PostMapping("/nuevo")
     public ResponseEntity<ArticuloInsumo> nuevoArticuloInsumo(@RequestBody NuevoInsumoDto nuevoInsumoDto){
         ArticuloInsumo articuloInsumo = serviceArticuloInsumo.cargarNuevoInsumo(nuevoInsumoDto);
@@ -25,7 +25,7 @@ public class ControllerArticuloInsumo {
     }
 
     //Recibe un arreglo con todos los insumos a recargar
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @PostMapping("/ingresoProveedor")
     public ResponseEntity ingresoInsumos(@RequestBody ArregloRecargaInsumoDto arregloRecargaInsumoDto){
         serviceArticuloInsumo.recargaDeInsumos(arregloRecargaInsumoDto);
@@ -34,7 +34,7 @@ public class ControllerArticuloInsumo {
     }
 
     //Lista todos los artículos insumo
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @GetMapping("/lista")
     public ResponseEntity<ArregloInsumoDto> listaInsumos(){
         return ResponseEntity.ok(serviceArticuloInsumo.listaInsumos());

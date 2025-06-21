@@ -16,7 +16,7 @@ public class ControllerRubroInsumo {
     private ServiceRubroInsumo serviceRubroInsumo;
 
     //Recibe los datos necesario para crear un nuevo rubro insumo
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
     @PostMapping("/nuevo")
     public void nuevoRubroInsumo(@RequestBody RubroInsumoDto rubroInsumoDto){
         serviceRubroInsumo.nuevoRubro(rubroInsumoDto);

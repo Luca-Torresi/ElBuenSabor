@@ -16,7 +16,7 @@ public class ControllerPromocion {
     private final ServicePromocion servicePromocion;
 
     //Recibe los datos necesarios para la creación de una nueva promoción
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
     @PostMapping("/nueva")
     public void crearNuevaPromocion(@RequestBody PromocionDto promocionDto) {
         servicePromocion.nuevaPromocion(promocionDto);
