@@ -1,7 +1,13 @@
 package com.example.demo.Presentation.Controllers;
 
+import com.auth0.exception.Auth0Exception;
+import com.auth0.json.mgmt.users.User;
 import com.example.demo.Application.DTO.Rol.AssingRoleDto;
+import com.example.demo.Application.DTO.Rol.Auth0RoleDto;
+import com.example.demo.Application.DTO.Rol.RoleDto;
+import com.example.demo.Application.DTO.Usuario.Auth0UsuarioDto;
 import com.example.demo.Application.DTO.Usuario.UsuarioDTO;
+import com.example.demo.Application.DTO.Usuario.UsuarioRespDto;
 import com.example.demo.Domain.Entities.Roles;
 import com.example.demo.Domain.Entities.Usuario;
 import com.example.demo.Domain.Repositories.RepoRoles;
@@ -12,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
@@ -26,23 +33,84 @@ public class ControllerUsuario {
 
     private final UserAuth0Service userAuth0Service;
     private final UserBBDDService userBBDDService;
-    private final RepoRoles rolRepository;
 
     // Endpoint para obtener todos los usuarios (solo ADMINISTRADOR)
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @GetMapping("/todos")
+    @Transactional(readOnly = true)  // Añadir esta anotación
     public ResponseEntity<?> obtenerTodos() {
         try {
-            List<Usuario> users = userBBDDService.findAll();
-            return ResponseEntity.ok(users);
+            List<Usuario> usuarios = userBBDDService.findAllUsers();
+
+            List<UsuarioRespDto> response = usuarios.stream()
+                    .map(usuario -> {
+                        UsuarioRespDto dto = new UsuarioRespDto();
+                        dto.setIdUsuario(usuario.getIdUsuario());
+                        dto.setIdAuth0(usuario.getIdAuth0());
+                        dto.setEmail(usuario.getEmail());
+                        dto.setNombre(usuario.getNombre());
+                        dto.setApellido(usuario.getApellido());
+                        dto.setTelefono(usuario.getTelefono());
+                        dto.setActivo(usuario.getActivo());
+
+                        // Convertir a un nuevo Set para evitar problemas de lazy loading
+                        Set<String> roles = new HashSet<>(usuario.getRoles().stream()
+                                .map(Roles::getName)
+                                .collect(Collectors.toSet()));
+                        dto.setRoles(roles);
+
+                        return dto;
+                    }).toList();
+
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error al obtener los usuarios: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.internalServerError()
+                    .body("Error al obtener los usuarios: " + (e.getMessage() != null ? e.getMessage() : e.toString()));
         }
     }
 
+
+
+    @GetMapping("/todosRoles")
+    // @PreAuthorize("hasAuthority('ADMINISTRADOR')") // Opcional: Proteger para que solo los admins puedan ver esto
+    public ResponseEntity<?> getAllAuth0Roles() {
+        try {
+            List<Auth0RoleDto> roles = userAuth0Service.getAllRole();
+            List<Roles> roleBD = userBBDDService.findAllRoles();
+            return ResponseEntity.ok(roleBD);
+        } catch (Auth0Exception e) {
+            // Log the exception
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al obtener roles de Auth0: " + e.getMessage());
+        }
+    }
+
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    @GetMapping("/auth0/todos")
+    public ResponseEntity<?> obtenerTodosUsuariosAuth0() {
+        try {
+            List<User> auth0Users = userAuth0Service.getAllUsers();
+
+            List<Auth0UsuarioDto> usuariosDto = auth0Users.stream()
+                    .map(user -> new Auth0UsuarioDto(
+                            user.getId(),
+                            user.getEmail(),
+                            user.getName(),
+                            user.isBlocked() != null ? user.isBlocked() : false
+                    ))
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(usuariosDto);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al obtener usuarios de Auth0: " + e.getMessage());
+        }
+    }
+
+
     // Endpoint para buscar un usuario por su ID de Auth0 (solo ADMINISTRADOR)
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    @GetMapping("/por-auth0-id/{auth0Id}")
+    @GetMapping("/{auth0Id}")
     public ResponseEntity<?> buscarPorAuth0Id(@PathVariable String auth0Id) {
         try {
             Usuario user = userBBDDService.findByIdAuth0(auth0Id);
@@ -52,81 +120,6 @@ public class ControllerUsuario {
             return ResponseEntity.ok(user);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error al buscar usuario: " + e.getMessage());
-        }
-    }
-
-    // Endpoint para crear un usuario (ej., un nuevo empleado - solo ADMINISTRADOR)
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    @PostMapping("/crear")
-    public ResponseEntity<?> crearUsuario(@RequestBody UsuarioDTO userDTO) {
-        try {
-            com.auth0.json.mgmt.users.User auth0UserResponse = userAuth0Service.createUser(userDTO);
-
-            if (userDTO.getRolesAuth0Ids() != null && !userDTO.getRolesAuth0Ids().isEmpty()) {
-                userAuth0Service.assignRoles(auth0UserResponse.getId(), userDTO.getRolesAuth0Ids());
-            }
-
-            Set<Roles> rolesAsignadosBD = new HashSet<>();
-            if (userDTO.getRolesAuth0Ids() != null && !userDTO.getRolesAuth0Ids().isEmpty()) {
-                rolesAsignadosBD = userDTO.getRolesAuth0Ids().stream()
-                        .map(idRolAuth0 -> rolRepository.findByAuth0RoleId(idRolAuth0)
-                                .orElseThrow(() -> new RuntimeException("Rol no encontrado en BD: " + idRolAuth0)))
-                        .collect(Collectors.toSet());
-            }
-
-            Usuario userBBDD = Usuario.builder()
-                    .idAuth0(auth0UserResponse.getId())
-                    .email(auth0UserResponse.getEmail())
-                    .nombre(userDTO.getNombre() != null ? userDTO.getNombre() : auth0UserResponse.getName())
-                    .apellido(userDTO.getApellido() != null ? userDTO.getApellido() : "")
-                    .telefono(userDTO.getTelefono())
-                    .roles(rolesAsignadosBD)
-                    .build();
-
-            return ResponseEntity.ok(userBBDDService.save(userBBDD));
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error al crear el usuario: " + e.getMessage());
-        }
-    }
-
-    // Endpoint para modificar un usuario (solo ADMINISTRADOR)
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    @PutMapping("/{auth0Id}/modificar")
-    public ResponseEntity<?> modificarUsuario(@PathVariable String auth0Id, @RequestBody UsuarioDTO userDTO) {
-        try {
-            if (auth0Id == null || auth0Id.isEmpty()) {
-                return ResponseEntity.badRequest().body("ID de Auth0 es requerido para modificar usuario.");
-            }
-            userDTO.setAuth0Id(auth0Id);
-
-            com.auth0.json.mgmt.users.User auth0UserUpdated = userAuth0Service.modifyUser(userDTO);
-
-            if (userDTO.getRolesAuth0Ids() != null) {
-                userAuth0Service.assignRoles(auth0UserUpdated.getId(), userDTO.getRolesAuth0Ids());
-            }
-
-            Usuario userToUpdate = userBBDDService.findByIdAuth0(auth0Id);
-            if(userToUpdate == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado en BD.");
-            }
-
-            userToUpdate.setEmail(userDTO.getEmail());
-            userToUpdate.setNombre(userDTO.getNombre());
-            userToUpdate.setApellido(userDTO.getApellido());
-            userToUpdate.setTelefono(userDTO.getTelefono());
-
-            Set<Roles> rolesAsignadosBD = new HashSet<>();
-            if (userDTO.getRolesAuth0Ids() != null && !userDTO.getRolesAuth0Ids().isEmpty()) {
-                rolesAsignadosBD = userDTO.getRolesAuth0Ids().stream()
-                        .map(idRolAuth0 -> rolRepository.findByAuth0RoleId(idRolAuth0)
-                                .orElseThrow(() -> new RuntimeException("Rol no encontrado en BD: " + idRolAuth0)))
-                        .collect(Collectors.toSet());
-            }
-            userToUpdate.setRoles(rolesAsignadosBD);
-
-            return ResponseEntity.ok(userBBDDService.save(userToUpdate));
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error al modificar usuario: " + e.getMessage());
         }
     }
 
@@ -153,93 +146,6 @@ public class ControllerUsuario {
             return ResponseEntity.ok("Usuario " + auth0Id + " eliminado físicamente.");
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error al eliminar físicamente al usuario: " + e.getMessage());
-        }
-    }
-
-    // Endpoint para agregar roles a un usuario (solo ADMINISTRADOR)
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    @PostMapping("/{auth0Id}/roles/agregar")
-    public ResponseEntity<?> agregarRoles(@PathVariable String auth0Id, @RequestBody AssingRoleDto request) {
-        try {
-            userAuth0Service.assignRoles(auth0Id, request.getRoles());
-
-            Usuario user = userBBDDService.findByIdAuth0(auth0Id);
-            if (user == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado en BD.");
-            }
-
-            Set<Roles> rolesAAgregar = request.getRoles().stream()
-                    .map(idRolAuth0 -> rolRepository.findByAuth0RoleId(idRolAuth0)
-                            .orElseThrow(() -> new RuntimeException("Rol no encontrado en BD: " + idRolAuth0)))
-                    .collect(Collectors.toSet());
-
-            user.getRoles().addAll(rolesAAgregar);
-            return ResponseEntity.ok(userBBDDService.save(user));
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error al agregar roles: " + e.getMessage());
-        }
-    }
-
-    // Endpoint para quitar roles a un usuario (solo ADMINISTRADOR)
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    @PostMapping("/{auth0Id}/roles/quitar")
-    public ResponseEntity<?> quitarRoles(@PathVariable String auth0Id, @RequestBody AssingRoleDto request) {
-        try {
-            userAuth0Service.removeRoles(auth0Id, request.getRoles());
-
-            Usuario user = userBBDDService.findByIdAuth0(auth0Id);
-            if (user == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado en BD.");
-            }
-
-            Set<Roles> rolesAEliminar = request.getRoles().stream()
-                    .map(idRolAuth0 -> rolRepository.findByAuth0RoleId(idRolAuth0)
-                            .orElseThrow(() -> new RuntimeException("Rol no encontrado en BD: " + idRolAuth0)))
-                    .collect(Collectors.toSet());
-
-            user.getRoles().removeAll(rolesAEliminar);
-            return ResponseEntity.ok(userBBDDService.save(user));
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error al quitar roles: " + e.getMessage());
-        }
-    }
-
-    // Endpoint para el auto-registro de un nuevo cliente (ACCESO PÚBLICO)
-    // No requiere @PreAuthorize porque es el punto de entrada para nuevos usuarios/clientes.
-    @PostMapping("/registrar-cliente")
-    public ResponseEntity<?> registrarCliente(@RequestBody UsuarioDTO userDTO) {
-        try {
-            Usuario existingUserBBDD = userBBDDService.findByIdAuth0(userDTO.getAuth0Id());
-            if (existingUserBBDD != null) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("El usuario ya existe en la base de datos.");
-            }
-
-            com.auth0.json.mgmt.users.User auth0User = userAuth0Service.getUserById(userDTO.getAuth0Id());
-            if(auth0User == null) {
-                return ResponseEntity.internalServerError().body("El usuario no existe en Auth0.");
-            }
-
-            Roles clienteRol = rolRepository.findByName("CLIENTE")
-                    .orElseThrow(() -> new RuntimeException("Rol CLIENTE no encontrado en BD."));
-            List<String> rolesAuth0Ids = List.of(clienteRol.getAuth0RoleId());
-
-            userAuth0Service.assignRoles(auth0User.getId(), rolesAuth0Ids);
-
-            Set<Roles> rolesParaBD = new HashSet<>();
-            rolesParaBD.add(clienteRol);
-
-            Usuario userBBDD = Usuario.builder()
-                    .idAuth0(auth0User.getId())
-                    .email(auth0User.getEmail() != null ? auth0User.getEmail() : userDTO.getEmail())
-                    .nombre(auth0User.getName() != null ? auth0User.getName() : userDTO.getNombre())
-                    .apellido(userDTO.getApellido())
-                    .telefono(userDTO.getTelefono())
-                    .roles(rolesParaBD)
-                    .build();
-
-            return ResponseEntity.ok(userBBDDService.save(userBBDD));
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error al registrar nuevo cliente: " + e.getMessage());
         }
     }
 }

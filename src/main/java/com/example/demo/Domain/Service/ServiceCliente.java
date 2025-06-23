@@ -1,6 +1,7 @@
 package com.example.demo.Domain.Service;
 
 import com.auth0.json.mgmt.users.User;
+import com.example.demo.Application.DTO.Usuario.ClienteDto;
 import com.example.demo.Application.DTO.Usuario.UsuarioDTO;
 import com.example.demo.Domain.Entities.Cliente;
 import com.example.demo.Domain.Entities.Roles;
@@ -35,35 +36,23 @@ public class ServiceCliente extends ServiceUsuario<Cliente> {
      * Aquí se maneja la asignación del rol "CLIENTE" en Auth0 y creación en BBDD local.
      */
     @Transactional
-    public Cliente registrarNuevoCliente(UsuarioDTO usuarioDTO) {
+    public Cliente registrarNuevoCliente(ClienteDto clienteDto) {
         try {
-            // Verificar existencia en Auth0
-            User auth0User = userAuth0Service.getUserById(usuarioDTO.getAuth0Id());
+            User auth0User = userAuth0Service.getUserById(clienteDto.getAuth0Id());
             if (auth0User == null) {
-                throw new RuntimeException("Usuario no encontrado en Auth0. El registro debe seguir a un signup en Auth0.");
+                throw new RuntimeException("Usuario no encontrado en Auth0.");
             }
 
-            // Obtener rol CLIENTE desde la BD local
             Roles clienteRol = repoRoles.findByName("CLIENTE")
-                    .orElseThrow(() -> new RuntimeException("Rol CLIENTE no encontrado en la base de datos local."));
+                    .orElseThrow(() -> new RuntimeException("Rol CLIENTE no encontrado."));
 
-            // Asignar rol CLIENTE en Auth0
             userAuth0Service.assignRoles(auth0User.getId(), List.of(clienteRol.getAuth0RoleId()));
 
-            // Crear el cliente usando el método genérico y una factory para inicializar campos específicos
-            return crearUsuarioDesdeDTO(usuarioDTO, dto -> {
+            return crearClienteDesdeDTO(clienteDto, dto -> {
                 Cliente c = new Cliente();
-                c.setIdAuth0(auth0User.getId());
-                c.setEmail(auth0User.getEmail() != null ? auth0User.getEmail() : dto.getEmail());
-                c.setNombre(dto.getNombre() != null ? dto.getNombre() : auth0User.getName());
-                c.setApellido(dto.getApellido());
-                c.setTelefono(dto.getTelefono());
-                c.setActivo(true);
-
-                Set<Roles> roles = new HashSet<>();
+                Set<Roles> roles = new java.util.HashSet<>();
                 roles.add(clienteRol);
                 c.setRoles(roles);
-
                 return c;
             });
 
@@ -72,10 +61,12 @@ public class ServiceCliente extends ServiceUsuario<Cliente> {
         }
     }
 
+
     /**
      * Obtener perfil del cliente por Auth0 ID.
      */
     public Optional<Cliente> obtenerMiPerfil(String auth0Id) {
+        System.out.println(auth0Id);
         return repoCliente.findByIdAuth0(auth0Id);
     }
 

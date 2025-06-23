@@ -1,5 +1,6 @@
 package com.example.demo.Presentation.Controllers;
 
+import com.example.demo.Application.DTO.Usuario.ClienteDto;
 import com.example.demo.Application.DTO.Usuario.UsuarioDTO;
 import com.example.demo.Domain.Entities.Cliente;
 import com.example.demo.Domain.Service.ServiceCliente;
@@ -35,10 +36,19 @@ public class ControllerCliente {
 
     @PreAuthorize("hasAuthority('CLIENTE')")
     @GetMapping("/perfil")
-    public ResponseEntity<Cliente> obtenerMiPerfil() {
+    public ResponseEntity<ClienteDto> obtenerMiPerfil() {
         String auth0Id = getAuth0IdFromAuthenticatedUser();
         return serviceCliente.obtenerMiPerfil(auth0Id)
-                .map(ResponseEntity::ok)
+                .map(cliente -> {
+                    ClienteDto dto = new ClienteDto();
+                    dto.setAuth0Id(cliente.getIdAuth0());
+                    dto.setNombre(cliente.getNombre());
+                    dto.setApellido(cliente.getApellido());
+                    dto.setEmail(cliente.getEmail());
+                    dto.setTelefono(cliente.getTelefono());
+                    dto.setImagen(cliente.getImagen().getUrl());
+                    return ResponseEntity.ok(dto);
+                })
                 .orElseThrow(() -> new RuntimeException("Perfil de cliente no encontrado."));
     }
 
@@ -51,11 +61,11 @@ public class ControllerCliente {
     }
 
     @PostMapping("/registrar")
-    public ResponseEntity<Cliente> registrarCliente(@RequestBody UsuarioDTO usuarioDTO) {
-        if (usuarioDTO.getAuth0Id() == null || usuarioDTO.getAuth0Id().isEmpty()) {
+    public ResponseEntity<Cliente> registrarCliente(@RequestBody ClienteDto clienteDto) {
+        if (clienteDto.getAuth0Id() == null || clienteDto.getAuth0Id().isEmpty()) {
             throw new IllegalArgumentException("El campo auth0Id es obligatorio para registrar un cliente.");
         }
-        Cliente nuevoCliente = serviceCliente.registrarNuevoCliente(usuarioDTO);
+        Cliente nuevoCliente = serviceCliente.registrarNuevoCliente(clienteDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoCliente);
     }
 

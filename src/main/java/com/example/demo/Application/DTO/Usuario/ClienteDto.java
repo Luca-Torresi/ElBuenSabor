@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor // Genera un constructor sin argumentos
 @AllArgsConstructor // Genera un constructor con todos los argumentos
 @Builder // Permite construir objetos con el patrón Builder
-public class UsuarioDTO {
+public class ClienteDto {
 
     // ID de Auth0: CRUCIAL para identificar el usuario en Auth0
     private String auth0Id;
@@ -23,14 +23,6 @@ public class UsuarioDTO {
     private String telefono;
     private String imagen; // Si manejas la URL de la imagen
 
-    // Para la creación de usuarios en Auth0 que requieren una contraseña inicial
-    // NOTA: Esta contraseña NUNCA debe ser devuelta en una respuesta.
-    private String password;
-
     // Nickname para Auth0 (opcional, si lo usas)
     private String nickName;
-
-    // IDs de los roles de Auth0 (para asignar/modificar roles)
-    private List<String> rolesAuth0Ids;
-
 }

@@ -1,6 +1,7 @@
 package com.example.demo.Domain.Service;
 
 import com.auth0.json.mgmt.users.User;
+import com.example.demo.Application.DTO.Usuario.ClienteDto;
 import com.example.demo.Application.DTO.Usuario.UsuarioDTO;
 import com.example.demo.Domain.Entities.Roles;
 import com.example.demo.Domain.Entities.Usuario;
@@ -64,6 +65,32 @@ public abstract class ServiceUsuario<T extends Usuario> {
             throw new RuntimeException("Error al crear usuario: " + e.getMessage(), e);
         }
     }
+
+    @Transactional
+    public T crearClienteDesdeDTO(ClienteDto dto, Function<ClienteDto, T> factoryEntidad) {
+        try {
+            // 1. El usuario ya está en Auth0, obtenelo
+            User auth0User = userAuth0Service.getUserById(dto.getAuth0Id());
+
+            // 2. Crear entidad específica (Cliente)
+            T nuevoUsuario = factoryEntidad.apply(dto);
+            nuevoUsuario.setIdAuth0(auth0User.getId());
+            nuevoUsuario.setEmail(auth0User.getEmail() != null ? auth0User.getEmail() : dto.getEmail());
+            nuevoUsuario.setNombre(dto.getNombre());
+            nuevoUsuario.setApellido(dto.getApellido());
+            nuevoUsuario.setTelefono(dto.getTelefono());
+            nuevoUsuario.setActivo(true); // opcional
+
+            // No se crean roles aquí, el ServiceCliente puede asignar CLIENTE si lo desea
+
+            // 3. Guardar en BD
+            return (T) userBBDDService.save(nuevoUsuario);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error al registrar cliente ya autenticado: " + e.getMessage(), e);
+        }
+    }
+
 
     /**
      * Modificar usuario tanto en Auth0 como en la base de datos.

@@ -6,6 +6,7 @@ import com.auth0.exception.Auth0Exception;
 import com.auth0.json.mgmt.Role;
 import com.auth0.json.mgmt.RolesPage;
 import com.auth0.json.mgmt.users.User;
+import com.example.demo.Application.DTO.Rol.Auth0RoleDto;
 import com.example.demo.Application.DTO.Usuario.UsuarioDTO;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +36,13 @@ public class UserAuth0Service {
         return managementAPI.users().create(user).execute();
     }
 
+    public List<Auth0RoleDto> getAllRole() throws Auth0Exception {
+        List<Role> auth0Roles = getAllAuth0Roles();
+        return auth0Roles.stream()
+                .map(role -> new Auth0RoleDto(role.getId(), role.getName()))
+                .collect(Collectors.toList());
+    }
+
     public void assignRoles(String userIdAuth0, List<String> auth0RoleIds) throws Exception {
         managementAPI.users().addRoles(userIdAuth0, auth0RoleIds).execute();
     }
@@ -54,6 +62,10 @@ public class UserAuth0Service {
 
     public User getUserById(String auth0Id) throws Exception {
         return managementAPI.users().get(auth0Id, null).execute();
+    }
+
+    public List<User> getAllUsers() throws Exception {
+        return managementAPI.users().list(null).execute().getItems();
     }
 
     public void deleteUser(String auth0Id) throws Exception {

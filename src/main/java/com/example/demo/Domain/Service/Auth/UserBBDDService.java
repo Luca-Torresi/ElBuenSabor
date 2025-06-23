@@ -25,8 +25,12 @@ public class UserBBDDService {
         this.rolRepository = rolRepository;
     }
 
-    public List<Usuario> findAll() {
-        return userRepository.findAll();
+    public List<Roles> findAllRoles() {
+        return rolRepository.findAll();
+    }
+
+    public List<Usuario> findAllUsers() {
+        return userRepository.findAllUser();
     }
 
     public Usuario findById(Long id) {

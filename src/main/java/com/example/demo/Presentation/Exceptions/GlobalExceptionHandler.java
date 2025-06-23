@@ -1,6 +1,6 @@
 package com.example.demo.Presentation.Exceptions;
 
-//import com.auth0.exception.Auth0Exception;
+import com.auth0.exception.Auth0Exception;
 import com.example.demo.Domain.Exceptions.DireccionInvalidaException;
 import com.example.demo.Domain.Exceptions.EmpleadoNotFoundException;
 import com.example.demo.Domain.Exceptions.RolNoEncontradoException;
@@ -26,29 +26,29 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
-//    @ExceptionHandler(Auth0Exception.class)
-//    public ResponseEntity<String> handleAuth0Exception(Auth0Exception ex) {
-//        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(ex.getMessage());
-//    }
+    @ExceptionHandler(Auth0Exception.class)
+    public ResponseEntity<String> handleAuth0Exception(Auth0Exception ex) {
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(ex.getMessage());
+    }
 
-//    // Errores de negocio genéricos
-//    @ExceptionHandler(RuntimeException.class)
-//    public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
-//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-//    }
-//
-//    // Errores por argumentos inválidos
-//    @ExceptionHandler(IllegalArgumentException.class)
-//    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
-//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-//    }
-//
-//    // Errores inesperados (fallback)
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<String> handleException(Exception ex) {
-//        ex.printStackTrace();
-//        return ResponseEntity
-//                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                .body("Error inesperado: " + ex.getMessage());
-//    }
+    // Errores de negocio genéricos
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    // Errores por argumentos inválidos
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    // Errores inesperados (fallback)
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleException(Exception ex) {
+        ex.printStackTrace();
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error inesperado: " + ex.getMessage());
+    }
 }

@@ -1,5 +1,6 @@
 package com.example.demo.Domain.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder; // Asegúrate de tener esta importación
@@ -29,6 +30,7 @@ public class Roles {
     private String auth0RoleId; // ID del rol en Auth0 (es una cadena larga)
 
     // Relación Many-to-Many con Usuario (asegúrate de que Usuario también tenga esta relación)
+    @JsonIgnore
     @ManyToMany(mappedBy = "roles")
     @Builder.Default // Asegura que HashSet se inicialice con el builder
     private Set<Usuario> usuarios = new HashSet<>();

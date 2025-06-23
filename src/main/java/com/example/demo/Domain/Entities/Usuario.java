@@ -40,7 +40,7 @@ public class Usuario {
     private Imagen imagen;
 
     @Column(name = "esta_activo", nullable = false)
-    @Builder.Default // <-- ¡AGREGA ESTO!
+    @Builder.Default
     private Boolean activo = Boolean.TRUE; // Campo para baja lógica de la cuenta
 
     @Column(name = "fecha_creacion", nullable = false, updatable = false)
@@ -49,13 +49,13 @@ public class Usuario {
     @Column(name = "fecha_actualizacion", nullable = false)
     private LocalDateTime fechaActualizacion;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "usuario_rol",
             joinColumns = @JoinColumn(name = "id_usuario"),
             inverseJoinColumns = @JoinColumn(name = "id_rol")
     )
-    @Builder.Default // <-- ¡AGREGA ESTO!
+    @Builder.Default
     private Set<Roles> roles = new HashSet<>();
 
     @PrePersist
