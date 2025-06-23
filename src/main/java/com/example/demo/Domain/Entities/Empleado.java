@@ -18,10 +18,9 @@ public class Empleado extends Usuario {
 
     @Enumerated(EnumType.STRING)
     private Rol rol;
-
     private LocalDate fechaBaja;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "idDireccion")
     private Direccion direccion;
 

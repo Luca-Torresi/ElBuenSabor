@@ -16,7 +16,7 @@ public class ControllerArticulo {
     //Devuelve los artículos para ser mostrados en el catálogo
     @GetMapping("/catalogo")
     public Page<ArticuloDto> mostrarArticulosCatalogo(@RequestParam(defaultValue = "0") int page,
-                                              @RequestParam(defaultValue = "9") int size){
+                                                      @RequestParam(defaultValue = "9") int size){
         return serviceArticulo.listarArticulosCatalogo(page, size);
     }
 

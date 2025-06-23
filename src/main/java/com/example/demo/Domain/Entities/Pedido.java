@@ -36,6 +36,7 @@ public class Pedido {
     @JsonBackReference
     private Cliente cliente;
 
+    /*
     @ManyToOne @JoinColumn(name = "idAdministrador")
     private Empleado administrador;
 
@@ -47,4 +48,5 @@ public class Pedido {
 
     @ManyToOne @JoinColumn(name = "idRepartidor")
     private Empleado repartidor;
+    */
 }

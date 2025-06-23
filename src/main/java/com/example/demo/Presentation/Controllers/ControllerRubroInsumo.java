@@ -1,12 +1,11 @@
 package com.example.demo.Presentation.Controllers;
 
-import com.example.demo.Application.DTO.RubroInsumo.RubroInsumoDto;
+import com.example.demo.Application.DTO.RubroInsumo.ArregloRubroInsumoDto;
+import com.example.demo.Application.DTO.RubroInsumo.NuevoRubroInsumoDto;
 import com.example.demo.Domain.Service.ServiceRubroInsumo;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,7 +15,13 @@ public class ControllerRubroInsumo {
 
     //Recibe los datos necesario para crear un nuevo rubro insumo
     @PostMapping("/nuevo")
-    public void nuevoRubroInsumo(@RequestBody RubroInsumoDto rubroInsumoDto){
-        serviceRubroInsumo.nuevoRubro(rubroInsumoDto);
+    public void nuevoRubroInsumo(@RequestBody NuevoRubroInsumoDto nuevoRubroInsumoDto){
+        serviceRubroInsumo.nuevoRubro(nuevoRubroInsumoDto);
+    }
+
+    //Devuelve una lista con los rubros
+    @GetMapping("/lista")
+    public ResponseEntity<ArregloRubroInsumoDto> listarRubros(){
+        return ResponseEntity.ok(serviceRubroInsumo.listarRubrosInsumo());
     }
 }

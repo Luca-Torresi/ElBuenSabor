@@ -1,9 +1,7 @@
 package com.example.demo.Domain.Service;
 
-import com.example.demo.Application.DTO.Pedido.CambioDeEstadoDto;
-import com.example.demo.Application.DTO.Pedido.DetallePedidoDto;
-import com.example.demo.Application.DTO.Pedido.HistorialDePedidosDto;
-import com.example.demo.Application.DTO.Pedido.PedidoDto;
+import com.example.demo.Application.DTO.Articulo.ArticuloDto;
+import com.example.demo.Application.DTO.Pedido.*;
 import com.example.demo.Application.Mapper.PedidoMapper;
 import com.example.demo.Domain.Entities.*;
 import com.example.demo.Domain.Enums.EstadoPedido;
@@ -12,6 +10,9 @@ import com.example.demo.Domain.Enums.TipoEnvio;
 import com.example.demo.Domain.Repositories.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -24,21 +25,20 @@ import java.util.Optional;
 public class ServicePedido {
     private final RepoPedido repoPedido;
     private final RepoCliente repoCliente;
-    private final RepoArticuloManufacturado repoArticuloManufacturado;
     private final RepoPedidoPendiente repoPedidoPendiente;
     private final PedidoMapper pedidoMapper;
     private final RepoArticulo repoArticulo;
 
     //Luego de evaluar si existen insumos suficientes, persiste el pedido en la base de datos
-    public String generarNuevoPedido(OidcUser _cliente, PedidoDto pedidoDto) {
-        String _faltantes = evaluarStock(pedidoDto);
+    public String generarNuevoPedido(OidcUser _cliente, NuevoPedidoDto nuevoPedidoDto) {
+        String _faltantes = evaluarStock(nuevoPedidoDto);
 
         if(_faltantes.equals("")){
 
             //String email = _cliente.getEmail();
             //Optional<Cliente> clienteOpt = repoCliente.findByEmail(email);
-            TipoEnvio tipoEnvio = TipoEnvio.valueOf(pedidoDto.getTipoEnvio());
-            MetodoDePago metodoDePago = MetodoDePago.valueOf(pedidoDto.getMetodoDePago());
+            TipoEnvio tipoEnvio = TipoEnvio.valueOf(nuevoPedidoDto.getTipoEnvio());
+            MetodoDePago metodoDePago = MetodoDePago.valueOf(nuevoPedidoDto.getMetodoDePago());
 
             Pedido pedido = Pedido.builder()
                     //.cliente(clienteOpt.get())
@@ -49,12 +49,13 @@ public class ServicePedido {
                     .build();
 
             List<DetallePedido> detalles = new ArrayList<>();
-            for(DetallePedidoDto detalle : pedidoDto.getDetalles()){
+            for(NuevoDetallePedidoDto detalle : nuevoPedidoDto.getDetalles()){
                 Optional<Articulo> articuloOpt = repoArticulo.findById(detalle.getIdArticulo());
 
                 DetallePedido detallePedido = DetallePedido.builder()
                         .articulo(articuloOpt.get())
                         .cantidad(detalle.getCantidad())
+                        .subtotal(articuloOpt.get().getPrecioVenta() * detalle.getCantidad())
                         .pedido(pedido)
                         .build();
                 detalles.add(detallePedido);
@@ -71,12 +72,12 @@ public class ServicePedido {
 
     //Evalua si hay stock suficiente para la elaboración del pedido
     @Transactional
-    public String evaluarStock(PedidoDto pedidoDto) {
+    public String evaluarStock(NuevoPedidoDto nuevoPedidoDto) {
         PedidoPendiente pedidoPendiente = PedidoPendiente.builder()
                 .build();
 
         List<DetallePedidoPendiente> detalles = new ArrayList<>();
-        for(DetallePedidoDto detalle : pedidoDto.getDetalles()){
+        for(NuevoDetallePedidoDto detalle : nuevoPedidoDto.getDetalles()){
             Optional<Articulo> articuloOpt = repoArticulo.findById(detalle.getIdArticulo());
 
             DetallePedidoPendiente detallePedidoPendiente = DetallePedidoPendiente.builder()
@@ -90,6 +91,17 @@ public class ServicePedido {
 
         PedidoPendiente nuevoPedido = repoPedidoPendiente.save(pedidoPendiente);
         return repoPedidoPendiente.evaluarStockParaPedido(nuevoPedido.getIdPedidoPendiente());
+    }
+
+    //Devuelve una lista con todos los pedidos realizados al local
+    public Page<PedidoDto> listarTodosLosPedidos(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Pedido> paginaPedidos = repoPedido.findAll(pageable);
+
+        return paginaPedidos.map(pedido -> {
+            PedidoDto dto = pedidoMapper.pedidoToPedidoDto(pedido);
+            return dto;
+        });
     }
 
     //El cliente cancela el pedido
@@ -123,12 +135,12 @@ public class ServicePedido {
     //Devuelve un arreglo con todos los pedidos realizados por el cliente
     public HistorialDePedidosDto mostrarHistorialDePedidos(Long idCliente){
         HistorialDePedidosDto historialDePedidosDto = new HistorialDePedidosDto();
-        List<PedidoDto> pedidosRealizados = new ArrayList<>();
+        List<NuevoPedidoDto> pedidosRealizados = new ArrayList<>();
 
         List<Pedido> pedidos = repoPedido.findPedidosByIdCliente(idCliente);
         for(Pedido pedido : pedidos){
-            PedidoDto pedidoDto = pedidoMapper.pedidoToPedidoDto(pedido);
-            pedidosRealizados.add(pedidoDto);
+            NuevoPedidoDto nuevoPedidoDto = pedidoMapper.pedidoToNuevoPedidoDto(pedido);
+            pedidosRealizados.add(nuevoPedidoDto);
         }
         historialDePedidosDto.setPedidos(pedidosRealizados);
 

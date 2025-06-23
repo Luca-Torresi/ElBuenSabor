@@ -5,9 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-//Detalles sobre nuevo pedido
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
 public class DetallePedidoDto {
     private Long idArticulo;
+    private String nombreArticulo;
     private int cantidad;
+    private double subtotal;
 }
