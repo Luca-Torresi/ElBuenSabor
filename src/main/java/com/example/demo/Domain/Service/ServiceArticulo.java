@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,12 +31,15 @@ public class ServiceArticulo {
 
         return paginaArticulos.map(articulo -> {
             ArticuloDto dto = articuloMapper.articuloToArticuloDto(articulo);
-            if(articulo.isEsManufacturado()){
+
+            if (articulo.isEsManufacturado()) {
                 dto.setPuedeElaborarse(repoArticulo.sePuedeElaborar(articulo.getIdArticulo()));
-            } else{
-                ArticuloNoElaborado noElaborado = repoArticuloNoElaborado.findById(articulo.getIdArticulo()).get();
-                dto.setPuedeElaborarse(noElaborado.getStock() >= 1 ? true : false);
+            } else {
+                Optional<ArticuloNoElaborado> optional = repoArticuloNoElaborado.findById(articulo.getIdArticulo());
+                boolean puedeElaborarse = optional.map(noElaborado -> noElaborado.getStock() >= 1).orElse(false);
+                dto.setPuedeElaborarse(puedeElaborarse);
             }
+
             return dto;
         });
     }
