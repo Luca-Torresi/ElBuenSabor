@@ -45,6 +45,13 @@ public class ControllerCategoria {
         return serviceCategoria.buscarCategoriaPorId(idCategoria);
     }
 
+    @PutMapping("/actualizar/{idCategoria}")
+    public ResponseEntity<Categoria> actualizarCategoria(@PathVariable Long idCategoria, @RequestBody NuevaCategoriaDto nuevaCategoriaDto) {
+        Categoria actualizada = serviceCategoria.actualizarCategoria(idCategoria, nuevaCategoriaDto);
+        return ResponseEntity.ok(actualizada);
+    }
+
+
     /*
     //Recibe los datos necesarios para actualizar el margen de ganancia de una categorías
     @PostMapping("/modificarMargenGanancia")

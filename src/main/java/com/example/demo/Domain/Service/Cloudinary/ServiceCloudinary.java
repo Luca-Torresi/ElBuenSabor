@@ -9,4 +9,5 @@ public interface ServiceCloudinary {
         return null;
     }
     public ResponseEntity<String> deleteImage(String publicId, UUID uuid);
+
 }

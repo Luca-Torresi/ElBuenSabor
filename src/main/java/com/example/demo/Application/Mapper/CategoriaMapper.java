@@ -11,7 +11,11 @@ public interface CategoriaMapper {
     @Mapping(source = "imagenModel", target = "imagen")
     Categoria nuevaCategoriaDtoToCategoria(NuevaCategoriaDto nuevaCategoriaDto);
 
+    @Mapping(source = "margenGanancia", target = "margenGanancia")
     @Mapping(source = "imagen", target = "imagenModel")
     @Mapping(source = "categoriaPadre.idCategoria", target = "idCategoriaPadre")
+    @Mapping(source = "fechaBaja", target = "fechaBaja")
     CategoriaDto categoriaToCategoriaDto(Categoria categoria);
+
+
 }
