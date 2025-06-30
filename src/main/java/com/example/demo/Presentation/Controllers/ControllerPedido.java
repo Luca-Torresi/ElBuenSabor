@@ -7,6 +7,7 @@ import com.example.demo.Domain.Service.ServicePedido;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ public class ControllerPedido {
     private final ServicePedido servicePedido;
 
     //Recibe la información correspondiente a un nuevo pedido
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'CLIENTE')")
     @PostMapping("/nuevo")
     public String nuevoPedido(@AuthenticationPrincipal OidcUser _cliente, @RequestBody NuevoPedidoDto nuevoPedidoDto) {
         return servicePedido.generarNuevoPedido(_cliente, nuevoPedidoDto);
@@ -31,34 +33,39 @@ public class ControllerPedido {
     }
 
     //El cliente cancela el pedido
-    @PutMapping("/cancelado/{idPedido}")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'CLIENTE')")
+    @PatchMapping("/cancelado/{idPedido}")
     public ResponseEntity cancelarPedido(@PathVariable Long idPedido) {
         servicePedido.cancelarPedido(idPedido);
         return ResponseEntity.ok().build();
     }
 
     //El cajero confirma el pedido y pasa al estado 'EN_PREPARACION'
-    @PutMapping("/confirmado/{idPedido}")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'CAJERO')")
+    @PatchMapping("/confirmado/{idPedido}")
     public ResponseEntity confirmarPedido(@PathVariable Long idPedido) {
         servicePedido.confirmarPedido(idPedido);
         return ResponseEntity.ok().build();
     }
 
     //El cajero rechaza el pedido
-    @PutMapping("/rechazado/{idPedido}")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'CAJERO')")
+    @PatchMapping("/rechazado/{idPedido}")
     public ResponseEntity rechazarPedido(@PathVariable Long idPedido) {
         servicePedido.rechazarPedido(idPedido);
         return ResponseEntity.ok().build();
     }
 
     //El cocinero marca el pedido como 'listo'
-    @PutMapping("/listo/{idPedido}")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'COCINERO')")
+    @PatchMapping("/listo/{idPedido}")
     public ResponseEntity pedidoListoParaEntrega(@PathVariable Long idPedido){
         servicePedido.pedidoListo(idPedido);
         return ResponseEntity.ok().build();
     }
 
     //Devuelve el historial de pedidos realizados por un cliente
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'CLIENTE')")
     @GetMapping("/pedidosRealizados/{idCliente}")
     public ResponseEntity<HistorialDePedidosDto> pedidosRealizados(@PathVariable Long idCliente){
         HistorialDePedidosDto historialDePedidosDto = servicePedido.mostrarHistorialDePedidos(idCliente);

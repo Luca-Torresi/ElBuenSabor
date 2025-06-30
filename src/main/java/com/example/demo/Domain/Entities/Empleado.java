@@ -1,6 +1,6 @@
 package com.example.demo.Domain.Entities;
 
-import com.example.demo.Domain.Enums.Rol;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -8,21 +8,13 @@ import lombok.experimental.SuperBuilder;
 import java.time.LocalDate;
 
 @EqualsAndHashCode(callSuper = true)
-@Data
-@SuperBuilder
-@AllArgsConstructor
-@NoArgsConstructor
+@Data @SuperBuilder @AllArgsConstructor @NoArgsConstructor
 @Entity
-@Table
 public class Empleado extends Usuario {
-
-    @Enumerated(EnumType.STRING)
-    private Rol rol;
     private LocalDate fechaBaja;
 
-    @OneToOne
-    @JoinColumn(name = "idDireccion")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @JoinColumn(name = "id_direccion")
     private Direccion direccion;
-
-    private String password;  // Agregamos password temporal asignado por el admin
 }

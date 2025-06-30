@@ -7,6 +7,5 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-public interface RepoImagen extends JpaRepository<Imagen, Long> {
-    void deleteById(UUID idBd);
+public interface RepoImagen extends JpaRepository<Imagen, UUID> {
 }

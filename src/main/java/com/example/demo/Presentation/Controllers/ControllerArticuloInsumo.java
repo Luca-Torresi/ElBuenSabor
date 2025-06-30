@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,6 +18,7 @@ public class ControllerArticuloInsumo {
     private final ServiceArticuloInsumo serviceArticuloInsumo;
 
     //Recibe los detalles para la creación de un nuevo insumo
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @PostMapping("/nuevo")
     public ResponseEntity<ArticuloInsumo> nuevoArticuloInsumo(@RequestBody NuevoInsumoDto nuevoInsumoDto){
         ArticuloInsumo articuloInsumo = serviceArticuloInsumo.cargarNuevoInsumo(nuevoInsumoDto);
@@ -25,6 +27,7 @@ public class ControllerArticuloInsumo {
     }
 
     //Recibe un arreglo con todos los insumos a recargar
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @PostMapping("/recargaStock")
     public ResponseEntity ingresoInsumos(@RequestBody ArregloRecargaInsumoDto arregloRecargaInsumoDto){
         serviceArticuloInsumo.recargaDeInsumos(arregloRecargaInsumoDto);
@@ -33,6 +36,7 @@ public class ControllerArticuloInsumo {
     }
 
     //Lista todos los artículos insumo
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @GetMapping("/lista")
     public ResponseEntity<ArregloInsumoDto> listaInsumos(){
         return ResponseEntity.ok(serviceArticuloInsumo.listaInsumos());
