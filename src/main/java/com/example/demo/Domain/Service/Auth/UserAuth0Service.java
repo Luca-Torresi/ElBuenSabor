@@ -18,9 +18,13 @@ public class UserAuth0Service {
 
     private final ManagementAPI managementAPI;
 
-    // Inyecta el bean de ManagementAPI que creamos en la configuración
+    private final String AUTH0_DATABASE_CONNECTION_ID = null;
+
+    // Constructor que inyecta el ManagementAPI y el Connection ID
     public UserAuth0Service(ManagementAPI managementAPI) {
         this.managementAPI = managementAPI;
+        System.out.println("DEBUG: Connection ID cargado en el constructor: [" + AUTH0_DATABASE_CONNECTION_ID + "]"); // Añade los corchetes para ver espacios
+
     }
 
 
@@ -29,7 +33,6 @@ public class UserAuth0Service {
         user.setEmail(usuarioDTO.getEmail());
         user.setPassword("GeneratedTempPassword123!"); // Auth0 puede requerir una password inicial
         user.setEmailVerified(true);
-        user.setConnection("Username-Password-Authentication"); // O tu conexión de Auth0
         user.setName(usuarioDTO.getNombre() + " " + usuarioDTO.getApellido()); // Nombre completo
         user.setNickname(usuarioDTO.getNickName());
 
@@ -122,5 +125,25 @@ public class UserAuth0Service {
         // RolesPage rolesPage = managementAPI.roles().list(new RolesFilter().withPage(0, 50)).execute();
 
         return rolesPage.getItems();
+    }
+
+    /**
+     * Actualiza la contraseña de un usuario directamente en Auth0.
+     * Esta operación es para uso administrativo o flujos controlados.
+     * El usuario NO recibe una notificación de email por defecto.
+     * @param userIdAuth0 El ID de Auth0 del usuario.
+     * @param newPassword La nueva contraseña para el usuario.
+     * @return El objeto User actualizado.
+     * @throws Auth0Exception si ocurre un error con la API de Auth0.
+     */
+    public User updatePasswordDirectly(String userIdAuth0, String newPassword) throws Auth0Exception {
+        User user = new User();
+        user.setPassword(newPassword.toCharArray());
+        user.setConnection(AUTH0_DATABASE_CONNECTION_ID);
+
+        // Puedes añadir password_verify para forzar la verificación si es un flujo de admin
+        // user.setPasswordVerify(true); // Requiere confirmación si tienes reglas de confirmación de password
+
+        return managementAPI.users().update(userIdAuth0, user).execute();
     }
 }

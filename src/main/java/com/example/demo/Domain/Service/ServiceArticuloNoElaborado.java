@@ -22,13 +22,13 @@ public class ServiceArticuloNoElaborado {
     private final RepoArticuloNoElaborado repoArticuloNoElaborado;
     private final NoElaboradoMapper noElaboradoMapper;
     private final RepoCategoria repoCategoria;
-    private final ImagenMapper imagenMapper;
     private final EntityManager entityManager;
 
     //Persiste en la base de datos un nuevo artículo manufacturado
     @Transactional
-    public void nuevoArticulo(NuevoArticuloNoElaboradoDto nuevoArticuloDto) {
-        Categoria categoria = repoCategoria.findById(nuevoArticuloDto.getIdCategoria()).get();
+    public ArticuloNoElaborado nuevoArticulo(NuevoArticuloNoElaboradoDto nuevoArticuloDto) { // <--- Ahora devuelve la entidad
+        Categoria categoria = repoCategoria.findById(nuevoArticuloDto.getIdCategoria())
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada para el artículo no elaborado"));
 
         ArticuloNoElaborado articulo = noElaboradoMapper.nuevoArticuloNoElaboradoDtoToArticuloNoElaborado(nuevoArticuloDto);
         articulo.setCategoria(categoria);
@@ -41,23 +41,22 @@ public class ServiceArticuloNoElaborado {
                     .setParameter("_idArticulo", articulo.getIdArticulo())
                     .executeUpdate();
         }
+        return articulo;
     }
 
-    //Modifica un artículo no elaborado existente
+    // Modifica un artículo no elaborado existente
     @Transactional
     public void actualizarArticulo(Long id, InformacionArticuloNoElaboradoDto dto) {
-        ArticuloNoElaborado articulo = repoArticuloNoElaborado.findById(id).get();
+        ArticuloNoElaborado articulo = repoArticuloNoElaborado.findById(id)
+                .orElseThrow(() -> new RuntimeException("Artículo no elaborado no encontrado: " + id));
 
         articulo.setNombre(dto.getNombre());
         articulo.setDescripcion(dto.getDescripcion());
+        articulo.setPrecioVenta(dto.getPrecioVenta());
 
-        Categoria categoria = repoCategoria.findById(dto.getIdCategoria()).get();
+        Categoria categoria = repoCategoria.findById(dto.getIdCategoria())
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada para el artículo no elaborado: " + dto.getIdCategoria()));
         articulo.setCategoria(categoria);
-
-        if (dto.getImagenModel() != null) {
-            Imagen imagen = imagenMapper.imagenModelToImagen(dto.getImagenModel());
-            articulo.setImagen(imagen);
-        }
 
         articulo = repoArticuloNoElaborado.save(articulo);
 

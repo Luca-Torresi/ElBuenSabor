@@ -5,14 +5,12 @@ import lombok.Builder;             // Para usar el patrón Builder
 import lombok.Data;                // Para getters, setters, toString, equals, hashCode
 import lombok.NoArgsConstructor;   // Para un constructor sin argumentos
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ClienteDto {
-    private long idUsuario;
+public class ClienteRegistroDto {
+
     private String auth0Id;
 
     private String email;

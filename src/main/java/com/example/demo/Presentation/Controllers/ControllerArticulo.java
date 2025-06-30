@@ -2,17 +2,23 @@ package com.example.demo.Presentation.Controllers;
 
 import com.example.demo.Application.DTO.Articulo.ArticuloDto;
 import com.example.demo.Domain.Service.ServiceArticulo;
+import com.example.demo.Domain.Service.ServiceImagen;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/articulo")
 public class ControllerArticulo {
     private final ServiceArticulo serviceArticulo;
+    private final ServiceImagen serviceImagen;
 
     //Devuelve los artículos para ser mostrados en el catálogo
     @GetMapping("/catalogo")
@@ -35,5 +41,29 @@ public class ControllerArticulo {
     @PostMapping("/actualizarPrecios")
     public void actualizarPreciosArticulos(){
         serviceArticulo.actualizarPrecios();
+    }
+
+    /**
+     * Endpoint para cargar la imagen de un artículo existente.
+     * Requiere el ID del artículo como PathVariable.
+     * Solo para roles con permiso (ej. 'ADMINISTRADOR').
+     */
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'COCINERO')") // Ajusta los roles según tu lógica
+    @PostMapping(value = "/{id}/imagen/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Map<String, String>> uploadArticleImage(
+            @PathVariable("id") Long idArticulo,
+            @RequestParam("file") MultipartFile file) {
+        return serviceImagen.uploadArticleImage(file, idArticulo);
+    }
+
+    /**
+     * Endpoint para eliminar la imagen de un artículo existente.
+     * Requiere el ID del artículo como PathVariable.
+     * Solo para roles con permiso (ej. 'ADMINISTRADOR').
+     */
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'COCINERO')") // Ajusta los roles según tu lógica
+    @DeleteMapping("/{id}/imagen/delete")
+    public ResponseEntity<String> deleteArticleImage(@PathVariable("id") Long idArticulo) {
+        return serviceImagen.deleteArticleImage(idArticulo);
     }
 }

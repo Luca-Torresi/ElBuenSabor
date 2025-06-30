@@ -1,6 +1,8 @@
 package com.example.demo.Domain.Repositories;
 
 import com.example.demo.Application.DTO.Usuario.UsuarioRespDto;
+import com.example.demo.Domain.Entities.Articulo;
+import com.example.demo.Domain.Entities.Imagen;
 import com.example.demo.Domain.Entities.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,4 +18,6 @@ public interface RepoUsuario extends JpaRepository<Usuario, Long> {
 
     @Query("SELECT DISTINCT u FROM Usuario u LEFT JOIN FETCH u.roles WHERE u.activo = true")
     List<Usuario> findAllUser();
+
+    Optional<Usuario> findByImagen(Imagen imagen);
 }

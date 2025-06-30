@@ -7,12 +7,13 @@ import com.example.demo.Domain.Entities.ArticuloNoElaborado;
 import com.example.demo.Domain.Repositories.RepoArticulo;
 import com.example.demo.Domain.Repositories.RepoArticuloNoElaborado;
 import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -24,6 +25,7 @@ public class ServiceArticulo {
     private final EntityManager entityManager;
     private final RepoArticuloNoElaborado repoArticuloNoElaborado;
 
+    @Transactional(readOnly = true)
     public Page<ArticuloDto> listarArticulosCatalogo(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Articulo> paginaArticulos = repoArticulo.findByFechaBajaIsNull(pageable);
@@ -52,6 +54,7 @@ public class ServiceArticulo {
     }
 
     //Dar de alta o baja a un artículo
+    @Transactional
     public void darDeAltaBaja(Long idArticulo) {
         Articulo articulo = repoArticulo.findById(idArticulo).get();
         articulo.setFechaBaja(

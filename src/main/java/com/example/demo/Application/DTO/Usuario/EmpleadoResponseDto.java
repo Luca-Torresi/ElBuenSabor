@@ -16,7 +16,7 @@ import java.util.List; // <--- Para manejar múltiples roles como Strings
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
 public class EmpleadoResponseDto {
     private Long idUsuario;
-    private String auth0Id; // <-- AGREGADO: Es útil tener el ID de Auth0 en la respuesta.
+    private String auth0Id;
     private String nombre;
     private String apellido;
     private String email;
@@ -25,6 +25,8 @@ public class EmpleadoResponseDto {
     private Boolean activo;
     private String telefono;
     private LocalDate fechaBaja;
+
+    private String imagen;
 
     private DireccionResponseDto direccion;
 

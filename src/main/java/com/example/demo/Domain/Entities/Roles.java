@@ -2,10 +2,7 @@ package com.example.demo.Domain.Entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder; // Asegúrate de tener esta importación
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 // import lombok.experimental.SuperBuilder; // <-- Generalmente no es necesario si Roles no es padre de otras entidades
 
 import java.util.HashSet;
@@ -31,7 +28,9 @@ public class Roles {
 
     // Relación Many-to-Many con Usuario (asegúrate de que Usuario también tenga esta relación)
     @JsonIgnore
-    @ManyToMany(mappedBy = "roles")
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @Builder.Default // Asegura que HashSet se inicialice con el builder
     private Set<Usuario> usuarios = new HashSet<>();
 }

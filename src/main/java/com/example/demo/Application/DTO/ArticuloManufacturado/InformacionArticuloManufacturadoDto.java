@@ -21,6 +21,6 @@ public class InformacionArticuloManufacturadoDto {
     private boolean dadoDeAlta;
     private Long idCategoria;
     private String nombreCategoria;
-    private ImagenModel imagenModel;
+    private String imagenUrl;
     private List<InformacionDetalleDto> detalles;
 }

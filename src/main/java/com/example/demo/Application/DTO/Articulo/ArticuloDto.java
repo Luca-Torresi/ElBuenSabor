@@ -15,6 +15,6 @@ public class ArticuloDto {
     private double precioVenta;
     private int tiempoDeCocina;
     private Long idCategoria;
-    private ImagenModel imagenModel;
+    private String imagenModel;
     private boolean puedeElaborarse;
 }

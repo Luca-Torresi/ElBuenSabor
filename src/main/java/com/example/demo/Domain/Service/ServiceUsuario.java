@@ -1,17 +1,19 @@
 package com.example.demo.Domain.Service;
 
 import com.auth0.json.mgmt.users.User;
-import com.example.demo.Application.DTO.Usuario.ClienteDto;
+import com.example.demo.Application.DTO.Usuario.ClienteRegistroDto;
 import com.example.demo.Application.DTO.Usuario.UsuarioDTO;
+import com.example.demo.Domain.Entities.Imagen;
 import com.example.demo.Domain.Entities.Roles;
 import com.example.demo.Domain.Entities.Usuario;
+import com.example.demo.Domain.Repositories.RepoImagen;
 import com.example.demo.Domain.Repositories.RepoRoles;
 import com.example.demo.Domain.Service.Auth.UserAuth0Service;
 import com.example.demo.Domain.Service.Auth.UserBBDDService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -26,6 +28,7 @@ public abstract class ServiceUsuario<T extends Usuario> {
     protected final UserAuth0Service userAuth0Service;
     protected final UserBBDDService userBBDDService;
     protected final RepoRoles repoRoles;
+    protected final RepoImagen repoImagen;
 
     /**
      * Crear usuario en Auth0, asignar roles y luego persistirlo en BBDD usando una factory.
@@ -67,10 +70,13 @@ public abstract class ServiceUsuario<T extends Usuario> {
     }
 
     @Transactional
-    public T crearClienteDesdeDTO(ClienteDto dto, Function<ClienteDto, T> factoryEntidad) {
+    public T crearClienteDesdeDTO(ClienteRegistroDto dto, Function<ClienteRegistroDto, T> factoryEntidad) {
         try {
             // 1. El usuario ya está en Auth0, obtenelo
             User auth0User = userAuth0Service.getUserById(dto.getAuth0Id());
+            if (auth0User == null) {
+                throw new RuntimeException("Usuario no encontrado en Auth0.");
+            }
 
             // 2. Crear entidad específica (Cliente)
             T nuevoUsuario = factoryEntidad.apply(dto);
@@ -81,15 +87,44 @@ public abstract class ServiceUsuario<T extends Usuario> {
             nuevoUsuario.setTelefono(dto.getTelefono());
             nuevoUsuario.setActivo(true); // opcional
 
-            // No se crean roles aquí, el ServiceCliente puede asignar CLIENTE si lo desea
+            // Lógica clave para la imagen de Auth0
+            Imagen imagen = null;
+            String auth0PictureUrl = auth0User.getPicture(); // URL de la imagen de Auth0
+            String dtoImageUrl = dto.getImagen(); // URL que podría venir del frontend en el DTO
 
-            // 3. Guardar en BD
+            if (auth0PictureUrl != null && !auth0PictureUrl.isEmpty()) {
+                imagen = Imagen.builder()
+                        .url(auth0PictureUrl)
+                        .name(dto.getAuth0Id() + "_auth0_profile") // Un nombre descriptivo
+                        .publicId("auth0_" + dto.getAuth0Id())
+                        .build();
+            } else if (dtoImageUrl != null && !dtoImageUrl.isEmpty()) {
+                // Si Auth0 no dio imagen, pero el DTO la incluye (ej. por un valor por defecto del frontend)
+                imagen = Imagen.builder()
+                        .url(dtoImageUrl)
+                        .name(dto.getAuth0Id() + "_default_profile")
+                        .build();
+            }
+
+            if (imagen != null) {
+                imagen = repoImagen.save(imagen);
+                nuevoUsuario.setImagen(imagen);
+            }
+
+            // Asigna fechas (si no lo hace @PrePersist en Usuario)
+            if (nuevoUsuario.getFechaCreacion() == null) {
+                nuevoUsuario.setFechaCreacion(LocalDateTime.now());
+            }
+            nuevoUsuario.setFechaActualizacion(LocalDateTime.now());
+
             return (T) userBBDDService.save(nuevoUsuario);
 
         } catch (Exception e) {
-            throw new RuntimeException("Error al registrar cliente ya autenticado: " + e.getMessage(), e);
-        }
+        e.printStackTrace(); // TEMPORAL: para ver stack trace real
+        throw new RuntimeException("Error al registrar cliente ya autenticado: " + e.getMessage(), e);
     }
+
+}
 
 
     /**

@@ -26,13 +26,13 @@ public class ServiceArticuloManufacturado {
     private final RepoCategoria repoCategoria;
     private final ManufacturadoMapper manufacturadoMapper;
     private final RepoArticuloInsumo repoArticuloInsumo;
-    private final ImagenMapper imagenMapper;
     private final EntityManager entityManager;
 
     //Persiste en la base de datos un nuevo artículo manufacturado
     @Transactional
     public ArticuloManufacturado nuevoArticulo(NuevoArticuloManufacturadoDto nuevoArticulomanufacturadoDto) {
-        Categoria categoria = repoCategoria.findById(nuevoArticulomanufacturadoDto.getIdCategoria()).get();
+        Categoria categoria = repoCategoria.findById(nuevoArticulomanufacturadoDto.getIdCategoria())
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
 
         ArticuloManufacturado articuloManufacturado = manufacturadoMapper.nuevoArticuloManufacturadoDtoToArticuloManufacturado(nuevoArticulomanufacturadoDto);
         articuloManufacturado.setCategoria(categoria);
@@ -40,7 +40,8 @@ public class ServiceArticuloManufacturado {
 
         List<ArticuloManufacturadoDetalle> detalles = new ArrayList<>();
         for(ArticuloManufacturadoDetalleDto detalle : nuevoArticulomanufacturadoDto.getDetalles()){
-            ArticuloInsumo articuloInsumo = repoArticuloInsumo.findById(detalle.getIdArticuloInsumo()).get();
+            ArticuloInsumo articuloInsumo = repoArticuloInsumo.findById(detalle.getIdArticuloInsumo())
+                    .orElseThrow(() -> new RuntimeException("Insumo no encontrado: " + detalle.getIdArticuloInsumo()));
 
             ArticuloManufacturadoDetalle articuloManufacturadoDetalle = ArticuloManufacturadoDetalle.builder()
                     .articuloManufacturado(articuloManufacturado)
@@ -77,24 +78,22 @@ public class ServiceArticuloManufacturado {
     //Modifica un artículo manufacturado
     @Transactional
     public void actualizarArticulo(Long id, InformacionArticuloManufacturadoDto dto) {
-        ArticuloManufacturado articulo = repoArticuloManufacturado.findById(id).get();
+        ArticuloManufacturado articulo = repoArticuloManufacturado.findById(id)
+                .orElseThrow(() -> new RuntimeException("Artículo manufacturado no encontrado: " + id));
 
         articulo.setNombre(dto.getNombre());
         articulo.setDescripcion(dto.getDescripcion());
         articulo.setReceta(dto.getReceta());
         articulo.setTiempoDeCocina(dto.getTiempoDeCocina());
 
-        Categoria categoria = repoCategoria.findById(dto.getIdCategoria()).get();
+        Categoria categoria = repoCategoria.findById(dto.getIdCategoria())
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada: " + dto.getIdCategoria()));
         articulo.setCategoria(categoria);
-
-        if (dto.getImagenModel() != null) {
-            Imagen imagen = imagenMapper.imagenModelToImagen(dto.getImagenModel());
-            articulo.setImagen(imagen);
-        }
 
         articulo.getDetalles().clear();
         for (InformacionDetalleDto detalleDto : dto.getDetalles()) {
-            ArticuloInsumo insumo = repoArticuloInsumo.findById(detalleDto.getIdArticuloInsumo()).get();
+            ArticuloInsumo insumo = repoArticuloInsumo.findById(detalleDto.getIdArticuloInsumo())
+                    .orElseThrow(() -> new RuntimeException("Insumo no encontrado: " + detalleDto.getIdArticuloInsumo()));
 
             ArticuloManufacturadoDetalle detalle = new ArticuloManufacturadoDetalle();
             detalle.setArticuloInsumo(insumo);

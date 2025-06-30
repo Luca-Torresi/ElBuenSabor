@@ -12,12 +12,7 @@ import com.example.demo.Application.DTO.Usuario.RegistroClienteDto;
 import com.example.demo.Application.DTO.Usuario.DireccionResponseDto; // <-- NUEVO DTO de respuesta
 import com.example.demo.Application.DTO.Departamento.DepartamentoDto; // <-- DTO de Departamento
 
-import com.example.demo.Domain.Entities.Cliente;
-import com.example.demo.Domain.Entities.Direccion;
-import com.example.demo.Domain.Entities.Empleado;
-import com.example.demo.Domain.Entities.Roles;
-import com.example.demo.Domain.Entities.Departamento; // <-- Importa la entidad Departamento
-import com.example.demo.Domain.Entities.Provincia; // <-- Importa la entidad Provincia si es necesaria para el mapeo del departamento
+import com.example.demo.Domain.Entities.*;
 
 import org.mapstruct.*;
 
@@ -43,14 +38,6 @@ public interface UsuarioMapper {
     @Mapping(source = "imagenModel", target = "imagen")
     Cliente registroClienteDtoToCliente(RegistroClienteDto dto);
 
-    // Mapeo para NuevoEmpleadoDto a Empleado (sin cambios relevantes en esta sección por ahora)
-    // MapStruct mapeará automáticamente 'direccion' si los nombres de los campos coinciden
-    // o si tienes un método para mapear NuevaDireccionDto a Direccion.
-    // Como NuevaDireccionDto no tiene id, y Direccion si lo tiene, necesitarás un @Mapping
-    // o un método default para manejarlo.
-    // PERO: Si tu ServiceEmpleado ya crea la entidad Direccion y la asigna, este mapeo aquí
-    // puede que no sea para crear, sino solo para actualizar campos si NuevaDireccionDto
-    // tiene campos que mapeen directamente a la entidad Direccion.
     @Mapping(target = "direccion", ignore = true) // <--- IGNORAR aquí si ServiceEmpleado maneja la creación
     Empleado nuevoEmpleadoDtoToEmpleado(NuevoEmpleadoDto nuevoEmpleadoDto);
 
@@ -59,8 +46,14 @@ public interface UsuarioMapper {
     @Mapping(target = "auth0Id", source = "idAuth0")
     @Mapping(target = "roles", expression = "java(mapRolesToStrings(empleado.getRoles()))")
     @Mapping(target = "direccion", source = "empleado.direccion", qualifiedByName = "toDireccionResponseDto") // <-- ¡CAMBIO CLAVE!
-    @Mapping(target = "fechaBaja", source = "fechaBaja") // <-- Mapea fechaBaja directamente
+    @Mapping(target = "fechaBaja", source = "fechaBaja")
+    @Mapping(target = "imagen", source = "imagen", qualifiedByName = "imagenToUrl")
     EmpleadoResponseDto empleadoToEmpleadoResponseDto(Empleado empleado);
+
+    @Named("imagenToUrl")
+    default String imagenToUrl(Imagen imagen) {
+        return imagen != null ? imagen.getUrl() : null;
+    }
 
 
     // --- MÉTODOS DEFAULT PARA MAPEOS ANIDADOS ---

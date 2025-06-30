@@ -2,16 +2,17 @@ package com.example.demo.Domain.Service;
 
 import com.example.demo.Application.DTO.Departamento.DepartamentoDto;
 import com.example.demo.Application.DTO.Usuario.*;
+import com.example.demo.Application.Mapper.UsuarioMapper;
 import com.example.demo.Domain.Entities.*;
 import com.example.demo.Domain.Repositories.*;
 import com.example.demo.Domain.Service.Auth.UserAuth0Service;
 import com.example.demo.Domain.Service.Auth.UserBBDDService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,6 +21,7 @@ public class ServiceEmpleado extends ServiceUsuario<Empleado> {
     private final RepoEmpleado repoEmpleado;
     private final RepoDireccion repoDireccion;
     private final RepoDepartamento repoDepartamento;
+    private final UsuarioMapper usuarioMapper;
 
     // Constructor inyectando repositorios y servicios, pasando a la superclase los servicios comunes
     public ServiceEmpleado(UserAuth0Service userAuth0Service,
@@ -27,11 +29,12 @@ public class ServiceEmpleado extends ServiceUsuario<Empleado> {
                            RepoRoles repoRoles,
                            RepoEmpleado repoEmpleado,
                            RepoDireccion repoDireccion,
-                           RepoDepartamento repoDepartamento) {
-        super(userAuth0Service, userBBDDService, repoRoles);
+                           RepoDepartamento repoDepartamento, RepoImagen repoImagen, UsuarioMapper usuarioMapper) {
+        super(userAuth0Service, userBBDDService, repoRoles, repoImagen);
         this.repoEmpleado = repoEmpleado;
         this.repoDireccion = repoDireccion;
         this.repoDepartamento = repoDepartamento;
+        this.usuarioMapper = usuarioMapper;
     }
 
     // Método para crear empleado, reutilizando crearUsuarioDesdeDTO y agregando lógica de dirección
@@ -143,16 +146,59 @@ public class ServiceEmpleado extends ServiceUsuario<Empleado> {
     }
 
     // Métodos para obtener DTOs para la UI, sin tocar lógica Auth0
+    @Transactional(readOnly = true)
     public List<EmpleadoResponseDto> obtenerEmpleadosFormateados() {
-        return repoEmpleado.findByActivoTrue().stream()
-                .map(this::mapToEmpleadoResponseDto)
+        List<Empleado> empleados = repoEmpleado.findAll();
+        return empleados.stream()
+                .map(empleado -> {
+                    // --- Forzar la inicialización de relaciones LAZY aquí ---
+                    // Imagen:
+                    if (empleado.getImagen() != null) {
+                        empleado.getImagen().getUrl(); // Acceso para cargarla
+                    }
+                    // Roles:
+                    if (empleado.getRoles() != null) {
+                        empleado.getRoles().size(); // Acceso para cargar la colección
+                    }
+                    // Dirección:
+                    if (empleado.getDireccion() != null) {
+                        empleado.getDireccion().getCalle(); // Acceso para cargarla
+                        // Departamento de la Dirección (si Direccion.departamento también es LAZY)
+                        if (empleado.getDireccion().getDepartamento() != null) {
+                            empleado.getDireccion().getDepartamento().getNombre(); // Acceso para cargarla
+                        }
+                    }
+                    // ----------------------------------------------------
+                    return usuarioMapper.empleadoToEmpleadoResponseDto(empleado);
+                })
                 .collect(Collectors.toList());
     }
 
     public EmpleadoResponseDto obtenerEmpleadoFormateadoPorId(Long id) {
-        Empleado empleado = repoEmpleado.findById(id)
-                .orElseThrow(() -> new RuntimeException("Empleado no encontrado con ID: " + id));
-        return mapToEmpleadoResponseDto(empleado);
+        Optional<Empleado> empleadoOptional = repoEmpleado.findById(id);
+        if (empleadoOptional.isEmpty()) {
+            throw new RuntimeException("Empleado no encontrado.");
+        }
+        Empleado empleado = empleadoOptional.get();
+
+        // --- Forzar la inicialización de relaciones LAZY aquí ---
+        // Imagen:
+        if (empleado.getImagen() != null) {
+            empleado.getImagen().getUrl();
+        }
+        // Roles:
+        if (empleado.getRoles() != null) {
+            empleado.getRoles().size();
+        }
+        // Dirección:
+        if (empleado.getDireccion() != null) {
+            empleado.getDireccion().getCalle();
+            if (empleado.getDireccion().getDepartamento() != null) {
+                empleado.getDireccion().getDepartamento().getNombre();
+            }
+        }
+        // ----------------------------------------------------
+        return usuarioMapper.empleadoToEmpleadoResponseDto(empleado);
     }
 
     private EmpleadoResponseDto mapToEmpleadoResponseDto(Empleado empleado) {

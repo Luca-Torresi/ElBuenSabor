@@ -1,5 +1,6 @@
 package com.example.demo.Domain.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,12 +37,13 @@ public class Usuario {
     private String telefono;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     @JoinColumn(name = "id_imagen")
     private Imagen imagen;
 
     @Column(name = "esta_activo", nullable = false)
     @Builder.Default
-    private Boolean activo = Boolean.TRUE; // Campo para baja lógica de la cuenta
+    private Boolean activo = Boolean.TRUE;
 
     @Column(name = "fecha_creacion", nullable = false, updatable = false)
     private LocalDateTime fechaCreacion;
@@ -55,6 +57,7 @@ public class Usuario {
             joinColumns = @JoinColumn(name = "id_usuario"),
             inverseJoinColumns = @JoinColumn(name = "id_rol")
     )
+    @JsonIgnore
     @Builder.Default
     private Set<Roles> roles = new HashSet<>();
 

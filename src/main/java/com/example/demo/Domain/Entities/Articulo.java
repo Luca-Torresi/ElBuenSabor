@@ -21,11 +21,11 @@ public class Articulo {
     private LocalDate fechaBaja;
     private boolean esManufacturado;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idImagen")
     private Imagen imagen;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idCategoria")
     @JsonBackReference
     private Categoria categoria;

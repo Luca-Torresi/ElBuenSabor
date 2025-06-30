@@ -8,11 +8,16 @@ import lombok.NoArgsConstructor;
 import java.util.UUID;
 
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
-@Entity @Table
+@Entity @Table(name = "imagen") // Buena práctica: nombrar la tabla explícitamente
 public class Imagen {
 
-    @Id @GeneratedValue(strategy = GenerationType.UUID)
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    private String name;
+
+    @Column(name = "public_id", unique = true, nullable = false)
+    private String publicId;
+
+    private String name; // Nombre original del archivo (opcional, pero útil)
     private String url;
 }
