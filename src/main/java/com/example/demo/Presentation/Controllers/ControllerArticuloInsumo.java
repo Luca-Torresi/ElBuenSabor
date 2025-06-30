@@ -1,9 +1,11 @@
 package com.example.demo.Presentation.Controllers;
 
 import com.example.demo.Application.DTO.ArticuloInsumo.*;
+import com.example.demo.Application.DTO.ArticuloManufacturado.InformacionArticuloManufacturadoDto;
 import com.example.demo.Domain.Entities.ArticuloInsumo;
 import com.example.demo.Domain.Service.ServiceArticuloInsumo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,7 +28,7 @@ public class ControllerArticuloInsumo {
 
     //Recibe un arreglo con todos los insumos a recargar
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    @PostMapping("/ingresoProveedor")
+    @PostMapping("/recargaStock")
     public ResponseEntity ingresoInsumos(@RequestBody ArregloRecargaInsumoDto arregloRecargaInsumoDto){
         serviceArticuloInsumo.recargaDeInsumos(arregloRecargaInsumoDto);
 
@@ -40,11 +42,12 @@ public class ControllerArticuloInsumo {
         return ResponseEntity.ok(serviceArticuloInsumo.listaInsumos());
     }
 
-    /*
-    //Recibe un arreglo con los nuevos costos de algunos insumos
-    @PostMapping("/actualizarCostos")
-    public void actualizarCostos(@RequestBody ArregloActualizacionCostoDto arregloActualizacionCostoDto){
-        serviceArticuloInsumo.actualizarCostos(arregloActualizacionCostoDto);
+    //Devuelve la información de los artículos insumos para ser mostrados en el ABM
+    @GetMapping("/abm")
+    public Page<InformacionInsumoDto> abmArticulosInsumo(@RequestParam(defaultValue = "0") int page,
+                                                         @RequestParam(defaultValue = "12") int size){
+        return serviceArticuloInsumo.listarArticulosABM(page, size);
     }
-    */
+
+    //FALTA EL ENDPOINT PARA LA MODIFICACIÓN DE UN ARTÍCULO INSUMO
 }

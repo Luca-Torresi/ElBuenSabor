@@ -11,8 +11,6 @@ import java.time.LocalDate;
 @Data @SuperBuilder @AllArgsConstructor @NoArgsConstructor
 @Entity
 public class Empleado extends Usuario {
-
-    @Column(name = "fecha_baja_laboral")
     private LocalDate fechaBaja;
 
     @OneToOne(fetch = FetchType.LAZY)

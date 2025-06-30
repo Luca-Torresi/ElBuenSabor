@@ -5,8 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
-public class RubroInsumoDto {
-    private Long idRubroInsumo;
-    private String nombre;
+public class ArregloRubroInsumoDto {
+    private List<RubroInsumoDto> arregloRubros;
 }

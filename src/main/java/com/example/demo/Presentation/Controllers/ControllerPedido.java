@@ -1,11 +1,11 @@
 package com.example.demo.Presentation.Controllers;
 
-import com.example.demo.Application.DTO.Pedido.CambioDeEstadoDto;
 import com.example.demo.Application.DTO.Pedido.HistorialDePedidosDto;
+import com.example.demo.Application.DTO.Pedido.NuevoPedidoDto;
 import com.example.demo.Application.DTO.Pedido.PedidoDto;
 import com.example.demo.Domain.Service.ServicePedido;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,8 +21,15 @@ public class ControllerPedido {
     //Recibe la información correspondiente a un nuevo pedido
     @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'CLIENTE')")
     @PostMapping("/nuevo")
-    public String nuevoPedido(@AuthenticationPrincipal OidcUser _cliente, @RequestBody PedidoDto pedidoDto) {
-        return servicePedido.generarNuevoPedido(_cliente, pedidoDto);
+    public String nuevoPedido(@AuthenticationPrincipal OidcUser _cliente, @RequestBody NuevoPedidoDto nuevoPedidoDto) {
+        return servicePedido.generarNuevoPedido(_cliente, nuevoPedidoDto);
+    }
+
+    //Devuelve una lista con todos los pedidos para ser gestionados por el cajero
+    @GetMapping("/lista")
+    public Page<PedidoDto> mostrarPedidos(@RequestParam(defaultValue = "0") int page,
+                                          @RequestParam(defaultValue = "9") int size){
+        return servicePedido.listarTodosLosPedidos(page,size);
     }
 
     //El cliente cancela el pedido

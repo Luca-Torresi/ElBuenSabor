@@ -1,6 +1,7 @@
 package com.example.demo.Domain.Service;
 
 import com.example.demo.Application.DTO.ArticuloInsumo.*;
+import com.example.demo.Application.DTO.ArticuloManufacturado.InformacionArticuloManufacturadoDto;
 import com.example.demo.Application.Mapper.InsumoMapper;
 import com.example.demo.Domain.Entities.*;
 import com.example.demo.Domain.Repositories.RepoActualizacionCosto;
@@ -8,6 +9,9 @@ import com.example.demo.Domain.Repositories.RepoArticuloInsumo;
 import com.example.demo.Domain.Repositories.RepoRubroInsumo;
 import com.example.demo.Domain.Repositories.RepoUnidadDeMedida;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -70,25 +74,15 @@ public class ServiceArticuloInsumo {
         return arregloInsumoDto;
     }
 
-    //Devuelve el nombre de un artículo insumo
-    public String obtenerNombreInsumo(Long idArticuloInsumo){
-        ArticuloInsumo articuloInsumo = repoArticuloInsumo.findById(idArticuloInsumo).get();
-        return articuloInsumo.getNombre();
-    }
+    //Devuelve una lista para ser mostrada en el ABM de artículos insumo
+    public Page<InformacionInsumoDto> listarArticulosABM(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ArticuloInsumo> paginaArticulosAbm = repoArticuloInsumo.findAll(pageable);
 
-    /*
-    //Realiza un 'insert' de los registros con el nuevo costo por cada insumo recibido
-    public void actualizarCostos(ArregloActualizacionCostoDto arregloActualizacionCostoDto){
-        for(ActualizacionCostoDto detalle: arregloActualizacionCostoDto.getDetalles()){
-            Optional<ArticuloInsumo> articuloInsumoOpt = repoArticuloInsumo.findById(detalle.getArticuloInsumo());
-
-            ActualizacionCosto actualizacionCosto = ActualizacionCosto.builder()
-                    .articuloInsumo(articuloInsumoOpt.get())
-                    .costo(detalle.getCosto())
-                    .fechaActualizacion(LocalDateTime.now())
-                    .build();
-            repoActualizacionCosto.save(actualizacionCosto);
-        }
+        return paginaArticulosAbm.map(articulo -> {
+            InformacionInsumoDto dto = insumoMapper.articuloInsumoToInformacionInsumo(articulo);
+            dto.setDadoDeAlta(articulo.getFechaBaja() != null ? false : true);
+            return dto;
+        });
     }
-    */
 }

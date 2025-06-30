@@ -20,10 +20,6 @@ public class ArticuloInsumo {
     private double stockMaximo;
     private LocalDate fechaBaja;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "idImagen")
-    private Imagen imagen;
-
     @ManyToOne
     @JoinColumn(name = "idRubroInsumo")
     @JsonBackReference

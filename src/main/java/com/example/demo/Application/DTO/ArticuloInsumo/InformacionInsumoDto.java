@@ -1,18 +1,22 @@
 package com.example.demo.Application.DTO.ArticuloInsumo;
 
-import com.example.demo.Application.DTO.Generic.ImagenModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-//Recibe la información necesaria para la creación de un nuevo artículo insumo
+//Envía y recibe la información necesaria de un artículo insumo para ser modificado
+//Como también para mostrar sus detalles en el ABM
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
-public class NuevoInsumoDto {
+public class InformacionInsumoDto {
+    private Long idArticuloInsumo;
     private String nombre;
+    private double stockActual;
     private double stockMinimo;
     private double stockMaximo;
     private boolean dadoDeAlta;
+    private Long idRubro;
+    private String nombreRubro;
     private Long idUnidadDeMedida;
-    private Long idRubroInsumo;
+    private String unidadDeMedida;
 }

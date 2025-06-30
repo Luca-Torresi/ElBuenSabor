@@ -21,10 +21,16 @@ public class ServiceCategoria {
 
     //Persiste la nueva categoría en la base de datos
     public Categoria cargarNuevaCategoria(NuevaCategoriaDto nuevaCategoriaDto) {
-        Categoria categoriaPadre = repoCategoria.findById(nuevaCategoriaDto.getIdCategoriaPadre()).get();
-
         Categoria categoria = categoriaMapper.nuevaCategoriaDtoToCategoria(nuevaCategoriaDto);
-        categoria.setCategoriaPadre(categoriaPadre);
+
+        if (nuevaCategoriaDto.getIdCategoriaPadre() != null) {
+            Categoria categoriaPadre = repoCategoria.findById(nuevaCategoriaDto.getIdCategoriaPadre())
+                    .orElseThrow(() -> new RuntimeException("Categoría padre no encontrada"));
+            categoria.setCategoriaPadre(categoriaPadre);
+        } else {
+            categoria.setCategoriaPadre(null);
+        }
+
         categoria.setFechaBaja(nuevaCategoriaDto.isDadoDeAlta() ? null : LocalDate.now());
 
         return repoCategoria.save(categoria);
@@ -53,6 +59,28 @@ public class ServiceCategoria {
         Categoria categoria = repoCategoria.findById(id).get();
         return categoria.getNombre();
     }
+
+    public Categoria actualizarCategoria(Long idCategoria, NuevaCategoriaDto dto) {
+        Categoria categoria = repoCategoria.findById(idCategoria)
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
+
+        categoria.setNombre(dto.getNombre());
+        categoria.setMargenGanancia(dto.getMargenGanancia());
+        categoria.setFechaBaja(dto.isDadoDeAlta() ? null : LocalDate.now());
+
+        if (dto.getIdCategoriaPadre() != null) {
+            Categoria padre = repoCategoria.findById(dto.getIdCategoriaPadre())
+                    .orElseThrow(() -> new RuntimeException("Categoría padre no encontrada"));
+            categoria.setCategoriaPadre(padre);
+        } else {
+            categoria.setCategoriaPadre(null);
+        }
+
+        categoria.setImagen(categoriaMapper.nuevaCategoriaDtoToCategoria(dto).getImagen());
+
+        return repoCategoria.save(categoria);
+    }
+
 
      /*
     //Actualiza el margen de ganancia de la categoría correspondiente pasada como parámetro
