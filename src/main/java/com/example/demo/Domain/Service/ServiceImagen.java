@@ -26,4 +26,5 @@ public interface ServiceImagen {
     // (Opcional, podrías manejar esto directamente en ServiceArticulo)
     ResponseEntity<Map<String, String>> uploadArticleImage(MultipartFile file, Long idArticulo);
     ResponseEntity<String> deleteArticleImage(Long idArticulo);
+    ResponseEntity<Map<String, String>> saveImageUrl(String imageUrl, Long idArticulo);
 }

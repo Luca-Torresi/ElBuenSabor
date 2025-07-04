@@ -8,6 +8,7 @@ import com.auth0.json.mgmt.RolesPage;
 import com.auth0.json.mgmt.users.User;
 import com.example.demo.Application.DTO.Rol.Auth0RoleDto;
 import com.example.demo.Application.DTO.Usuario.UsuarioDTO;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,13 +19,13 @@ public class UserAuth0Service {
 
     private final ManagementAPI managementAPI;
 
-    private final String AUTH0_DATABASE_CONNECTION_ID = null;
+    @Value("${auth0.database.connection.id}")
+    private String auth0Connection;
+
 
     // Constructor que inyecta el ManagementAPI y el Connection ID
     public UserAuth0Service(ManagementAPI managementAPI) {
         this.managementAPI = managementAPI;
-        System.out.println("DEBUG: Connection ID cargado en el constructor: [" + AUTH0_DATABASE_CONNECTION_ID + "]"); // Añade los corchetes para ver espacios
-
     }
 
 
@@ -35,6 +36,10 @@ public class UserAuth0Service {
         user.setEmailVerified(true);
         user.setName(usuarioDTO.getNombre() + " " + usuarioDTO.getApellido()); // Nombre completo
         user.setNickname(usuarioDTO.getNickName());
+        user.setConnection(auth0Connection);
+
+        System.out.println("🟢 Connection ID inyectado: " + auth0Connection);
+
 
         return managementAPI.users().create(user).execute();
     }
@@ -139,7 +144,7 @@ public class UserAuth0Service {
     public User updatePasswordDirectly(String userIdAuth0, String newPassword) throws Auth0Exception {
         User user = new User();
         user.setPassword(newPassword.toCharArray());
-        user.setConnection(AUTH0_DATABASE_CONNECTION_ID);
+        user.setConnection(auth0Connection);
 
         // Puedes añadir password_verify para forzar la verificación si es un flujo de admin
         // user.setPasswordVerify(true); // Requiere confirmación si tienes reglas de confirmación de password

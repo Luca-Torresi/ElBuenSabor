@@ -18,7 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*") // Permite CORS, asegurate de configurarlo para producción
+@CrossOrigin(origins = "*")
 @RequestMapping("/empleado")
 public class ControllerEmpleado {
 
@@ -26,7 +26,7 @@ public class ControllerEmpleado {
     private final ServiceImagen serviceImagen;
 
     // El administrador carga un nuevo empleado en el sistema
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')") // Usar hasAuthority()
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @PostMapping("/nuevo")
     public ResponseEntity<Void> nuevoEmpleado(@RequestBody NuevoEmpleadoDto nuevoEmpleadoDto) {
         serviceEmpleado.cargarNuevoEmpleado(nuevoEmpleadoDto);
@@ -34,7 +34,7 @@ public class ControllerEmpleado {
     }
 
     // Dar de alta o baja lógica a un empleado
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')") // Usar hasAuthority()
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @PostMapping("/altaBaja/{idEmpleado}")
     public ResponseEntity<Void> altaBajaLogica(@PathVariable Long idEmpleado) throws Exception {
         serviceEmpleado.altaBajaEmpleado(idEmpleado);
@@ -42,7 +42,7 @@ public class ControllerEmpleado {
     }
 
     // Modificar datos de un empleado con DTO extendido
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')") // Usar hasAuthority()
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @PutMapping("/{id}")
     public ResponseEntity<Void> modificarEmpleado(@PathVariable Long id, @RequestBody ActualizarEmpleadoDto dto) {
         serviceEmpleado.modificarEmpleado(id, dto);
@@ -50,14 +50,14 @@ public class ControllerEmpleado {
     }
 
     // Obtener todos los empleados (considera añadir PreAuthorize si no es público)
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')") // Ejemplo
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
     @GetMapping
     public List<EmpleadoResponseDto> listarEmpleados() {
         return serviceEmpleado.obtenerEmpleadosFormateados();
     }
 
     // Obtener un empleado por ID (considera añadir PreAuthorize)
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')") // Ejemplo
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
     @GetMapping("/{id}")
     public EmpleadoResponseDto obtenerEmpleado(@PathVariable Long id) {
         return serviceEmpleado.obtenerEmpleadoFormateadoPorId(id);
@@ -71,10 +71,9 @@ public class ControllerEmpleado {
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @PostMapping(value = "/{id}/imagen/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, String>> uploadEmpleadoImage(
-            @PathVariable("id") Long id, // Aquí es el ID del empleado (que es un Usuario)
+            @PathVariable("id") Long id,
             @RequestParam("file") MultipartFile file) {
         try {
-            // ¡CAMBIO CLAVE AQUÍ! Llama al método genérico de perfil de usuario
             return serviceImagen.uploadProfileImage(file, id);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("status", "ERROR", "message", e.getMessage()));
@@ -91,9 +90,8 @@ public class ControllerEmpleado {
      */
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @DeleteMapping("/{id}/imagen/delete")
-    public ResponseEntity<String> deleteEmpleadoImage(@PathVariable("id") Long id) { // Aquí es el ID del empleado (que es un Usuario)
+    public ResponseEntity<String> deleteEmpleadoImage(@PathVariable("id") Long id) {
         try {
-            // ¡CAMBIO CLAVE AQUÍ! Llama al método genérico de perfil de usuario
             return serviceImagen.deleteProfileImage(id);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body("{\"status\":\"ERROR\", \"message\":\"" + e.getMessage() + "\"}");

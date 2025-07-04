@@ -17,5 +17,6 @@ public class NuevoArticuloManufacturadoDto {
     private int tiempoDeCocina;
     private boolean dadoDeAlta;
     private Long idCategoria;
+    private String imagenUrl;
     private List<ArticuloManufacturadoDetalleDto> detalles;
 }

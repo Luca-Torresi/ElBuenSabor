@@ -246,6 +246,10 @@ public class ServiceImagenImpl implements ServiceImagen {
 
             articulo.setImagen(nuevaImagen);
             repoArticulo.save(articulo);
+            repoArticulo.flush(); // <- fuerza sincronización con la DB
+
+            System.out.println("🖼 Imagen asociada al artículo ID: " + articulo.getIdArticulo()
+                    + ", Imagen ID: " + nuevaImagen.getId() + ", URL: " + nuevaImagen.getUrl());
 
             return ResponseEntity.status(HttpStatus.OK).body(Map.of("status", "OK", "message", "Imagen de artículo cargada y asociada exitosamente.", "imageUrl", imageUrl, "publicId", publicId));
 
@@ -254,6 +258,55 @@ public class ServiceImagenImpl implements ServiceImagen {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("status", "ERROR", "message", "Ocurrió un error inesperado al cargar la imagen: " + e.getMessage()));
         }
     }
+
+    @Override
+    @Transactional
+    public ResponseEntity<Map<String, String>> saveImageUrl(String imageUrl, Long idArticulo) {
+        if (imageUrl == null || imageUrl.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("status", "ERROR", "message", "La URL de la imagen no puede estar vacía."));
+        }
+
+        try {
+            Optional<Articulo> articuloOptional = repoArticulo.findById(idArticulo);
+            if (articuloOptional.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("status", "ERROR", "message", "Artículo no encontrado."));
+            }
+
+            Articulo articulo = articuloOptional.get();
+
+            // Si ya tenía una imagen previa, eliminarla
+            Imagen imagenExistente = articulo.getImagen();
+            if (imagenExistente != null) {
+                articulo.setImagen(null);
+                repoArticulo.save(articulo);
+                serviceCloudinary.deleteImage(imagenExistente.getPublicId());
+                repoImagen.delete(imagenExistente);
+            }
+
+            String publicIdFake = "url-" + UUID.randomUUID();
+            // Guardar nueva imagen referenciada desde URL
+            Imagen nuevaImagen = Imagen.builder()
+                    .publicId(publicIdFake)
+                    .name(articulo.getNombre()+articulo.getIdArticulo())
+                    .url(imageUrl)
+                    .build();
+
+            nuevaImagen = repoImagen.save(nuevaImagen);
+            articulo.setImagen(nuevaImagen);
+            repoArticulo.save(articulo);
+
+            return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+                    "status", "OK",
+                    "message", "Imagen desde URL asociada correctamente al artículo.",
+                    "imageUrl", imageUrl
+            ));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("status", "ERROR", "message", "Error al guardar la imagen desde la URL: " + e.getMessage()));
+        }
+    }
+
 
     @Override
     @Transactional

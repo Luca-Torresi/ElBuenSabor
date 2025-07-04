@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import java.util.UUID;
 
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
-@Entity @Table(name = "imagen") // Buena práctica: nombrar la tabla explícitamente
+@Entity @Table(name = "imagen")
 public class Imagen {
 
     @Id
@@ -18,6 +18,6 @@ public class Imagen {
     @Column(name = "public_id", unique = true, nullable = false)
     private String publicId;
 
-    private String name; // Nombre original del archivo (opcional, pero útil)
+    private String name;
     private String url;
 }
