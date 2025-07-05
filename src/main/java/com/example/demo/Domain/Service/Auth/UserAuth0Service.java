@@ -8,6 +8,7 @@ import com.auth0.json.mgmt.RolesPage;
 import com.auth0.json.mgmt.users.User;
 import com.example.demo.Application.DTO.Rol.Auth0RoleDto;
 import com.example.demo.Application.DTO.Usuario.UsuarioDTO;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,22 +19,22 @@ public class UserAuth0Service {
 
     private final ManagementAPI managementAPI;
 
-    private final String AUTH0_DATABASE_CONNECTION_ID = null;
+    @Value("${auth0.database.connection.id}")
+    private String auth0Connection;
 
     // Constructor que inyecta el ManagementAPI y el Connection ID
     public UserAuth0Service(ManagementAPI managementAPI) {
         this.managementAPI = managementAPI;
-        System.out.println("DEBUG: Connection ID cargado en el constructor: [" + AUTH0_DATABASE_CONNECTION_ID + "]"); // Añade los corchetes para ver espacios
-
     }
 
 
     public User createUser(UsuarioDTO usuarioDTO) throws Exception {
         User user = new User();
         user.setEmail(usuarioDTO.getEmail());
-        user.setPassword("GeneratedTempPassword123!"); // Auth0 puede requerir una password inicial
+        user.setPassword("GeneratedTempPassword123!");
         user.setEmailVerified(true);
-        user.setName(usuarioDTO.getNombre() + " " + usuarioDTO.getApellido()); // Nombre completo
+        user.setName(usuarioDTO.getNombre() + " " + usuarioDTO.getApellido());
+        user.setConnection(auth0Connection);
 
         return managementAPI.users().create(user).execute();
     }
@@ -57,7 +58,6 @@ public class UserAuth0Service {
         User user = new User();
         user.setEmail(usuarioDTO.getEmail());
         user.setName(usuarioDTO.getNombre() + " " + usuarioDTO.getApellido());
-        // No modificar contraseña aquí, Auth0 la maneja
         return managementAPI.users().update(usuarioDTO.getAuth0Id(), user).execute();
     }
 
@@ -112,16 +112,7 @@ public class UserAuth0Service {
     }
 
     public List<Role> getAllAuth0Roles() throws Auth0Exception {
-        // La forma correcta de obtener todos los roles sin filtros específicos
-        // Deberías usar RolesFilter.emptyFilter() o un new RolesFilter()
-        // ajustando el número de ítems por página si tienes muchos roles.
-
-        // Opción 1: Usando RolesFilter.emptyFilter() - Preferido si solo quieres todos los roles
         RolesPage rolesPage = managementAPI.roles().list(new RolesFilter()).execute();
-        // Puedes agregar paginación si lo necesitas: .withPage(0, 50)
-        // Ejemplo con paginación (primeros 50 roles):
-        // RolesPage rolesPage = managementAPI.roles().list(new RolesFilter().withPage(0, 50)).execute();
-
         return rolesPage.getItems();
     }
 
@@ -137,7 +128,7 @@ public class UserAuth0Service {
     public User updatePasswordDirectly(String userIdAuth0, String newPassword) throws Auth0Exception {
         User user = new User();
         user.setPassword(newPassword.toCharArray());
-        user.setConnection(AUTH0_DATABASE_CONNECTION_ID);
+        user.setConnection(auth0Connection);
 
         // Puedes añadir password_verify para forzar la verificación si es un flujo de admin
         // user.setPasswordVerify(true); // Requiere confirmación si tienes reglas de confirmación de password

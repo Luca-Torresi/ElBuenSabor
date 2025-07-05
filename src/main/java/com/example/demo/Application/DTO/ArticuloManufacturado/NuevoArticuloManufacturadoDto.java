@@ -18,4 +18,5 @@ public class NuevoArticuloManufacturadoDto {
     private boolean dadoDeAlta;
     private Long idCategoria;
     private List<ArticuloManufacturadoDetalleDto> detalles;
+    private String imagenUrl;
 }
