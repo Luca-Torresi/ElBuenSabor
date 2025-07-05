@@ -1,17 +1,18 @@
+
 package com.example.demo.Domain.Service;
 
-import com.example.demo.Domain.Entities.Articulo; // Importa Articulo
+import com.example.demo.Domain.Entities.Articulo;
 import com.example.demo.Domain.Entities.Imagen;
 import com.example.demo.Domain.Entities.Usuario;
-import com.example.demo.Domain.Repositories.RepoArticulo; // Importa RepoArticulo
+import com.example.demo.Domain.Repositories.RepoArticulo;
 import com.example.demo.Domain.Repositories.RepoImagen;
 import com.example.demo.Domain.Repositories.RepoUsuario;
 import com.example.demo.Domain.Service.Cloudinary.ServiceCloudinary;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -23,17 +24,17 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ServiceImagen {
-    private ServiceCloudinary serviceCloudinary;
-    private RepoImagen repoImagen;
-    private RepoUsuario repoUsuario;
-    private RepoArticulo repoArticulo;
+
+
+    private final ServiceCloudinary serviceCloudinary;
+    private final RepoImagen repoImagen;
+    private final RepoUsuario repoUsuario;
+    private final RepoArticulo repoArticulo;
 
     public ResponseEntity<List<Map<String, Object>>> getAllImages() {
         try {
             List<Imagen> imagenes = repoImagen.findAll();
             List<Map<String, Object>> imageList = imagenes.stream()
-                    // CAMBIO AQUÍ: Castear los valores a (Object) explícitamente
-                    // O hacer un Map.of(K, V) donde V es Object
                     .map(imagen -> Map.<String, Object>of(
                             "id", imagen.getId(),
                             "publicId", imagen.getPublicId(),
@@ -68,7 +69,7 @@ public class ServiceImagen {
                     .build();
             imagen = repoImagen.save(imagen);
 
-            return ResponseEntity.status(HttpStatus.OK).body(Map.<String, Object>of( // CAST A OBJECT
+            return ResponseEntity.status(HttpStatus.OK).body(Map.<String, Object>of(
                     "status", "OK",
                     "message", "Imagen cargada genéricamente.",
                     "id", imagen.getId().toString(),
@@ -95,9 +96,6 @@ public class ServiceImagen {
 
             Imagen imagenAEliminar = imagenOptional.get();
 
-            // Desasociar si está asociada a algún Articulo o Usuario (siempre una buena práctica)
-            // Aunque esta es una imagen "genérica", la desasociación preventiva es buena.
-            // Para Articulo:
             repoArticulo.findByImagen(imagenAEliminar).ifPresent(articulo -> {
                 articulo.setImagen(null);
                 repoArticulo.save(articulo);
@@ -109,8 +107,8 @@ public class ServiceImagen {
             });
 
 
-            serviceCloudinary.deleteImage(publicId); // Eliminar de Cloudinary
-            repoImagen.delete(imagenAEliminar); // Eliminar de la base de datos local
+            serviceCloudinary.deleteImage(publicId);
+            repoImagen.delete(imagenAEliminar);
 
             return ResponseEntity.status(HttpStatus.OK).body("{\"status\":\"OK\", \"message\":\"Imagen eliminada correctamente.\"}");
         } catch (Exception e) {
@@ -234,12 +232,63 @@ public class ServiceImagen {
 
             articulo.setImagen(nuevaImagen);
             repoArticulo.save(articulo);
+            repoArticulo.flush();
+
+            System.out.println("🖼 Imagen asociada al artículo ID: " + articulo.getIdArticulo()
+                    + ", Imagen ID: " + nuevaImagen.getId() + ", URL: " + nuevaImagen.getUrl());
 
             return ResponseEntity.status(HttpStatus.OK).body(Map.of("status", "OK", "message", "Imagen de artículo cargada y asociada exitosamente.", "imageUrl", imageUrl, "publicId", publicId));
 
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("status", "ERROR", "message", "Ocurrió un error inesperado al cargar la imagen: " + e.getMessage()));
+        }
+    }
+
+    @Transactional
+    public ResponseEntity<Map<String, String>> saveImageUrl(String imageUrl, Long idArticulo) {
+        if (imageUrl == null || imageUrl.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("status", "ERROR", "message", "La URL de la imagen no puede estar vacía."));
+        }
+
+        try {
+            Optional<Articulo> articuloOptional = repoArticulo.findById(idArticulo);
+            if (articuloOptional.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("status", "ERROR", "message", "Artículo no encontrado."));
+            }
+
+            Articulo articulo = articuloOptional.get();
+
+            // Si ya tenía una imagen previa, eliminarla
+            Imagen imagenExistente = articulo.getImagen();
+            if (imagenExistente != null) {
+                articulo.setImagen(null);
+                repoArticulo.save(articulo);
+                serviceCloudinary.deleteImage(imagenExistente.getPublicId());
+                repoImagen.delete(imagenExistente);
+            }
+
+            String publicIdFake = "url-" + UUID.randomUUID();
+            // Guardar nueva imagen referenciada desde URL
+            Imagen nuevaImagen = Imagen.builder()
+                    .publicId(publicIdFake)
+                    .name(articulo.getNombre()+articulo.getIdArticulo())
+                    .url(imageUrl)
+                    .build();
+
+            nuevaImagen = repoImagen.save(nuevaImagen);
+            articulo.setImagen(nuevaImagen);
+            repoArticulo.save(articulo);
+
+            return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+                    "status", "OK",
+                    "message", "Imagen desde URL asociada correctamente al artículo.",
+                    "imageUrl", imageUrl
+            ));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("status", "ERROR", "message", "Error al guardar la imagen desde la URL: " + e.getMessage()));
         }
     }
 
