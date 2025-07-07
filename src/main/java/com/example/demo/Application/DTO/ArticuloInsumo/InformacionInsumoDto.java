@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 public class InformacionInsumoDto {
     private Long idArticuloInsumo;
     private String nombre;
+    private double costo;
     private double stockActual;
     private double stockMinimo;
     private double stockMaximo;

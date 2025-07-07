@@ -91,6 +91,9 @@ public class ServiceArticuloInsumo {
         return paginaArticulosAbm.map(articulo -> {
             InformacionInsumoDto dto = insumoMapper.articuloInsumoToInformacionInsumo(articulo);
             dto.setDadoDeAlta(articulo.getFechaBaja() != null ? false : true);
+
+            ActualizacionCosto actualizacionCosto = repoActualizacionCosto.findTopByArticuloInsumoOrderByFechaActualizacionDesc(articulo);
+            dto.setCosto(actualizacionCosto.getCosto());
             return dto;
         });
     }
