@@ -39,7 +39,16 @@ public class ServiceArticuloInsumo {
         articuloInsumo.setRubroInsumo(rubroInsumoOpt.get());
         articuloInsumo.setFechaBaja(nuevoInsumoDto.isDadoDeAlta() ? null : LocalDate.now());
 
-        return repoArticuloInsumo.save(articuloInsumo);
+        ArticuloInsumo nuevoInsumo = repoArticuloInsumo.save(articuloInsumo);
+
+        ActualizacionCosto actualizacionCosto = new ActualizacionCosto();
+        actualizacionCosto.setArticuloInsumo(nuevoInsumo);
+        actualizacionCosto.setCosto(nuevoInsumoDto.getCosto());
+        actualizacionCosto.setFechaActualizacion(LocalDateTime.now());
+
+        repoActualizacionCosto.save(actualizacionCosto);
+
+        return nuevoInsumo;
     }
 
     //Para cada insumo del arreglo se suma al stock actual la cantidad ingresada

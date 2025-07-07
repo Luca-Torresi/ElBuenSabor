@@ -10,9 +10,11 @@ import lombok.NoArgsConstructor;
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
 public class NuevoInsumoDto {
     private String nombre;
+    private double stockActual;
     private double stockMinimo;
     private double stockMaximo;
     private boolean dadoDeAlta;
     private Long idUnidadDeMedida;
     private Long idRubroInsumo;
+    private double costo;
 }
