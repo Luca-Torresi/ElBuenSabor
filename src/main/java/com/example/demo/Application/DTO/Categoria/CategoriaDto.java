@@ -16,5 +16,4 @@ public class CategoriaDto {
     private ImagenModel imagenModel;
     private LocalDate fechaBaja;
     private double margenGanancia;
-
 }

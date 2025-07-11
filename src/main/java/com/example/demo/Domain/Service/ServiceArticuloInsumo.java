@@ -1,13 +1,9 @@
 package com.example.demo.Domain.Service;
 
 import com.example.demo.Application.DTO.ArticuloInsumo.*;
-import com.example.demo.Application.DTO.ArticuloManufacturado.InformacionArticuloManufacturadoDto;
 import com.example.demo.Application.Mapper.InsumoMapper;
 import com.example.demo.Domain.Entities.*;
-import com.example.demo.Domain.Repositories.RepoActualizacionCosto;
-import com.example.demo.Domain.Repositories.RepoArticuloInsumo;
-import com.example.demo.Domain.Repositories.RepoRubroInsumo;
-import com.example.demo.Domain.Repositories.RepoUnidadDeMedida;
+import com.example.demo.Domain.Repositories.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,6 +24,7 @@ public class ServiceArticuloInsumo {
     private final RepoUnidadDeMedida repoUnidadDeMedida;
     private final RepoRubroInsumo repoRubroInsumo;
     private final InsumoMapper insumoMapper;
+    private final RepoArticulo repoArticulo;
 
     //Persiste un nuevo artículo insumo
     public ArticuloInsumo cargarNuevoInsumo(NuevoInsumoDto nuevoInsumoDto){
@@ -89,12 +86,34 @@ public class ServiceArticuloInsumo {
         Page<ArticuloInsumo> paginaArticulosAbm = repoArticuloInsumo.findAll(pageable);
 
         return paginaArticulosAbm.map(articulo -> {
-            InformacionInsumoDto dto = insumoMapper.articuloInsumoToInformacionInsumo(articulo);
+            InformacionInsumoDto dto = insumoMapper.articuloInsumoToInformacionInsumoDto(articulo);
             dto.setDadoDeAlta(articulo.getFechaBaja() != null ? false : true);
 
             ActualizacionCosto actualizacionCosto = repoActualizacionCosto.findTopByArticuloInsumoOrderByFechaActualizacionDesc(articulo);
             dto.setCosto(actualizacionCosto.getCosto());
             return dto;
         });
+    }
+
+    //Modifica la información de un artículo insumo
+    public ArticuloInsumo modificarArticuloInsumo(Long idArticuloInsumo, InsumoModificacionDto dto){
+        RubroInsumo rubroInsumo = repoRubroInsumo.findById(dto.getIdRubroInsumo()).get();
+        UnidadDeMedida unidadDeMedida = repoUnidadDeMedida.findById(dto.getIdUnidadDeMedida()).get();
+
+        ArticuloInsumo articuloInsumo = repoArticuloInsumo.findById(idArticuloInsumo).get();
+        articuloInsumo.setRubroInsumo(rubroInsumo);
+        articuloInsumo.setUnidadDeMedida(unidadDeMedida);
+        articuloInsumo.setFechaBaja(dto.isDadoDeAlta() ? null : LocalDate.now());
+
+        return repoArticuloInsumo.save(articuloInsumo);
+    }
+
+    //Dar de alta o baja a un insumo
+    public void darDeAltaBaja(Long idArticuloInsumo) {
+        ArticuloInsumo articuloInsumo = repoArticuloInsumo.findById(idArticuloInsumo).get();
+        articuloInsumo.setFechaBaja(
+                articuloInsumo.getFechaBaja() != null ? null : LocalDate.now()
+        );
+        repoArticuloInsumo.save(articuloInsumo);
     }
 }

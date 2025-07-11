@@ -14,5 +14,5 @@ public interface InsumoMapper {
     @Mapping(source = "rubroInsumo.nombre", target = "nombreRubro")
     @Mapping(source = "unidadDeMedida.idUnidadDeMedida", target = "idUnidadDeMedida")
     @Mapping(source = "unidadDeMedida.nombre", target = "unidadDeMedida")
-    InformacionInsumoDto articuloInsumoToInformacionInsumo(ArticuloInsumo articuloInsumo);
+    InformacionInsumoDto articuloInsumoToInformacionInsumoDto(ArticuloInsumo articuloInsumo);
 }

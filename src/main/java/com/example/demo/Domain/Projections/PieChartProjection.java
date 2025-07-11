@@ -1,6 +1,6 @@
 package com.example.demo.Domain.Projections;
 
 public interface PieChartProjection {
-    String getNombre();
+    String getNombreArticulo();
     Integer getCantVendido();
 }

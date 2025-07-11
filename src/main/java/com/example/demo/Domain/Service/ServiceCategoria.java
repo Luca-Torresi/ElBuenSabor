@@ -10,6 +10,7 @@ import com.example.demo.Domain.Repositories.RepoCategoria;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -81,6 +82,16 @@ public class ServiceCategoria {
         return repoCategoria.save(categoria);
     }
 
+    //Obtiene de la base de datos únicamente los nombres de las categorías
+    public List<String> nombresCategorias(){
+        List<String> nombres = new ArrayList<>();
+
+        List<Categoria> categorias = repoCategoria.findAll();
+        for (Categoria categoria : categorias) {
+            nombres.add(categoria.getNombre());
+        }
+        return nombres;
+    }
 
      /*
     //Actualiza el margen de ganancia de la categoría correspondiente pasada como parámetro

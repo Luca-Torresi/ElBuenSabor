@@ -54,6 +54,12 @@ public class ControllerCategoria {
         return ResponseEntity.ok(actualizada);
     }
 
+    //Devuelve una lista con únicamente los nombres de las categorías
+    @GetMapping("/nombres")
+    public List<String> nombresCategorias(){
+        return serviceCategoria.nombresCategorias();
+    }
+
 
     /*
     //Recibe los datos necesarios para actualizar el margen de ganancia de una categorías

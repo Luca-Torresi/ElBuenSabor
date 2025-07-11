@@ -1,7 +1,6 @@
 package com.example.demo.Presentation.Controllers;
 
 import com.example.demo.Application.DTO.ArticuloInsumo.*;
-import com.example.demo.Application.DTO.ArticuloManufacturado.InformacionArticuloManufacturadoDto;
 import com.example.demo.Domain.Entities.ArticuloInsumo;
 import com.example.demo.Domain.Service.ServiceArticuloInsumo;
 import lombok.RequiredArgsConstructor;
@@ -49,5 +48,18 @@ public class ControllerArticuloInsumo {
         return serviceArticuloInsumo.listarArticulosABM(page, size);
     }
 
-    //FALTA EL ENDPOINT PARA LA MODIFICACIÓN DE UN ARTÍCULO INSUMO
+    //Recibe un DTO con la información necesaria para modificar los datos de un artículo insumo
+    @PutMapping("/modificar/{idArticuloInsumo}")
+    public ResponseEntity<String> modificarArticuloInsumo(@PathVariable Long idArticuloInsumo, @RequestBody InsumoModificacionDto insumoModificacionDto){
+        serviceArticuloInsumo.modificarArticuloInsumo(idArticuloInsumo, insumoModificacionDto);
+        return ResponseEntity.ok("El insumo se modificó exitosamente");
+    }
+
+    //Dar de alta o baja a un artículo insumo
+    @PostMapping("/altaBaja/{idArticuloInsumo}")
+    public ResponseEntity darDeAltaBajaLogica(@PathVariable Long idArticuloInsumo){
+        serviceArticuloInsumo.darDeAltaBaja(idArticuloInsumo);
+
+        return ResponseEntity.ok().build();
+    }
 }
