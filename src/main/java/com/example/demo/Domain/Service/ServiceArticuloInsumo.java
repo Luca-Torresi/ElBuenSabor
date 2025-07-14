@@ -116,4 +116,18 @@ public class ServiceArticuloInsumo {
         );
         repoArticuloInsumo.save(articuloInsumo);
     }
+
+    //Obtiene de la base de datos los artículos que contienen un insumo específico
+    public ArregloIngredienteDto obtenerUsosInsumo(Long idArticuloInsumo){
+        List<IngredienteDto> registros = repoArticuloInsumo.contienenDeterminadoInsumo(idArticuloInsumo);
+
+        ArregloIngredienteDto arregloIngredienteDto = new ArregloIngredienteDto();
+
+        List<IngredienteDto> ingredientes = new ArrayList<>();
+        for(IngredienteDto ingredienteDto : registros){
+            ingredientes.add(ingredienteDto);
+        }
+        arregloIngredienteDto.setIngredientes(ingredientes);
+        return arregloIngredienteDto;
+    }
 }

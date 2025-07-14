@@ -62,4 +62,10 @@ public class ControllerArticuloInsumo {
 
         return ResponseEntity.ok().build();
     }
+
+    //Devuelve, para el insumo seleccionado, los nombres de los artículos que contienen este insumo y la cantidad
+    @GetMapping("/articulos/{idArticuloInsumo}")
+    public ResponseEntity<ArregloIngredienteDto> obtenerUsosInsumo(@PathVariable Long idArticuloInsumo){
+        return ResponseEntity.ok(serviceArticuloInsumo.obtenerUsosInsumo(idArticuloInsumo));
+    }
 }

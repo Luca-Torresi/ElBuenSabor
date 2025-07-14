@@ -1,9 +1,7 @@
-package com.example.demo.Presentation.Exceptions;
+package com.example.demo.Presentation.Handlers;
 
 import com.auth0.exception.Auth0Exception;
-import com.example.demo.Domain.Exceptions.DireccionInvalidaException;
-import com.example.demo.Domain.Exceptions.EmpleadoNotFoundException;
-import com.example.demo.Domain.Exceptions.RolNoEncontradoException;
+import com.example.demo.Domain.Exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

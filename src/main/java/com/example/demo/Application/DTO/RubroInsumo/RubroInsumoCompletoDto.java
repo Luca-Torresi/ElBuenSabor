@@ -5,10 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-//Para la creación de un nuevo rubro insumo
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
-public class NuevoRubroInsumoDto {
+public class RubroInsumoCompletoDto {
+    private Long idRubroInsumo;
     private String nombre;
     private boolean dadoDeAlta;
-    private Long idRubroInsumoPadre;
+    private Long idRubroPadre;
+    private String rubroPadre;
 }

@@ -2,6 +2,7 @@ package com.example.demo.Domain.Service;
 
 import com.example.demo.Domain.Projections.ColumnChartProjection;
 import com.example.demo.Domain.Projections.LineChartProjection;
+import com.example.demo.Domain.Projections.MultipleLineChartProjection;
 import com.example.demo.Domain.Projections.PieChartProjection;
 import com.example.demo.Domain.Repositories.RepoEstadistica;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +50,18 @@ public class ServiceEstadistica {
         List<LineChartProjection> datos = repoEstadistica.obtenerRecaudadoPorMes();
         for (LineChartProjection dato : datos) {
             resultado.add(List.of(dato.getMes(), dato.getTotalRecaudado()));
+        }
+        return resultado;
+    }
+
+    //Obtiene la información de la VIEW 'frecuenciaClientes'
+    public List<List<Object>> multipleLineChart(){
+        List<List<Object>> resultado = new ArrayList<>();
+
+        resultado.add(List.of("Mes", "Sin pedidos", "Un solo pedido", "Más de un pedido"));
+        List<MultipleLineChartProjection> datos = repoEstadistica.obtenerFrecuenciaClientes();
+        for (MultipleLineChartProjection dato : datos) {
+            resultado.add(List.of(dato.getMes(), dato.getClientesSinPedido(), dato.getClientesConUnPedido(), dato.getClientesRecurrentes()));
         }
         return resultado;
     }

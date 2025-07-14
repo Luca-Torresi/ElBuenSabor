@@ -13,7 +13,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class ControllerDepartamento {
-
     private final ServiceDepartamento serviceDepartamento;
 
     @GetMapping("/mendoza")

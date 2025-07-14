@@ -7,6 +7,7 @@ import com.example.demo.Application.DTO.Generic.AltaBajaDto;
 import com.example.demo.Domain.Entities.Categoria;
 import com.example.demo.Domain.Service.ServiceCategoria;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class ControllerCategoria {
     public ResponseEntity<Categoria> nuevaCategoria(@RequestBody NuevaCategoriaDto nuevaCategoriaDto){
         Categoria categoria = serviceCategoria.cargarNuevaCategoria(nuevaCategoriaDto);
 
-        return ResponseEntity.ok(categoria);
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoria);
     }
 
     //Dar de alta o baja a una categoría

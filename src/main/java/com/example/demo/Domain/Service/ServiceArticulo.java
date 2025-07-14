@@ -6,7 +6,7 @@ import com.example.demo.Domain.Entities.Articulo;
 import com.example.demo.Domain.Entities.ArticuloNoElaborado;
 import com.example.demo.Domain.Repositories.RepoArticulo;
 import com.example.demo.Domain.Repositories.RepoArticuloNoElaborado;
-import com.example.demo.Presentation.Exceptions.ActualizacionPreciosException;
+import com.example.demo.Domain.Exceptions.ActualizacionPreciosException;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

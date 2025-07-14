@@ -4,11 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.List;
 
-//Para la creación de un nuevo rubro insumo
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
-public class NuevoRubroInsumoDto {
-    private String nombre;
-    private boolean dadoDeAlta;
-    private Long idRubroInsumoPadre;
+public class ArregloRubroInsumoCompletoDto {
+    List<RubroInsumoCompletoDto> rubrosDto;
 }

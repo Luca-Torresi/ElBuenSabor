@@ -7,7 +7,7 @@ import com.example.demo.Domain.Entities.Cliente;
 import com.example.demo.Domain.Entities.Direccion;
 import com.example.demo.Domain.Repositories.RepoCliente;
 import com.example.demo.Domain.Repositories.RepoDireccion;
-import com.example.demo.Presentation.Exceptions.ClienteNoEncontradoException;
+import com.example.demo.Domain.Exceptions.ClienteNoEncontradoException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;

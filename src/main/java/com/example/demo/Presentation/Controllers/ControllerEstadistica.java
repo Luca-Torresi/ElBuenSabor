@@ -31,4 +31,10 @@ public class ControllerEstadistica {
     public List<List<Object>> recaudadoPorMes(){
         return serviceEstadistica.LineChart();
     }
+
+    //Devuelve los datos necesarios para generar el gráfico de varias líneas para ver el comportamiento de los clientes
+    @GetMapping("/frecuenciaClientes")
+    public List<List<Object>> frecuenciaClientes(){
+        return serviceEstadistica.multipleLineChart();
+    }
 }

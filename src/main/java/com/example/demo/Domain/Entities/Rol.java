@@ -9,7 +9,6 @@ import java.util.Set;
 @Data @Builder @NoArgsConstructor @AllArgsConstructor
 @Entity @Table
 public class Rol {
-
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idRol;
 
