@@ -5,16 +5,18 @@ import com.example.demo.Application.DTO.RubroInsumo.ArregloRubroInsumoDto;
 import com.example.demo.Application.DTO.RubroInsumo.NuevoRubroInsumoDto;
 import com.example.demo.Domain.Entities.RubroInsumo;
 import com.example.demo.Domain.Service.ServiceRubroInsumo;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/rubroInsumo")
 public class ControllerRubroInsumo {
     private ServiceRubroInsumo serviceRubroInsumo;
+
+    public ControllerRubroInsumo(ServiceRubroInsumo serviceRubroInsumo) {
+        this.serviceRubroInsumo = serviceRubroInsumo;
+    }
 
     //Recibe los datos necesario para crear un nuevo rubro insumo
     @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
@@ -29,6 +31,13 @@ public class ControllerRubroInsumo {
     public ResponseEntity<ArregloRubroInsumoCompletoDto> abmRubroInsumo(){
         ArregloRubroInsumoCompletoDto arreglo = serviceRubroInsumo.abmRubrosInsumo();
         return ResponseEntity.ok(arreglo);
+    }
+
+    //Dar de alta o baja a un rubro insumo
+    @PostMapping("/altaBaja/{idRubroInsumo}")
+    public ResponseEntity darDeAltaBajaLogica(@PathVariable Long idRubroInsumo){
+        serviceRubroInsumo.darDeAltaBaja(idRubroInsumo);
+        return ResponseEntity.ok().build();
     }
 
     //Devuelve una lista con los rubros

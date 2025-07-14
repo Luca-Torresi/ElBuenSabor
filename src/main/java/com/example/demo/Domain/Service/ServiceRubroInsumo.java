@@ -2,6 +2,7 @@ package com.example.demo.Domain.Service;
 
 import com.example.demo.Application.DTO.RubroInsumo.*;
 import com.example.demo.Application.Mapper.RubroInsumoMapper;
+import com.example.demo.Domain.Entities.Categoria;
 import com.example.demo.Domain.Entities.RubroInsumo;
 import com.example.demo.Domain.Repositories.RepoRubroInsumo;
 import lombok.RequiredArgsConstructor;
@@ -59,5 +60,14 @@ public class ServiceRubroInsumo {
         ArregloRubroInsumoCompletoDto arreglo = new ArregloRubroInsumoCompletoDto();
         arreglo.setRubrosDto(rubrosCompletos);
         return arreglo;
+    }
+
+    //Dar de alta o baja a un rubro insumo
+    public void darDeAltaBaja(Long idRubroInsumo) {
+        RubroInsumo rubroInsumo = repoRubroInsumo.findById(idRubroInsumo).get();
+        rubroInsumo.setFechaBaja(
+                rubroInsumo.getFechaBaja() != null ? null : LocalDate.now()
+        );
+        repoRubroInsumo.save(rubroInsumo);
     }
 }

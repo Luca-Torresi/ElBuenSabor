@@ -8,6 +8,6 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface RubroInsumoMapper {
 
-    @Mapping(source = "rubroPadre.nombre", target = "rubroPadre")
+    @Mapping(source = "rubroInsumoPadre.nombre", target = "rubroPadre")
     RubroInsumoCompletoDto rubroInsumoToRubroInsumoCompletoDto(RubroInsumo rubroInsumo);
 }
