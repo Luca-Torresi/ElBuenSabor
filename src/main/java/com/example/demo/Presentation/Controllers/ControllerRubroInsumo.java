@@ -19,7 +19,6 @@ public class ControllerRubroInsumo {
     }
 
     //Recibe los datos necesario para crear un nuevo rubro insumo
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
     @PostMapping("/nuevo")
     public ResponseEntity<RubroInsumo> nuevoRubroInsumo(@RequestBody NuevoRubroInsumoDto nuevoRubroInsumoDto){
         RubroInsumo rubroInsumo = serviceRubroInsumo.nuevoRubro(nuevoRubroInsumoDto);
@@ -31,6 +30,13 @@ public class ControllerRubroInsumo {
     public ResponseEntity<ArregloRubroInsumoCompletoDto> abmRubroInsumo(){
         ArregloRubroInsumoCompletoDto arreglo = serviceRubroInsumo.abmRubrosInsumo();
         return ResponseEntity.ok(arreglo);
+    }
+
+    //Recibe la información necesaria para modificar un rubro
+    @PutMapping("/modificar/{idRubroInsumo}")
+    public ResponseEntity<RubroInsumo> modificarRubroInsumo(@PathVariable Long idRubroInsumo, @RequestBody NuevoRubroInsumoDto dto){
+        RubroInsumo rubroInsumo = serviceRubroInsumo.modificarRubroInsumo(idRubroInsumo,dto);
+        return ResponseEntity.ok(rubroInsumo);
     }
 
     //Dar de alta o baja a un rubro insumo

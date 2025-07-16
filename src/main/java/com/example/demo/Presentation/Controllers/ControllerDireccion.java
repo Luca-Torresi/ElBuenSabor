@@ -23,4 +23,10 @@ public class ControllerDireccion {
 
         return ResponseEntity.ok(arregloDireccionDto);
     }
+
+    //Nueva dirección
+
+    //Editar dirección
+
+    //Eliminar dirección
 }

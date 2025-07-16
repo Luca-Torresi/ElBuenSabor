@@ -18,14 +18,20 @@ public class ServiceRubroInsumo {
     private final RubroInsumoMapper rubroInsumoMapper;
 
     //Persiste en la base de datos un nuevo Rubro Insumo
-    public RubroInsumo nuevoRubro(NuevoRubroInsumoDto nuevoRubroInsumoDto) {
-        RubroInsumo rubroInsumoPadre = repoRubroInsumo.findById(nuevoRubroInsumoDto.getIdRubroInsumoPadre()).get();
+    public RubroInsumo nuevoRubro(NuevoRubroInsumoDto dto) {
 
         RubroInsumo rubroInsumo = RubroInsumo.builder()
-                .nombre(nuevoRubroInsumoDto.getNombre())
-                .fechaBaja(nuevoRubroInsumoDto.isDadoDeAlta() ? null : LocalDate.now())
-                .rubroInsumoPadre(rubroInsumoPadre)
+                .nombre(dto.getNombre())
+                .fechaBaja(dto.isDadoDeAlta() ? null : LocalDate.now())
                 .build();
+
+        if(dto.getIdRubroInsumoPadre() != null){
+            RubroInsumo padre = repoRubroInsumo.findById(dto.getIdRubroInsumoPadre()).get();
+            rubroInsumo.setRubroInsumoPadre(padre);
+        } else {
+            rubroInsumo.setRubroInsumoPadre(null);
+        }
+
         return repoRubroInsumo.save(rubroInsumo);
     }
 
@@ -55,6 +61,7 @@ public class ServiceRubroInsumo {
 
         for(RubroInsumo rubro: rubros){
             RubroInsumoCompletoDto dto = rubroInsumoMapper.rubroInsumoToRubroInsumoCompletoDto(rubro);
+            dto.setDadoDeAlta(rubro.getFechaBaja() != null ? false : true);
             rubrosCompletos.add(dto);
         }
         ArregloRubroInsumoCompletoDto arreglo = new ArregloRubroInsumoCompletoDto();
@@ -69,5 +76,22 @@ public class ServiceRubroInsumo {
                 rubroInsumo.getFechaBaja() != null ? null : LocalDate.now()
         );
         repoRubroInsumo.save(rubroInsumo);
+    }
+
+    //Actualiza los datos del rubro
+    public RubroInsumo modificarRubroInsumo(Long idRubroInsumo, NuevoRubroInsumoDto dto) {
+        RubroInsumo rubroInsumo = repoRubroInsumo.findById(idRubroInsumo).get();
+
+        rubroInsumo.setNombre(dto.getNombre());
+        rubroInsumo.setFechaBaja(dto.isDadoDeAlta() ? null : LocalDate.now());
+
+        if(dto.getIdRubroInsumoPadre() != null){
+            RubroInsumo padre = repoRubroInsumo.findById(dto.getIdRubroInsumoPadre()).get();
+            rubroInsumo.setRubroInsumoPadre(padre);
+        } else {
+            rubroInsumo.setRubroInsumoPadre(null);
+        }
+
+        return repoRubroInsumo.save(rubroInsumo);
     }
 }
