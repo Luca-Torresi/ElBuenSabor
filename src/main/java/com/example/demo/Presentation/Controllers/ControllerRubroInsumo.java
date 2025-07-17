@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/rubroInsumo")
 public class ControllerRubroInsumo {
-    private ServiceRubroInsumo serviceRubroInsumo;
+    private final ServiceRubroInsumo serviceRubroInsumo;
 
     //Recibe los datos necesario para crear un nuevo rubro insumo
     @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
