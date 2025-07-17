@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/rubroInsumo")
 public class ControllerRubroInsumo {
-    private ServiceRubroInsumo serviceRubroInsumo;
+    private final ServiceRubroInsumo serviceRubroInsumo;
 
     public ControllerRubroInsumo(ServiceRubroInsumo serviceRubroInsumo) {
         this.serviceRubroInsumo = serviceRubroInsumo;

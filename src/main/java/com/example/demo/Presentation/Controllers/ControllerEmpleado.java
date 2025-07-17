@@ -50,14 +50,14 @@ public class ControllerEmpleado {
     }
 
     // Obtener todos los empleados (considera añadir PreAuthorize si no es público)
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')") // Ejemplo
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'CAJERO', 'REPARTIDOR', 'COCINERO')") // Ejemplo
     @GetMapping
     public List<EmpleadoResponseDto> listarEmpleados() {
         return serviceEmpleado.obtenerEmpleadosFormateados();
     }
 
     // Obtener un empleado por ID (considera añadir PreAuthorize)
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')") // Ejemplo
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'CAJERO', 'REPARTIDOR', 'COCINERO')") // Ejemplo
     @GetMapping("/{id}")
     public EmpleadoResponseDto obtenerEmpleado(@PathVariable Long id) {
         return serviceEmpleado.obtenerEmpleadoFormateadoPorId(id);

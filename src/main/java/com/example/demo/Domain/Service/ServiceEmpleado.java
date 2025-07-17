@@ -92,7 +92,7 @@ public class ServiceEmpleado extends ServiceUsuario<Empleado> {
         repoEmpleado.save(empleado);
 
         // Bloquear/desbloquear usuario en Auth0 (usa método del padre)
-        // userAuth0Service.blockUser(empleado.getIdAuth0(), !activo);
+         userAuth0Service.blockUser(empleado.getIdAuth0(), activo);
     }
 
     // Métodos para obtener DTOs para la UI, sin tocar lógica Auth0

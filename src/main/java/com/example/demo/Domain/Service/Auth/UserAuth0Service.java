@@ -31,7 +31,7 @@ public class UserAuth0Service {
     public User createUser(UsuarioDTO usuarioDTO) throws Exception {
         User user = new User();
         user.setEmail(usuarioDTO.getEmail());
-        user.setPassword("GeneratedTempPassword123!");
+        user.setPassword(usuarioDTO.getPassword().toCharArray());
         user.setEmailVerified(true);
         user.setName(usuarioDTO.getNombre() + " " + usuarioDTO.getApellido());
         user.setConnection(auth0Connection);
