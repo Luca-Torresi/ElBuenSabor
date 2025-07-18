@@ -1,7 +1,4 @@
 # Artículos más vendidos
-
-DROP VIEW IF EXISTS articulosMasVendidos;
-
 CREATE VIEW articulosMasVendidos AS
 SELECT
     articulo.nombre AS nombreArticulo,

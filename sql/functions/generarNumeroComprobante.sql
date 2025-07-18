@@ -1,7 +1,4 @@
 # Genera un nuevo número de comprobante para una factura
-
-DROP FUNCTION IF EXISTS generarNumeroComprobante;
-
 DELIMITER $$
 CREATE FUNCTION generarNumeroComprobante()
     RETURNS VARCHAR(255)

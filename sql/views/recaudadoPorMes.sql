@@ -1,7 +1,4 @@
 # Número de ventas y total recaudado por mes
-
-DROP VIEW IF EXISTS recaudadoPorMes;
-
 CREATE VIEW recaudadoPorMes AS
 SELECT
     DATE_FORMAT(fechaYHora, '%M %Y') AS mes,

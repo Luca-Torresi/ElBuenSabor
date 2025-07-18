@@ -1,7 +1,4 @@
 # Obtiene los detalles del pedido cancelado, para luego deshacer los cambios realizados en el stock
-
-DROP PROCEDURE IF EXISTS detallesPedidoCancelado;
-
 DELIMITER $$
 CREATE PROCEDURE detallesPedidoCancelado(IN _idPedido INT)
 BEGIN

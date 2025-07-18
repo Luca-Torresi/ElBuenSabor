@@ -1,7 +1,4 @@
 # Cuando se realiza un nuevo pedido, se descuentan los insumos utilizados en su prerparación
-
-DROP TRIGGER IF EXISTS descontarInsumos_ai;
-
 DELIMITER $$
 CREATE TRIGGER descontarInsumos_ai
     AFTER INSERT ON detallePedido

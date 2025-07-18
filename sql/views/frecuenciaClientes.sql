@@ -1,7 +1,4 @@
 # Cantidad de clientes repartida según el número de pedidos realizados
-
-DROP VIEW IF EXISTS frecuenciaClientes;
-
 CREATE VIEW frecuenciaClientes AS
 WITH registroMes AS (
     SELECT

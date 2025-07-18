@@ -1,7 +1,4 @@
 # Verifica si hay stock suficiente para elaborar al menos un artículo manufacturado
-
-DROP FUNCTION IF EXISTS sePuedeElaborar;
-
 DELIMITER $$
 CREATE FUNCTION sePuedeElaborar(_idArticulo INT)
     RETURNS BOOLEAN

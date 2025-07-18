@@ -1,7 +1,4 @@
 # Genera los registros correspondientes en las tablas 'factura' y 'detalleFactura' asociados al pedido
-
-DROP PROCEDURE IF EXISTS generarNuevaFactura;
-
 DELIMITER $$
 CREATE PROCEDURE generarNuevaFactura(IN _idPedido INT)
 BEGIN

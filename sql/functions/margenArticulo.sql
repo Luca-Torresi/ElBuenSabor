@@ -1,7 +1,4 @@
 # Devuelve el margen de ganancia de la categoría del producto recibido como parámetro
-
-DROP FUNCTION IF EXISTS margenArticulo;
-
 DELIMITER $$
 CREATE FUNCTION margenArticulo(_idArticulo INT)
     RETURNS DECIMAL(3,2)

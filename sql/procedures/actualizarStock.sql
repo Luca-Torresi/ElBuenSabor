@@ -1,7 +1,4 @@
 # Según si el pedido fue confirmado o cancelado, se realizan los cambios correspondientes en el stock
-
-DROP PROCEDURE IF EXISTS actualizarStock;
-
 DELIMITER $$
 CREATE PROCEDURE actualizarStock(IN _idArticulo INT, IN _cantArticulo INT, IN _pedidoCancelado BOOLEAN)
 BEGIN

@@ -1,7 +1,4 @@
 # Actualiza el precio de venta de todos los artículos
-
-DROP PROCEDURE IF EXISTS actualizarPreciosArticulos;
-
 DELIMITER $$
 CREATE PROCEDURE actualizarPreciosArticulos()
 BEGIN
