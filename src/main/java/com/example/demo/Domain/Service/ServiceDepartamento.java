@@ -23,7 +23,6 @@ public class ServiceDepartamento {
                 .map(d -> DepartamentoDto.builder()
                         .id(d.getIdDepartamento())
                         .nombre(d.getNombre())
-                        .nombreProvincia(d.getProvincia() != null ? d.getProvincia().getNombre() : null)
                         .build())
                 .collect(Collectors.toList());
     }
