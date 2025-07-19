@@ -14,6 +14,8 @@ import com.example.demo.Domain.Exceptions.ClienteNoEncontradoException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,35 +27,43 @@ public class ServiceDireccion {
     private final RepoDepartamento repoDepartamento;
 
     //Obtenemos las direcciones de un cliente
-    public ArregloDireccionDto obtenerDireccionesCliente(OidcUser _cliente){
-        Cliente cliente = repoCliente.findByEmail(_cliente.getEmail())
+    public ArregloDireccionDto obtenerDireccionesCliente(String auth0Id){
+        Cliente cliente = repoCliente.findByIdAuth0(auth0Id)
                 .orElseThrow(() -> new ClienteNoEncontradoException("No se encontró el cliente en la base de datos"));
 
-        List<Direccion> direcciones = repoDireccion.findByClienteId(cliente.getIdUsuario());
+        List<Direccion> direcciones = repoDireccion.findByClienteIdAndActivoTrue(cliente.getIdUsuario());
 
         ArregloDireccionDto arregloDireccionDto = new ArregloDireccionDto();
+        List<DireccionDto> direccionesDto = new ArrayList<>();
+
         for(Direccion direccion : direcciones){
             DireccionDto dto = direccionMapper.direccionToDireccionDto(direccion);
-            arregloDireccionDto.getDirecciones().add(dto);
+            direccionesDto.add(dto);
         }
+        arregloDireccionDto.setDirecciones(direccionesDto);
         return arregloDireccionDto;
     }
 
     //Guarda una nueva dirección de un cliente
-    public Direccion nuevaDireccion(NuevaDireccionDto dto){
-        //Cliente cliente = repoCliente.findByEmail(_cliente.getEmail()).get();
+    public Direccion nuevaDireccion(String auth0Id, NuevaDireccionDto dto){
+        Cliente cliente = repoCliente.findByIdAuth0(auth0Id)
+                .orElseThrow(() -> new ClienteNoEncontradoException("No se encontró el cliente en la base de datos"));
+
         Departamento departamento = repoDepartamento.findById(dto.getIdDepartamento()).get();
 
         Direccion direccion = direccionMapper.nuevaDireccionDtoToDireccion(dto);
-        //direccion.setCliente(cliente);
+        direccion.setActivo(true);
+        direccion.setCliente(cliente);
         direccion.setDepartamento(departamento);
 
         return repoDireccion.save(direccion);
     }
 
     //Modifica la dirección de un cliente
-    public Direccion modificarDireccion(Long idDireccion, NuevaDireccionDto dto){
-        //Cliente cliente = repoCliente.findByEmail(_cliente.getEmail()).get();
+    public Direccion modificarDireccion(String auth0Id, Long idDireccion, NuevaDireccionDto dto){
+        Cliente cliente = repoCliente.findByIdAuth0(auth0Id)
+                .orElseThrow(() -> new ClienteNoEncontradoException("No se encontró el cliente en la base de datos"));
+
         Departamento departamento = repoDepartamento.findById(dto.getIdDepartamento()).get();
 
         Direccion direccion = repoDireccion.findById(idDireccion).get();
@@ -69,6 +79,8 @@ public class ServiceDireccion {
 
     //Eliminar la dirección de un cliente
     public void eliminarDireccion(Long idDireccion){
-        repoDireccion.deleteById(idDireccion);
+        Direccion direccion = repoDireccion.findById(idDireccion).get();
+        direccion.setActivo(false);
+        repoDireccion.save(direccion);
     }
 }

@@ -1,5 +1,6 @@
 # Genera los registros correspondientes en las tablas 'factura' y 'detalleFactura' asociados al pedido
 DELIMITER $$
+
 CREATE PROCEDURE generarNuevaFactura(IN _idPedido INT)
 BEGIN
     DECLARE _idFactura INT;
@@ -26,8 +27,8 @@ BEGIN
     FROM pedido
     WHERE idPedido = _idPedido;
 
-    INSERT INTO factura(idPedido, nroComprobante, fechaYHora, metodoDePago)
-    VALUES(_idPedido, generarNumeroComprobante(), NOW(), _metodoDePago);
+    INSERT INTO factura(idPedido, nroComprobante, fechaYHora, metodoDePago, total)
+    VALUES(_idPedido, generarNumeroComprobante(), NOW(), _metodoDePago, 0);
 
     SET _idFactura = LAST_INSERT_ID();
 

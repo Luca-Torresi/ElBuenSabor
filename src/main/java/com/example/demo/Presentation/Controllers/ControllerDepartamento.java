@@ -1,4 +1,3 @@
-// src/main/java/com/example/demo/Presentation/Controllers/DepartamentoController.java
 package com.example.demo.Presentation.Controllers;
 
 import com.example.demo.Application.DTO.Direccion.DepartamentoDto;

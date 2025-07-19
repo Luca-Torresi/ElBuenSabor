@@ -10,6 +10,6 @@ import java.util.List;
 
 @Repository
 public interface RepoDireccion extends JpaRepository<Direccion, Long> {
-    @Query(value = "SELECT * FROM direccion WHERE idCliente = :idCliente", nativeQuery = true)
-    List<Direccion> findByClienteId(@Param("idCliente") Long idCliente);
+    @Query(value = "SELECT * FROM direccion WHERE idCliente = :idCliente AND activo = true", nativeQuery = true)
+    List<Direccion> findByClienteIdAndActivoTrue(@Param("idCliente") Long idCliente);
 }
