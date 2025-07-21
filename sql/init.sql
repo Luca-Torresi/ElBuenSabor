@@ -223,8 +223,8 @@ BEGIN
     FROM pedido
     WHERE idPedido = _idPedido;
 
-    INSERT INTO factura(idPedido, nroComprobante, fechaYHora, metodoDePago)
-    VALUES(_idPedido, generarNumeroComprobante(), NOW(), _metodoDePago);
+    INSERT INTO factura(idPedido, nroComprobante, fechaYHora, metodoDePago, total)
+    VALUES(_idPedido, generarNumeroComprobante(), NOW(), _metodoDePago, 0);
 
     SET _idFactura = LAST_INSERT_ID();
 

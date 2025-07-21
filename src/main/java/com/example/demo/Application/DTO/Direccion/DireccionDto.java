@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
 public class DireccionDto {
     private Long idDireccion;
+    private String nombre;
     private String calle;
     private String numero;
     private String piso;

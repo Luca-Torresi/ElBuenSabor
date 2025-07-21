@@ -13,10 +13,12 @@ public class Direccion {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idDireccion;
+    private String nombre;
     private String calle;
     private String numero;
     private String piso;
     private String dpto;
+    private boolean activo;
 
     @ManyToOne @JoinColumn(name = "idDepartamento")
     private Departamento departamento;
