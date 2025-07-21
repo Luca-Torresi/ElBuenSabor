@@ -61,7 +61,13 @@ public class ServiceEstadistica {
         resultado.add(List.of("Mes", "Sin pedidos", "Un solo pedido", "Más de un pedido"));
         List<MultipleLineChartProjection> datos = repoEstadistica.obtenerFrecuenciaClientes();
         for (MultipleLineChartProjection dato : datos) {
-            resultado.add(List.of(dato.getMes(), dato.getClientesSinPedido(), dato.getClientesConUnPedido(), dato.getClientesRecurrentes()));
+            String mesParaMostrar;
+            if (dato.getMes() == null) {
+                    mesParaMostrar = "Mes desconocido";
+            } else {
+                mesParaMostrar = dato.getMes();
+            }
+            resultado.add(List.of(mesParaMostrar, dato.getClientesSinPedido(), dato.getClientesConUnPedido(), dato.getClientesRecurrentes()));
         }
         return resultado;
     }
