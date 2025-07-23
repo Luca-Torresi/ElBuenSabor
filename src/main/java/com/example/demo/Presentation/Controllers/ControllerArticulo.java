@@ -37,7 +37,7 @@ public class ControllerArticulo {
 
     //Ejecuta el procedimiento almacenado de la base de datos el cual actualiza los precios de todos los artículos
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    @PostMapping("/actualizarPrecios")
+    @PutMapping("/actualizarPrecios")
     public ResponseEntity<String> actualizarPreciosArticulos(){
         serviceArticulo.actualizarPrecios();
         return ResponseEntity.ok("Se actualizó correctamente el precio de todos los artículos");

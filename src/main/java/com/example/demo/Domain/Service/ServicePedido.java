@@ -9,6 +9,9 @@ import com.example.demo.Domain.Enums.TipoEnvio;
 import com.example.demo.Domain.Repositories.*;
 import com.example.demo.Domain.Exceptions.InsumosInsuficientesException;
 import com.example.demo.Domain.Exceptions.PedidoNoEncontradoException;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -58,6 +61,8 @@ public class ServicePedido {
         }
 
         int demora = 0;
+        double total = 0;
+
         List<DetallePedido> detalles = new ArrayList<>();
         for (NuevoDetallePedidoDto detalle : nuevoPedidoDto.getDetalles()) {
             Articulo articulo = repoArticulo.findById(detalle.getIdArticulo()).get();
@@ -76,8 +81,11 @@ public class ServicePedido {
                     .pedido(pedido)
                     .build();
             detalles.add(detallePedido);
+
+            total += detallePedido.getSubtotal();
         }
         pedido.setDetalles(detalles);
+        pedido.setTotal(total);
 
         //Establecemos el horario de entrega del pedido
         //Si el tipo de envío es DELIVERY se suman 15 minutos a la demora
@@ -211,11 +219,16 @@ public class ServicePedido {
     }
 
     //El pedido cambia al estado ENTREGADO
+    @Transactional
     public void pedidoEntregadoAlCliente(Long idPedido) {
         Pedido pedido = repoPedido.findById(idPedido)
                 .orElseThrow(() -> new PedidoNoEncontradoException("No se encontró el pedido con ID " + idPedido));
 
         pedido.setEstadoPedido(EstadoPedido.ENTREGADO);
+
+        if(pedido.getTotal() == null) {
+            pedido.setTotal((double) 0);
+        }
         repoPedido.save(pedido);
     }
 
