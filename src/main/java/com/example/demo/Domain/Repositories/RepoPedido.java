@@ -3,6 +3,8 @@ package com.example.demo.Domain.Repositories;
 import com.example.demo.Domain.Entities.Pedido;
 import com.example.demo.Domain.Enums.EstadoPedido;
 import com.example.demo.Domain.Enums.TipoEnvio;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,4 +20,8 @@ public interface RepoPedido extends JpaRepository<Pedido, Long> {
     List<Pedido> findByEstadoPedidoIn(List<EstadoPedido> estados);
 
     List<Pedido> findByEstadoPedidoInAndTipoEnvio(List<EstadoPedido> estados, TipoEnvio tipoEnvio);
+
+    Page<Pedido> findByCliente_IdUsuarioAndEstadoPedidoIn(Long idCliente, List<EstadoPedido> estados, Pageable pageable);
+
+
 }

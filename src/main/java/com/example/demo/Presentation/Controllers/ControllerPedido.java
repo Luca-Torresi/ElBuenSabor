@@ -15,6 +15,8 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/pedido")
@@ -125,4 +127,25 @@ public class ControllerPedido {
 
         return ResponseEntity.ok(historialDePedidosDto);
     }
+
+    @GetMapping("/cliente/curso")
+    public ResponseEntity<Page<PedidoClienteDto>> pedidosEnCursoCliente(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        String idAuth0 = getAuth0IdFromAuthenticatedUser();
+        Page<PedidoClienteDto> pedidos = servicePedido.mostrarPedidosEnCursoCliente(idAuth0, page, size);
+        return ResponseEntity.ok(pedidos);
+    }
+
+    @GetMapping("/cliente/historial")
+    public ResponseEntity<Page<PedidoClienteDto>> historialPedidosCliente(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        String idAuth0 = getAuth0IdFromAuthenticatedUser();
+        Page<PedidoClienteDto> pedidos = servicePedido.mostrarHistorialPedidosCliente(idAuth0, page, size);
+        return ResponseEntity.ok(pedidos);
+    }
+
 }

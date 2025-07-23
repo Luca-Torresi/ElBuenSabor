@@ -9,5 +9,5 @@ import java.util.List;
 //Devuelve un arrelgo con todos los pedidos realizados por un cliente
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
 public class HistorialDePedidosDto {
-    private List<NuevoPedidoDto> pedidos;
+    private List<PedidoClienteDto> pedidos;
 }

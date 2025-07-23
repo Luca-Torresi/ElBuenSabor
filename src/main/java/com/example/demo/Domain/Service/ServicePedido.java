@@ -17,11 +17,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.*;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 @Service
 @RequiredArgsConstructor
 public class ServicePedido {
     private final RepoPedido repoPedido;
+    private final RepoUsuario repoUsuario;
     private final RepoCliente repoCliente;
     private final PedidoMapper pedidoMapper;
     private final RepoArticulo repoArticulo;
@@ -29,6 +31,7 @@ public class ServicePedido {
     private final RepoArticuloManufacturado repoArticuloManufacturado;
     private final RepoArticuloNoElaborado repoArticuloNoElaborado;
     private final RepoDireccion repoDireccion;
+    private final SimpMessagingTemplate messagingTemplate;
 
     //Luego de verificar que existan insumos suficientes para su elaboración, se persiste el pedido en la base de datos
     public Pedido nuevoPedido(String _cliente, NuevoPedidoDto nuevoPedidoDto) {
@@ -85,7 +88,24 @@ public class ServicePedido {
             pedido.setHoraEntrega(pedido.getFechaYHora().plusMinutes(demora));
         }
 
-        return repoPedido.save(pedido);
+        Pedido savedPedido = repoPedido.save(pedido);
+
+        // --- Notificación WebSocket para nuevo pedido ---
+        PedidoStatusUpdateDto newOrderDto = PedidoStatusUpdateDto.builder()
+                .idPedido(savedPedido.getIdPedido())
+                .estadoPedido(savedPedido.getEstadoPedido())
+                .clienteId(savedPedido.getCliente().getIdUsuario())
+                .horaEntrega(savedPedido.getHoraEntrega())
+                .mensajeActualizacion("Nuevo pedido recibido.")
+                .build();
+
+        // Notificar al cliente específico sobre su pedido
+        messagingTemplate.convertAndSend("/topic/pedido/updates/" + pedido.getIdPedido(), newOrderDto);
+        // Notificar al panel de cajero sobre un nuevo pedido
+        messagingTemplate.convertAndSend("/topic/cashier/orders", newOrderDto);
+        // -------------------------------------------------
+
+        return savedPedido;
     }
 
     //Evalua si hay stock suficiente para la elaboración del pedido
@@ -170,6 +190,17 @@ public class ServicePedido {
 
         pedido.setEstadoPedido(EstadoPedido.CANCELADO);
         repoPedido.save(pedido);
+
+        // --- Notificación WebSocket ---
+        PedidoStatusUpdateDto updateDto = PedidoStatusUpdateDto.builder()
+                .idPedido(pedido.getIdPedido())
+                .estadoPedido(pedido.getEstadoPedido())
+                .clienteId(pedido.getCliente().getIdUsuario())
+                .mensajeActualizacion("Pedido cancelado por el cliente.")
+                .build();
+        messagingTemplate.convertAndSend("/topic/pedido/updates/" + pedido.getIdPedido(), updateDto);
+        messagingTemplate.convertAndSend("/topic/cashier/orders", updateDto); // Notificar al cajero
+        // ------------------------------
     }
 
     //El cajero confirma el pedido
@@ -179,6 +210,19 @@ public class ServicePedido {
 
         pedido.setEstadoPedido(EstadoPedido.EN_PREPARACION);
         repoPedido.save(pedido);
+
+        // --- Notificación WebSocket ---
+        PedidoStatusUpdateDto updateDto = PedidoStatusUpdateDto.builder()
+                .idPedido(pedido.getIdPedido())
+                .estadoPedido(pedido.getEstadoPedido())
+                .clienteId(pedido.getCliente().getIdUsuario())
+                .horaEntrega(pedido.getHoraEntrega()) // Incluir hora de entrega
+                .mensajeActualizacion("Pedido confirmado y en preparación.")
+                .build();
+        messagingTemplate.convertAndSend("/topic/pedido/updates/" + pedido.getIdPedido(), updateDto);
+        messagingTemplate.convertAndSend("/topic/cashier/orders", updateDto); // Notificar al cajero
+        messagingTemplate.convertAndSend("/topic/kitchen/orders", updateDto); // Notificar a la cocina
+        // ------------------------------
     }
 
     //El cajero rechaza el pedido
@@ -188,6 +232,17 @@ public class ServicePedido {
 
         pedido.setEstadoPedido(EstadoPedido.RECHAZADO);
         repoPedido.save(pedido);
+
+        // --- Notificación WebSocket ---
+        PedidoStatusUpdateDto updateDto = PedidoStatusUpdateDto.builder()
+                .idPedido(pedido.getIdPedido())
+                .estadoPedido(pedido.getEstadoPedido())
+                .clienteId(pedido.getCliente().getIdUsuario())
+                .mensajeActualizacion("Pedido rechazado por el cajero.")
+                .build();
+        messagingTemplate.convertAndSend("/topic/pedido/updates/" + pedido.getIdPedido(), updateDto);
+        messagingTemplate.convertAndSend("/topic/cashier/orders", updateDto); // Notificar al cajero
+        // ------------------------------
     }
 
     //El cocinero marca el pedido como listo
@@ -197,6 +252,19 @@ public class ServicePedido {
 
         pedido.setEstadoPedido(EstadoPedido.LISTO);
         repoPedido.save(pedido);
+        // --- Notificación WebSocket ---
+        PedidoStatusUpdateDto updateDto = PedidoStatusUpdateDto.builder()
+                .idPedido(pedido.getIdPedido())
+                .estadoPedido(pedido.getEstadoPedido())
+                .clienteId(pedido.getCliente().getIdUsuario())
+                .horaEntrega(pedido.getHoraEntrega()) // Incluir hora de entrega
+                .mensajeActualizacion("Pedido listo para entrega.")
+                .build();
+        messagingTemplate.convertAndSend("/topic/pedido/updates/" + pedido.getIdPedido(), updateDto);
+        messagingTemplate.convertAndSend("/topic/cashier/orders", updateDto); // Notificar al cajero
+        messagingTemplate.convertAndSend("/topic/kitchen/orders", updateDto); // Notificar a la cocina
+        messagingTemplate.convertAndSend("/topic/delivery/orders", updateDto); // Notificar al repartidor
+        // ------------------------------
     }
 
     //El pedido cambia al estado EN_CAMINO
@@ -206,6 +274,19 @@ public class ServicePedido {
 
         pedido.setEstadoPedido(EstadoPedido.EN_CAMINO);
         repoPedido.save(pedido);
+
+        // --- Notificación WebSocket ---
+        PedidoStatusUpdateDto updateDto = PedidoStatusUpdateDto.builder()
+                .idPedido(pedido.getIdPedido())
+                .estadoPedido(pedido.getEstadoPedido())
+                .clienteId(pedido.getCliente().getIdUsuario())
+                .horaEntrega(pedido.getHoraEntrega()) // Incluir hora de entrega
+                .mensajeActualizacion("Pedido retirado del local, en camino.")
+                .build();
+        messagingTemplate.convertAndSend("/topic/pedido/updates/" + pedido.getIdPedido(), updateDto);
+        messagingTemplate.convertAndSend("/topic/cashier/orders", updateDto); // Notificar al cajero
+        messagingTemplate.convertAndSend("/topic/delivery/orders", updateDto); // Notificar al repartidor
+        // ------------------------------
     }
 
     //El pedido cambia al estado ENTREGADO
@@ -215,6 +296,18 @@ public class ServicePedido {
 
         pedido.setEstadoPedido(EstadoPedido.ENTREGADO);
         repoPedido.save(pedido);
+
+        // --- Notificación WebSocket ---
+        PedidoStatusUpdateDto updateDto = PedidoStatusUpdateDto.builder()
+                .idPedido(pedido.getIdPedido())
+                .estadoPedido(pedido.getEstadoPedido())
+                .clienteId(pedido.getCliente().getIdUsuario())
+                .mensajeActualizacion("Pedido entregado al cliente.")
+                .build();
+        messagingTemplate.convertAndSend("/topic/pedido/updates/" + pedido.getIdPedido(), updateDto);
+        messagingTemplate.convertAndSend("/topic/cashier/orders", updateDto); // Notificar al cajero
+        messagingTemplate.convertAndSend("/topic/delivery/orders", updateDto); // Notificar al repartidor
+        // ------------------------------
     }
 
     //Añade 5 minutos al horario de entrega de un pedido
@@ -224,20 +317,70 @@ public class ServicePedido {
 
         pedido.setHoraEntrega(pedido.getHoraEntrega().plusMinutes(5));
         repoPedido.save(pedido);
+
+        // --- Notificación WebSocket ---
+        PedidoStatusUpdateDto updateDto = PedidoStatusUpdateDto.builder()
+                .idPedido(pedido.getIdPedido())
+                .estadoPedido(pedido.getEstadoPedido())
+                .clienteId(pedido.getCliente().getIdUsuario())
+                .horaEntrega(pedido.getHoraEntrega()) // Es crucial enviar la nueva hora de entrega
+                .mensajeActualizacion("Tiempo de preparación extendido en 5 minutos.")
+                .build();
+        messagingTemplate.convertAndSend("/topic/pedido/updates/" + pedido.getIdPedido(), updateDto);
+        messagingTemplate.convertAndSend("/topic/cashier/orders", updateDto); // Notificar al cajero
+        messagingTemplate.convertAndSend("/topic/kitchen/orders", updateDto); // Notificar a la cocina
+        // ------------------------------
     }
 
     //Devuelve un arreglo con todos los pedidos realizados por el cliente
     public HistorialDePedidosDto mostrarHistorialDePedidos(Long idCliente) {
         HistorialDePedidosDto historialDePedidosDto = new HistorialDePedidosDto();
-        List<NuevoPedidoDto> pedidosRealizados = new ArrayList<>();
+        List<PedidoClienteDto> pedidosRealizados = new ArrayList<>();
 
         List<Pedido> pedidos = repoPedido.findPedidosByIdCliente(idCliente);
         for (Pedido pedido : pedidos) {
-            NuevoPedidoDto nuevoPedidoDto = pedidoMapper.pedidoToNuevoPedidoDto(pedido);
+            PedidoClienteDto nuevoPedidoDto = pedidoMapper.pedidoToPedidoClienteDto(pedido);
             pedidosRealizados.add(nuevoPedidoDto);
         }
         historialDePedidosDto.setPedidos(pedidosRealizados);
 
         return historialDePedidosDto;
+    }
+
+    public Page<PedidoClienteDto> mostrarPedidosEnCursoCliente(String idAuth0, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Long idCliente = getIdUsuarioDesdeAuth0(idAuth0);
+
+        List<EstadoPedido> estadosEnCurso = List.of(
+                EstadoPedido.A_CONFIRMAR,
+                EstadoPedido.EN_PREPARACION,
+                EstadoPedido.LISTO,
+                EstadoPedido.EN_CAMINO
+        );
+
+        Page<Pedido> paginaPedidos = repoPedido.findByCliente_IdUsuarioAndEstadoPedidoIn(idCliente, estadosEnCurso, pageable);
+
+        return paginaPedidos.map(pedidoMapper::pedidoToPedidoClienteDto);
+    }
+
+    public Page<PedidoClienteDto> mostrarHistorialPedidosCliente(String idAuth0, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Long idCliente = getIdUsuarioDesdeAuth0(idAuth0);
+
+        List<EstadoPedido> estadosHistorial = List.of(
+                EstadoPedido.ENTREGADO,
+                EstadoPedido.CANCELADO,
+                EstadoPedido.RECHAZADO
+        );
+
+        Page<Pedido> paginaPedidos = repoPedido.findByCliente_IdUsuarioAndEstadoPedidoIn(idCliente, estadosHistorial, pageable);
+
+        return paginaPedidos.map(pedidoMapper::pedidoToPedidoClienteDto);
+    }
+
+    private Long getIdUsuarioDesdeAuth0(String idAuth0) {
+        Usuario usuario = repoUsuario.findByIdAuth0(idAuth0)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        return usuario.getIdUsuario();
     }
 }
