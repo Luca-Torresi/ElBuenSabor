@@ -2,11 +2,11 @@ package com.example.demo.Domain.Service;
 
 import com.example.demo.Domain.Entities.DetalleFactura;
 import com.example.demo.Domain.Entities.Factura;
+import com.example.demo.Domain.Entities.Pedido;
+import com.example.demo.Domain.Enums.TipoEnvio;
 import com.example.demo.Domain.Repositories.RepoFactura;
-import com.lowagie.text.Document;
-import com.lowagie.text.Element;
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.Font;
+import com.example.demo.Domain.Repositories.RepoPedido;
+import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import jakarta.mail.MessagingException;
@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.transaction.annotation.Propagation;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ServiceFactura {
     private final RepoFactura repoFactura;
+    private final RepoPedido repoPedido;
     private final JavaMailSender javaMailSender;
 
     //Obtiene los datos necesario y genera el PDF correspondiente a la factura
@@ -36,13 +38,13 @@ public class ServiceFactura {
 
             document.open();
 
-            // Logo (espacio para cargar imagen por URL)
-            /*
-            Image logo = Image.getInstance("URL_DEL_LOGO"); // <- Reemplazar
+            // Logo del negocio
+            InputStream is = getClass().getResourceAsStream("/images/logo.png");
+            byte[] bytes = is.readAllBytes();
+            Image logo = Image.getInstance(bytes);
             logo.scaleToFit(100, 100);
             logo.setAlignment(Element.ALIGN_RIGHT);
             document.add(logo);
-            */
 
             // Nombre del restaurante
             Font tituloFont = new Font(Font.HELVETICA, 18, Font.BOLD);
@@ -84,6 +86,12 @@ public class ServiceFactura {
 
             document.add(tabla);
             document.add(new Paragraph(" ")); // Espacio
+
+            // Añadimos el costo del envío
+            Pedido pedido = repoPedido.findById(idPedido).get();
+            if(pedido.getTipoEnvio() == TipoEnvio.DELIVERY){
+                document.add(new Paragraph("Delivery: $2000"));
+            }
 
             // Total y método de pago
             document.add(new Paragraph("Total: $" + factura.getTotal()));

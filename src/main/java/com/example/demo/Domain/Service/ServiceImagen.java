@@ -3,9 +3,11 @@ package com.example.demo.Domain.Service;
 
 import com.example.demo.Domain.Entities.Articulo;
 import com.example.demo.Domain.Entities.Imagen;
+import com.example.demo.Domain.Entities.Promocion;
 import com.example.demo.Domain.Entities.Usuario;
 import com.example.demo.Domain.Repositories.RepoArticulo;
 import com.example.demo.Domain.Repositories.RepoImagen;
+import com.example.demo.Domain.Repositories.RepoPromocion;
 import com.example.demo.Domain.Repositories.RepoUsuario;
 import com.example.demo.Domain.Service.Cloudinary.ServiceCloudinary;
 import lombok.RequiredArgsConstructor;
@@ -24,12 +26,11 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ServiceImagen {
-
-
     private final ServiceCloudinary serviceCloudinary;
     private final RepoImagen repoImagen;
     private final RepoUsuario repoUsuario;
     private final RepoArticulo repoArticulo;
+    private final RepoPromocion repoPromocion;
 
     public ResponseEntity<List<Map<String, Object>>> getAllImages() {
         try {
@@ -317,6 +318,106 @@ public class ServiceImagen {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"status\":\"ERROR\", \"message\":\"Error al eliminar la imagen del artículo: " + e.getMessage() + "\"}");
+        }
+    }
+
+    //Método para la carga de una imagen como archivo correspondiente a una promoción
+    @Transactional
+    public ResponseEntity<Map<String, String>> subirImagenArchivoPromocion(MultipartFile file, Long idPromocion) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("status", "ERROR", "message", "No se ha seleccionado ningún archivo."));
+        }
+
+        try {
+            Optional<Promocion> promocionOpt = repoPromocion.findById(idPromocion);
+            if (promocionOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("status", "ERROR", "message", "Artículo no encontrado."));
+            }
+            Promocion promocion = promocionOpt.get();
+
+            Imagen imagenExistente = promocion.getImagen();
+            if (imagenExistente != null) {
+                promocion.setImagen(null);
+                repoPromocion.save(promocion);
+                serviceCloudinary.deleteImage(imagenExistente.getPublicId());
+                repoImagen.delete(imagenExistente);
+            }
+
+            Map<String, String> uploadResult = serviceCloudinary.uploadFile(file);
+            String imageUrl = uploadResult.get("url");
+            String publicId = uploadResult.get("publicId");
+
+            if (imageUrl == null || imageUrl.isEmpty() || publicId == null || publicId.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("status", "ERROR", "message", "No se pudo obtener la URL o Public ID de la imagen desde Cloudinary."));
+            }
+
+            Imagen nuevaImagen = Imagen.builder()
+                    .publicId(publicId)
+                    .name(file.getOriginalFilename())
+                    .url(imageUrl)
+                    .build();
+            nuevaImagen = repoImagen.save(nuevaImagen);
+
+            promocion.setImagen(nuevaImagen);
+            repoPromocion.save(promocion);
+            repoPromocion.flush();
+
+            System.out.println("🖼 Imagen asociada a la promoción ID: " + promocion.getIdPromocion()
+                    + ", Imagen ID: " + nuevaImagen.getId() + ", URL: " + nuevaImagen.getUrl());
+
+            return ResponseEntity.status(HttpStatus.OK).body(Map.of("status", "OK", "message", "Imagen de artículo cargada y asociada exitosamente.", "imageUrl", imageUrl, "publicId", publicId));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("status", "ERROR", "message", "Ocurrió un error inesperado al cargar la imagen: " + e.getMessage()));
+        }
+    }
+
+    //Método para la carga de una imagen con URL para una promoción
+    @Transactional
+    public ResponseEntity<Map<String, String>> subirImagenUrlPromocion(String imageUrl, Long idPromocion) {
+        if (imageUrl == null || imageUrl.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("status", "ERROR", "message", "La URL de la imagen no puede estar vacía."));
+        }
+
+        try {
+            Optional<Promocion> promocionOpt = repoPromocion.findById(idPromocion);
+            if (promocionOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("status", "ERROR", "message", "Promoción no encontrada."));
+            }
+
+            Promocion promocion = promocionOpt.get();
+
+            // Si ya tenía una imagen previa, eliminarla
+            Imagen imagenExistente = promocion.getImagen();
+            if (imagenExistente != null) {
+                promocion.setImagen(null);
+                repoPromocion.save(promocion);
+                serviceCloudinary.deleteImage(imagenExistente.getPublicId());
+                repoImagen.delete(imagenExistente);
+            }
+
+            String publicIdFake = "url-" + UUID.randomUUID();
+            // Guardar nueva imagen referenciada desde URL
+            Imagen nuevaImagen = Imagen.builder()
+                    .publicId(publicIdFake)
+                    .name(promocion.getTitulo()+promocion.getIdPromocion())
+                    .url(imageUrl)
+                    .build();
+
+            nuevaImagen = repoImagen.save(nuevaImagen);
+            promocion.setImagen(nuevaImagen);
+            repoPromocion.save(promocion);
+
+            return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+                    "status", "OK",
+                    "message", "Imagen desde URL asociada correctamente a la promoción.",
+                    "imageUrl", imageUrl
+            ));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("status", "ERROR", "message", "Error al guardar la imagen desde la URL: " + e.getMessage()));
         }
     }
 }

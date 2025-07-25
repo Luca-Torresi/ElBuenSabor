@@ -45,9 +45,4 @@ BEGIN
 
     END LOOP;
     CLOSE nuevoCursor;
-
-    IF _tipoEnvio = 'DELIVERY' THEN
-        SET _total = _total + 1500;
-    END IF;
-
 END $$

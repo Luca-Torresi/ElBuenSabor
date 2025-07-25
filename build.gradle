@@ -19,6 +19,14 @@ configurations {
 	}
 }
 
+configurations {
+	developmentOnly
+	runtimeClasspath {
+		extendsFrom developmentOnly
+	}
+}
+
+
 repositories {
 	mavenCentral()
 }
@@ -72,6 +80,8 @@ dependencies {
 
 	//Mercado pago
 	implementation 'com.mercadopago:sdk-java:2.4.0'
+
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }
 
 tasks.named('test') {

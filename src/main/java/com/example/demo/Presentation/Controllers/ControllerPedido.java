@@ -91,7 +91,7 @@ public class ControllerPedido {
     }
 
     //El repartidor o el cajero marca el pedido como entregado
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'REPARTIDOR', 'CAJERO')")
+    //@PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'REPARTIDOR', 'CAJERO')")
     @PutMapping("/entregado/{idPedido}")
     public ResponseEntity<String> pedidoEstregado(@PathVariable Long idPedido){
         servicePedido.pedidoEntregadoAlCliente(idPedido);

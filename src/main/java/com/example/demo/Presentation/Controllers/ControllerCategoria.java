@@ -29,7 +29,7 @@ public class ControllerCategoria {
     }
 
     //Dar de alta o baja a una categoría
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    //@PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @PostMapping("/altaBaja/{idCategoria}")
     public ResponseEntity darDeAltaBajaLogica(@PathVariable Long idCategoria){
         serviceCategoria.darDeAltaBaja(idCategoria);

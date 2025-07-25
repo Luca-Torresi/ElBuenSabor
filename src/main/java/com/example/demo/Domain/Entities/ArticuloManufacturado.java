@@ -10,11 +10,10 @@ import java.util.List;
 @Data @SuperBuilder @AllArgsConstructor @NoArgsConstructor
 @Entity @Table
 public class ArticuloManufacturado extends Articulo {
-
-    @OneToMany(mappedBy = "articuloManufacturado", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<ArticuloManufacturadoDetalle> detalles;
-
     private String receta;
     private int tiempoDeCocina;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "articuloManufacturado", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ArticuloManufacturadoDetalle> detalles;
 }

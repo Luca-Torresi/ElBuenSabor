@@ -6,6 +6,7 @@ import com.example.demo.Domain.Entities.*;
 import com.example.demo.Domain.Enums.EstadoPedido;
 import com.example.demo.Domain.Enums.MetodoDePago;
 import com.example.demo.Domain.Enums.TipoEnvio;
+import com.example.demo.Domain.Exceptions.ClienteNoEncontradoException;
 import com.example.demo.Domain.Repositories.*;
 import com.example.demo.Domain.Exceptions.InsumosInsuficientesException;
 import com.example.demo.Domain.Exceptions.PedidoNoEncontradoException;
@@ -39,10 +40,8 @@ public class ServicePedido {
             throw new InsumosInsuficientesException("No hay insumos suficientes para la elaboración del pedido");
         }
 
-        /*
-        Cliente cliente = repoCliente.findByEmail(_cliente.getEmail())
-                .orElseThrow(() -> new ClienteNoEncontradoException("No se encontró el cliente en la base de datos"));
-        */
+        //Cliente cliente = repoCliente.findByEmail(_cliente.getEmail())
+        //        .orElseThrow(() -> new ClienteNoEncontradoException("No se encontró el cliente en la base de datos"));
 
         TipoEnvio tipoEnvio = TipoEnvio.valueOf(nuevoPedidoDto.getTipoEnvio());
         MetodoDePago metodoDePago = MetodoDePago.valueOf(nuevoPedidoDto.getMetodoDePago());
@@ -85,6 +84,10 @@ public class ServicePedido {
             total += detallePedido.getSubtotal();
         }
         pedido.setDetalles(detalles);
+
+        if(pedido.getTipoEnvio() == TipoEnvio.DELIVERY){
+            total += 2000;
+        }
         pedido.setTotal(total);
 
         //Establecemos el horario de entrega del pedido

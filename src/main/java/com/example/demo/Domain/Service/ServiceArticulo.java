@@ -1,6 +1,7 @@
 package com.example.demo.Domain.Service;
 
 import com.example.demo.Application.DTO.Articulo.ArticuloDto;
+import com.example.demo.Application.DTO.Articulo.ArticuloNombreDto;
 import com.example.demo.Application.Mapper.ArticuloMapper;
 import com.example.demo.Domain.Entities.Articulo;
 import com.example.demo.Domain.Entities.ArticuloNoElaborado;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -65,5 +68,17 @@ public class ServiceArticulo {
                 articulo.getFechaBaja() != null ? null : LocalDate.now()
         );
         repoArticulo.save(articulo);
+    }
+
+    //Obtiene de la base de datos una lista con los nombres de todos los artículos para ser mostrados dentro de un 'select'
+    public List<ArticuloNombreDto> listaNombresArticulos(){
+        List<Articulo> articulos = repoArticulo.findAll();
+
+        List<ArticuloNombreDto> lista = new ArrayList<ArticuloNombreDto>();
+        for(Articulo articulo : articulos){
+            ArticuloNombreDto dto = articuloMapper.articuloToArticuloNombreDto(articulo);
+            lista.add(dto);
+        }
+        return lista;
     }
 }

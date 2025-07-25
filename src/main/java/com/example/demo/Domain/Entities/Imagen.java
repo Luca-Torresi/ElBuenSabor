@@ -8,9 +8,8 @@ import lombok.NoArgsConstructor;
 import java.util.UUID;
 
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
-@Entity @Table(name = "imagen")
+@Entity @Table
 public class Imagen {
-
     @Id @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 

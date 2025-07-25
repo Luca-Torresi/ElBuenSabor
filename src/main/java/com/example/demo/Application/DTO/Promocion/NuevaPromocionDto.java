@@ -5,16 +5,16 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.time.LocalDate;
 
-//Información necesaria para la creación de una nueva promoción
+import java.time.LocalTime;
+
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
-public class PromocionDto {
+public class NuevaPromocionDto {
     private String titulo;
     private String descripcion;
     private double descuento;
-    private LocalDate fechaInicio;
-    private LocalDate fechaFin;
-    private ImagenModel imagenModel;
-    private Long idArticuloManufacturado;
+    private LocalTime horarioInicio;
+    private LocalTime horarioFin;
+    private boolean activo;
+    private Long idArticulo;
 }
