@@ -1,6 +1,7 @@
 package com.example.demo.Application.Mapper;
 
 import com.example.demo.Application.DTO.Pedido.DetallePedidoCajeroDto;
+import com.example.demo.Application.DTO.Pedido.DetallePedidoClienteDto;
 import com.example.demo.Application.DTO.Pedido.DetallePedidoCocinaDto;
 import com.example.demo.Domain.Entities.DetallePedido;
 import org.mapstruct.Mapper;
@@ -14,4 +15,8 @@ public interface DetallePedidoMapper {
 
     @Mapping(source = "articulo.nombre", target = "nombreArticulo")
     DetallePedidoCocinaDto detallePedidoToDetallePedidoCocinaDto(DetallePedido detallePedido);
+
+    @Mapping(source = "articulo.nombre", target = "nombreArticulo")
+    DetallePedidoClienteDto detallePedidoToDetallePedidoClienteDto(DetallePedido detallePedido);
+
 }

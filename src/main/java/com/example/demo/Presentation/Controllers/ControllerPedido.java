@@ -9,9 +9,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,11 +25,21 @@ public class ControllerPedido {
     private final ServicePedido servicePedido;
     private final ServiceFactura serviceFactura;
 
+    private String getAuth0IdFromAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof Jwt) {
+            Jwt jwt = (Jwt) authentication.getPrincipal();
+            return jwt.getSubject();
+        }
+        throw new IllegalStateException("Usuario no autenticado o ID de Auth0 no disponible.");
+    }
+
     //Recibe la información correspondiente a un nuevo pedido
     //@PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'CLIENTE')")
     @PostMapping("/nuevo")
-    public ResponseEntity<Pedido> nuevoPedido(@AuthenticationPrincipal OidcUser _cliente, @RequestBody NuevoPedidoDto nuevoPedidoDto) {
-        Pedido pedido = servicePedido.nuevoPedido(_cliente, nuevoPedidoDto);
+    public ResponseEntity<Pedido> nuevoPedido(@RequestBody NuevoPedidoDto nuevoPedidoDto) {
+        String auth0Id = getAuth0IdFromAuthenticatedUser();
+        Pedido pedido = servicePedido.nuevoPedido(auth0Id, nuevoPedidoDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(pedido);
     }
 
@@ -115,4 +130,25 @@ public class ControllerPedido {
 
         return ResponseEntity.ok(historialDePedidosDto);
     }
+
+    @GetMapping("/cliente/curso")
+    public ResponseEntity<Page<PedidoClienteDto>> pedidosEnCursoCliente(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        String idAuth0 = getAuth0IdFromAuthenticatedUser();
+        Page<PedidoClienteDto> pedidos = servicePedido.mostrarPedidosEnCursoCliente(idAuth0, page, size);
+        return ResponseEntity.ok(pedidos);
+    }
+
+    @GetMapping("/cliente/historial")
+    public ResponseEntity<Page<PedidoClienteDto>> historialPedidosCliente(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        String idAuth0 = getAuth0IdFromAuthenticatedUser();
+        Page<PedidoClienteDto> pedidos = servicePedido.mostrarHistorialPedidosCliente(idAuth0, page, size);
+        return ResponseEntity.ok(pedidos);
+    }
+
 }

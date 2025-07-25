@@ -11,6 +11,7 @@ public interface DireccionMapper {
     Direccion direccionDtoToDireccion(DireccionDto dto);
 
     @Mapping(source = "departamento.nombre", target = "nombreDepartamento")
+    @Mapping(source = "departamento.idDepartamento", target = "idDepartamento")
     DireccionDto direccionToDireccionDto(Direccion direccion);
 
     Direccion nuevaDireccionDtoToDireccion(NuevaDireccionDto nuevaDireccionDto);
