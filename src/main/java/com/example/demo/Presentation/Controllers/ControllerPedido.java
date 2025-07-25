@@ -2,6 +2,7 @@ package com.example.demo.Presentation.Controllers;
 
 import com.example.demo.Application.DTO.Pedido.*;
 import com.example.demo.Domain.Entities.Pedido;
+import com.example.demo.Domain.Service.ServiceFactura;
 import com.example.demo.Domain.Service.ServicePedido;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,6 +23,7 @@ import java.util.List;
 @RequestMapping("/pedido")
 public class ControllerPedido {
     private final ServicePedido servicePedido;
+    private final ServiceFactura serviceFactura;
 
     private String getAuth0IdFromAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -103,11 +105,12 @@ public class ControllerPedido {
         return ResponseEntity.ok("El pedido está en camino");
     }
 
-    //El repartidor marca el pedido como entregado
-    //@PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'REPARTIDOR')")
+    //El repartidor o el cajero marca el pedido como entregado
+    //@PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'REPARTIDOR', 'CAJERO')")
     @PutMapping("/entregado/{idPedido}")
     public ResponseEntity<String> pedidoEstregado(@PathVariable Long idPedido){
         servicePedido.pedidoEntregadoAlCliente(idPedido);
+        serviceFactura.enviarFacturaPorMail(idPedido);
         return ResponseEntity.ok("El pedido fue entregado al cliente");
     }
 

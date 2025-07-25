@@ -21,6 +21,7 @@ public class Pedido {
     private Long idPedido;
     private LocalDateTime fechaYHora;
     private LocalDateTime horaEntrega;
+    private Double total;
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
     @JsonManagedReference

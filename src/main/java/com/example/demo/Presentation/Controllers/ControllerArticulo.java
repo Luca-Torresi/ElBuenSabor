@@ -1,6 +1,7 @@
 package com.example.demo.Presentation.Controllers;
 
 import com.example.demo.Application.DTO.Articulo.ArticuloDto;
+import com.example.demo.Application.DTO.Articulo.ArticuloNombreDto;
 import com.example.demo.Domain.Service.ServiceArticulo;
 import com.example.demo.Domain.Service.ServiceImagen;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -26,10 +29,18 @@ public class ControllerArticulo {
         return serviceArticulo.listarArticulosCatalogo(page, size);
     }
 
+    //Devuelve una lista con los nombres de todos los artículos
+    @GetMapping("/listado")
+    public ResponseEntity<List<ArticuloNombreDto>> listaNombresArticulos(){
+        List<ArticuloNombreDto> lista = serviceArticulo.listaNombresArticulos();
+
+        return ResponseEntity.ok(lista);
+    }
+
     //Dar de alta o baja un artículo
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @PostMapping("/altaBaja/{idArticulo}")
-    public ResponseEntity darDeAltaBajaLogica(@PathVariable Long idArticulo) {
+    public ResponseEntity<Void> darDeAltaBajaLogica(@PathVariable Long idArticulo) {
         serviceArticulo.darDeAltaBaja(idArticulo);
 
         return ResponseEntity.ok().build();
@@ -37,7 +48,7 @@ public class ControllerArticulo {
 
     //Ejecuta el procedimiento almacenado de la base de datos el cual actualiza los precios de todos los artículos
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    @PostMapping("/actualizarPrecios")
+    @PutMapping("/actualizarPrecios")
     public ResponseEntity<String> actualizarPreciosArticulos(){
         serviceArticulo.actualizarPrecios();
         return ResponseEntity.ok("Se actualizó correctamente el precio de todos los artículos");

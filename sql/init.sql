@@ -19,6 +19,7 @@ BEGIN
     RETURN _costoTotal;
 END $$
 
+
 # Genera un nuevo número de comprobante para una factura
 DROP FUNCTION IF EXISTS generarNumeroComprobante;
 
@@ -38,6 +39,7 @@ BEGIN
     RETURN LPAD(_ultimoNro + 1, 8, '0');
 END $$
 
+
 # Devuelve el margen de ganancia de la categoría del producto recibido como parámetro
 DROP FUNCTION IF EXISTS margenArticulo;
 
@@ -55,6 +57,7 @@ BEGIN
 
     RETURN _margen;
 END $$
+
 
 # Verifica si hay stock suficiente para elaborar al menos un artículo manufacturado
 DROP FUNCTION IF EXISTS sePuedeElaborar;
@@ -105,6 +108,7 @@ BEGIN
     END LOOP;
     CLOSE nuevoCursor;
 END $$
+
 
 # Según si el pedido fue confirmado o cancelado, se realizan los cambios correspondientes en el stock
 DROP PROCEDURE IF EXISTS actualizarStock;
@@ -163,6 +167,7 @@ BEGIN
 
 END $$
 
+
 # Obtiene los detalles del pedido cancelado, para luego deshacer los cambios realizados en el stock
 DROP PROCEDURE IF EXISTS detallesPedidoCancelado;
 
@@ -193,6 +198,7 @@ BEGIN
     CLOSE nuevoCursor;
 END $$
 
+
 # Genera los registros correspondientes en las tablas 'factura' y 'detalleFactura' asociados al pedido
 DROP PROCEDURE IF EXISTS generarNuevaFactura;
 
@@ -218,13 +224,13 @@ BEGIN
 
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET finCursor = 1;
 
-    SELECT metodoDePago, tipoEnvio
-    INTO _metodoDePago,_tipoEnvio
+    SELECT metodoDePago, tipoEnvio, total
+    INTO _metodoDePago,_tipoEnvio, _total
     FROM pedido
     WHERE idPedido = _idPedido;
 
     INSERT INTO factura(idPedido, nroComprobante, fechaYHora, metodoDePago, total)
-    VALUES(_idPedido, generarNumeroComprobante(), NOW(), _metodoDePago, 0);
+    VALUES(_idPedido, generarNumeroComprobante(), NOW(), _metodoDePago, _total);
 
     SET _idFactura = LAST_INSERT_ID();
 
@@ -236,22 +242,14 @@ BEGIN
         END IF;
 
         SET _subtotal = _precioVenta * _cantArticulo;
-        SET _total = _total + _subtotal;
 
         INSERT INTO detalleFactura(idFactura, idArticulo, nombreArticulo, cantidad, precioUnitario, subtotal)
         VALUES(_idFactura, _idArticulo, _nombre, _cantArticulo, _precioVenta, _subtotal);
 
     END LOOP;
     CLOSE nuevoCursor;
-
-    IF _tipoEnvio = 'DELIVERY' THEN
-        SET _total = _total + 1500;
-    END IF;
-
-    UPDATE factura
-    SET total = _total
-    WHERE idFactura = _idFactura;
 END $$
+
 
 # Actualiza el precio de venta de un artículo teniendo en cuenta su costo y el margen de ganancia de su categoría
 DROP PROCEDURE IF EXISTS modificarPrecioVenta;
@@ -289,6 +287,7 @@ CREATE TRIGGER descontarInsumos_ai
 BEGIN
     CALL actualizarStock(NEW.idArticulo, NEW.cantidad, FALSE);
 END $$
+
 
 # Si el cliente o el cajero cancelan el pedido, se revierten los cambios realizados en el stock
 DROP TRIGGER IF EXISTS deshacerCambiosStock_au;
@@ -335,6 +334,7 @@ WHERE estadoPedido = 'ENTREGADO'
 GROUP BY nombreArticulo
 ORDER BY cantVendido DESC;
 
+
 # Cantidad de clientes repartida según el número de pedidos realizados
 DROP VIEW IF EXISTS frecuenciaClientes;
 
@@ -367,7 +367,6 @@ WITH registroMes AS (
          GROUP BY mes
      ),
      primerPedido AS (
-         -- Obtener primer pedido de cada cliente
          SELECT
              p.idCliente AS clienteId,
              MIN(p.fechaYHora) AS fechaPrimerPedido
@@ -375,7 +374,6 @@ WITH registroMes AS (
          GROUP BY p.idCliente
      ),
      clientesConUnPedidoMes AS (
-         -- Clientes cuyo primer pedido fue en ese mes y no tuvieron segundo pedido en 30 días después
          SELECT
              DATE_FORMAT(pp.fechaPrimerPedido, '%Y-%m') AS mes,
              COUNT(*) AS clientesConUnPedido
@@ -388,7 +386,6 @@ WITH registroMes AS (
          GROUP BY mes
      ),
      clientesRecurrentes AS (
-         -- Clientes que tienen segundo o más pedidos
          SELECT
              DATE_FORMAT(p.fechaYHora, '%Y-%m') AS mes,
              p.idCliente AS clienteId
@@ -428,8 +425,8 @@ SELECT
 FROM clientesAgrupados c
          RIGHT JOIN clientesConUnPedidoMes u ON c.mes = u.mes
          RIGHT JOIN clientesRecurrentesAgrupados r ON u.mes = r.mes
-
 ORDER BY mes;
+
 
 # Insumos cuyo stock actual se encuentre por debajo del stock establecido como minimo
 DROP VIEW IF EXISTS insumosQueReponer;
@@ -438,6 +435,7 @@ CREATE VIEW insumosQueReponer AS
 SELECT idArticuloInsumo, nombre, stockActual, stockMinimo
 FROM articuloInsumo
 WHERE stockActual <= stockMinimo;
+
 
 # Promedio de cantidad de pedidos por hora en el día
 DROP VIEW IF EXISTS promedioPedidosPorHora;
@@ -449,6 +447,7 @@ SELECT
 FROM pedido
 GROUP BY HOUR(fechaYHora)
 ORDER BY HOUR(fechaYHora);
+
 
 # Número de ventas y total recaudado por mes
 DROP VIEW IF EXISTS recaudadoPorMes;
@@ -462,16 +461,17 @@ FROM factura
 GROUP BY YEAR(fechaYHora), MONTH(fechaYHora)
 ORDER BY YEAR(fechaYHora) ASC, MONTH(fechaYHora) ASC;
 
+
 # Tabla con todos los insumos y su último costo registrado
 DROP VIEW IF EXISTS ultimoCostoInsumo;
 
 CREATE VIEW ultimoCostoInsumo AS
 SELECT ac.idArticuloInsumo, ac.costo
 FROM actualizacionCosto ac
-         JOIN (
+JOIN (
     SELECT idArticuloInsumo, MAX(fechaActualizacion) AS fechaReciente
     FROM actualizacionCosto
     GROUP BY idArticuloInsumo
 ) ult
-              ON ac.idArticuloInsumo = ult.idArticuloInsumo
-                  AND ac.fechaActualizacion = ult.fechaReciente;
+ON ac.idArticuloInsumo = ult.idArticuloInsumo
+AND ac.fechaActualizacion = ult.fechaReciente;

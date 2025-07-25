@@ -13,7 +13,6 @@ import java.util.List;
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
 @Entity @Table
 public class Factura {
-
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idFactura;
     private String nroComprobante;

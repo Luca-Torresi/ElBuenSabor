@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
 @Entity @Table
 public class DetalleFactura {
-
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idDetalleFactura;
     private int cantidad;

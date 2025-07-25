@@ -19,6 +19,14 @@ configurations {
 	}
 }
 
+configurations {
+	developmentOnly
+	runtimeClasspath {
+		extendsFrom developmentOnly
+	}
+}
+
+
 repositories {
 	mavenCentral()
 }
@@ -54,6 +62,12 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 
+	//OpenPDF
+	implementation 'com.github.librepdf:openpdf:1.3.30'
+
+	//Implementación para enviar mails desde la API
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
 	//Cloudinary
 	implementation 'com.cloudinary:cloudinary-http44:1.36.0'
 	implementation 'com.cloudinary:cloudinary-taglib:1.36.0'
@@ -66,6 +80,8 @@ dependencies {
 
 	//Mercado pago
 	implementation 'com.mercadopago:sdk-java:2.4.0'
+
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }
 
 tasks.named('test') {

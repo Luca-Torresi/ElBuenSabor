@@ -1,6 +1,5 @@
 # Genera los registros correspondientes en las tablas 'factura' y 'detalleFactura' asociados al pedido
 DELIMITER $$
-
 CREATE PROCEDURE generarNuevaFactura(IN _idPedido INT)
 BEGIN
     DECLARE _idFactura INT;
@@ -22,13 +21,13 @@ BEGIN
 
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET finCursor = 1;
 
-    SELECT metodoDePago, tipoEnvio
-    INTO _metodoDePago,_tipoEnvio
+    SELECT metodoDePago, tipoEnvio, total
+    INTO _metodoDePago,_tipoEnvio, _total
     FROM pedido
     WHERE idPedido = _idPedido;
 
     INSERT INTO factura(idPedido, nroComprobante, fechaYHora, metodoDePago, total)
-    VALUES(_idPedido, generarNumeroComprobante(), NOW(), _metodoDePago, 0);
+    VALUES(_idPedido, generarNumeroComprobante(), NOW(), _metodoDePago, _total);
 
     SET _idFactura = LAST_INSERT_ID();
 
@@ -40,19 +39,10 @@ BEGIN
         END IF;
 
         SET _subtotal = _precioVenta * _cantArticulo;
-        SET _total = _total + _subtotal;
 
         INSERT INTO detalleFactura(idFactura, idArticulo, nombreArticulo, cantidad, precioUnitario, subtotal)
         VALUES(_idFactura, _idArticulo, _nombre, _cantArticulo, _precioVenta, _subtotal);
 
     END LOOP;
     CLOSE nuevoCursor;
-
-    IF _tipoEnvio = 'DELIVERY' THEN
-        SET _total = _total + 1500;
-    END IF;
-
-    UPDATE factura
-    SET total = _total
-    WHERE idFactura = _idFactura;
 END $$

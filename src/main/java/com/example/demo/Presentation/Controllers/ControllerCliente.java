@@ -25,7 +25,6 @@ import java.util.Optional; // Importar Optional
 @RequestMapping(path = "/cliente", produces = MediaType.APPLICATION_JSON_VALUE)
 @CrossOrigin(origins = "*")
 public class ControllerCliente {
-
     private final ServiceCliente serviceCliente;
     private final ServiceImagen serviceImagen;
 
