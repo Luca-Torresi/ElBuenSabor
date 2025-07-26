@@ -13,4 +13,5 @@ public class InsumoModificacionDto {
     private boolean dadoDeAlta;
     private Long idRubroInsumo;
     private Long idUnidadDeMedida;
+    private double costo;
 }

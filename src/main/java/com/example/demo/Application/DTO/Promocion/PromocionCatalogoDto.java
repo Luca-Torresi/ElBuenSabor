@@ -9,5 +9,9 @@ import lombok.NoArgsConstructor;
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
 public class PromocionCatalogoDto {
     private Long idPromocion;
+    private String titulo;
+    private String descripcion;
+    private Long idArticulo;
+    private double descuento;
     private String url;
 }

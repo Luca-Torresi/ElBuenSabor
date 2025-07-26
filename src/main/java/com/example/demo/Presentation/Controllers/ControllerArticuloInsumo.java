@@ -27,7 +27,7 @@ public class ControllerArticuloInsumo {
 
     //Recibe un arreglo con todos los insumos a recargar
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    @PostMapping("/recargaStock")
+    @PutMapping("/recargaStock")
     public ResponseEntity ingresoInsumos(@RequestBody ArregloRecargaInsumoDto arregloRecargaInsumoDto){
         serviceArticuloInsumo.recargaDeInsumos(arregloRecargaInsumoDto);
 
@@ -35,7 +35,7 @@ public class ControllerArticuloInsumo {
     }
 
     //Lista todos los artículos insumo
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    //@PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @GetMapping("/lista")
     public ResponseEntity<ArregloInsumoDto> listaInsumos(){
         return ResponseEntity.ok(serviceArticuloInsumo.listaInsumos());
@@ -50,13 +50,15 @@ public class ControllerArticuloInsumo {
 
     //Recibe un DTO con la información necesaria para modificar los datos de un artículo insumo
     @PutMapping("/modificar/{idArticuloInsumo}")
-    public ResponseEntity<String> modificarArticuloInsumo(@PathVariable Long idArticuloInsumo, @RequestBody InsumoModificacionDto insumoModificacionDto){
+    public ResponseEntity<String> modificarArticuloInsumo(
+            @PathVariable Long idArticuloInsumo,
+            @RequestBody InsumoModificacionDto insumoModificacionDto){
         serviceArticuloInsumo.modificarArticuloInsumo(idArticuloInsumo, insumoModificacionDto);
         return ResponseEntity.ok("El insumo se modificó exitosamente");
     }
 
     //Dar de alta o baja a un artículo insumo
-    @PostMapping("/altaBaja/{idArticuloInsumo}")
+    @PutMapping("/altaBaja/{idArticuloInsumo}")
     public ResponseEntity darDeAltaBajaLogica(@PathVariable Long idArticuloInsumo){
         serviceArticuloInsumo.darDeAltaBaja(idArticuloInsumo);
 

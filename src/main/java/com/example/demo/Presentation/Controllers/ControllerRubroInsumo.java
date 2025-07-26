@@ -38,7 +38,7 @@ public class ControllerRubroInsumo {
     }
 
     //Dar de alta o baja a un rubro insumo
-    @PostMapping("/altaBaja/{idRubroInsumo}")
+    @PutMapping("/altaBaja/{idRubroInsumo}")
     public ResponseEntity darDeAltaBajaLogica(@PathVariable Long idRubroInsumo){
         serviceRubroInsumo.darDeAltaBaja(idRubroInsumo);
         return ResponseEntity.ok().build();

@@ -105,6 +105,13 @@ public class ServiceArticuloInsumo {
         articuloInsumo.setUnidadDeMedida(unidadDeMedida);
         articuloInsumo.setFechaBaja(dto.isDadoDeAlta() ? null : LocalDate.now());
 
+        ActualizacionCosto actualizacionCosto = ActualizacionCosto.builder()
+                .articuloInsumo(articuloInsumo)
+                .costo(dto.getCosto())
+                .fechaActualizacion(LocalDateTime.now())
+                .build();
+        repoActualizacionCosto.save(actualizacionCosto);
+
         return repoArticuloInsumo.save(articuloInsumo);
     }
 
