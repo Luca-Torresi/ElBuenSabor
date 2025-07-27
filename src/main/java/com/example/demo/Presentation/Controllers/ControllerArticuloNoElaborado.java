@@ -1,6 +1,8 @@
 package com.example.demo.Presentation.Controllers;
 
+import com.example.demo.Application.DTO.ArticuloNoElaborado.ArregloRecargaNoElaboradoDto;
 import com.example.demo.Application.DTO.ArticuloNoElaborado.InformacionArticuloNoElaboradoDto;
+import com.example.demo.Application.DTO.ArticuloNoElaborado.NoElaboradoNombreDto;
 import com.example.demo.Application.DTO.ArticuloNoElaborado.NuevoArticuloNoElaboradoDto;
 import com.example.demo.Domain.Entities.ArticuloNoElaborado;
 import com.example.demo.Domain.Service.ServiceArticuloNoElaborado;
@@ -15,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -68,5 +72,17 @@ public class ControllerArticuloNoElaborado {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size) {
         return serviceArticuloNoElaborado.mostrarArticulosAbm(page, size);
+    }
+
+    @PutMapping("/recargaStock")
+    public ResponseEntity<Void> recargaStock(@RequestBody ArregloRecargaNoElaboradoDto arregloDto){
+        serviceArticuloNoElaborado.recargaStock(arregloDto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/lista")
+    public ResponseEntity<List<NoElaboradoNombreDto>> listaArticulosNoElaborados(){
+        List<NoElaboradoNombreDto> lista = serviceArticuloNoElaborado.listaArticulosNoElaborados();
+        return ResponseEntity.ok(lista);
     }
 }

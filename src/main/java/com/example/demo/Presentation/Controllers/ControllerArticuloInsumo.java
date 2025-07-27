@@ -28,7 +28,7 @@ public class ControllerArticuloInsumo {
     //Recibe un arreglo con todos los insumos a recargar
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @PutMapping("/recargaStock")
-    public ResponseEntity ingresoInsumos(@RequestBody ArregloRecargaInsumoDto arregloRecargaInsumoDto){
+    public ResponseEntity<Void> ingresoInsumos(@RequestBody ArregloRecargaInsumoDto arregloRecargaInsumoDto){
         serviceArticuloInsumo.recargaDeInsumos(arregloRecargaInsumoDto);
 
         return ResponseEntity.ok().build();

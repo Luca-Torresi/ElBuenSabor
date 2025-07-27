@@ -1,7 +1,6 @@
 package com.example.demo.Domain.Service;
 
-import com.example.demo.Application.DTO.ArticuloNoElaborado.InformacionArticuloNoElaboradoDto;
-import com.example.demo.Application.DTO.ArticuloNoElaborado.NuevoArticuloNoElaboradoDto;
+import com.example.demo.Application.DTO.ArticuloNoElaborado.*;
 import com.example.demo.Application.Mapper.ImagenMapper;
 import com.example.demo.Application.Mapper.NoElaboradoMapper;
 import com.example.demo.Domain.Entities.*;
@@ -15,6 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -77,5 +78,25 @@ public class ServiceArticuloNoElaborado {
             dto.setDadoDeAlta(articulo.getFechaBaja() != null ? false : true);
             return dto;
         });
+    }
+
+    public void recargaStock(ArregloRecargaNoElaboradoDto arregloDto){
+        for (RecargaNoElaboradoDto dto: arregloDto.getRecargas()){
+            ArticuloNoElaborado articulo = repoArticuloNoElaborado.findById(dto.getIdArticulo()).get();
+
+            articulo.setStock(articulo.getStock() + dto.getCantidad());
+            repoArticuloNoElaborado.save(articulo);
+        }
+    }
+
+    public List<NoElaboradoNombreDto> listaArticulosNoElaborados() {
+        List<ArticuloNoElaborado> articulos = repoArticuloNoElaborado.findAll();
+
+        List<NoElaboradoNombreDto> lista = new ArrayList<>();
+        for (ArticuloNoElaborado articulo: articulos){
+            NoElaboradoNombreDto dto = noElaboradoMapper.noElaboradoToNoElaboradoNombreDto(articulo);
+            lista.add(dto);
+        }
+        return lista;
     }
 }

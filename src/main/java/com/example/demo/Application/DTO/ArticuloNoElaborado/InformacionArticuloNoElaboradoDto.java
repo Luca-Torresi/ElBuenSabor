@@ -17,4 +17,5 @@ public class InformacionArticuloNoElaboradoDto {
     private Long idCategoria;
     private String nombreCategoria;
     private String imagenUrl;
+    private int stock;
 }

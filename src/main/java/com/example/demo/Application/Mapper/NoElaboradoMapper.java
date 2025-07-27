@@ -1,6 +1,7 @@
 package com.example.demo.Application.Mapper;
 
 import com.example.demo.Application.DTO.ArticuloNoElaborado.InformacionArticuloNoElaboradoDto;
+import com.example.demo.Application.DTO.ArticuloNoElaborado.NoElaboradoNombreDto;
 import com.example.demo.Application.DTO.ArticuloNoElaborado.NuevoArticuloNoElaboradoDto;
 import com.example.demo.Domain.Entities.ArticuloNoElaborado;
 import com.example.demo.Domain.Entities.Imagen;
@@ -17,4 +18,6 @@ public interface NoElaboradoMapper {
     @Mapping(source = "categoria.idCategoria", target = "idCategoria")
     @Mapping(source = "categoria.nombre", target = "nombreCategoria")
     InformacionArticuloNoElaboradoDto articuloNoElaboradoToDto(ArticuloNoElaborado articuloNoElaborado);
+
+    NoElaboradoNombreDto noElaboradoToNoElaboradoNombreDto(ArticuloNoElaborado articuloNoElaborado);
 }
