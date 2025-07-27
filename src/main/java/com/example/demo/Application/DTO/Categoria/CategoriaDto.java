@@ -13,7 +13,6 @@ public class CategoriaDto {
     private Long idCategoria;
     private String nombre;
     private Long idCategoriaPadre;
-    private ImagenModel imagenModel;
     private LocalDate fechaBaja;
     private double margenGanancia;
 }

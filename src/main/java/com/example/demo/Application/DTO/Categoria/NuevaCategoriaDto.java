@@ -13,5 +13,4 @@ public class NuevaCategoriaDto {
     private double margenGanancia;
     private boolean dadoDeAlta;
     private Long idCategoriaPadre;
-    private ImagenModel imagenModel;
 }
