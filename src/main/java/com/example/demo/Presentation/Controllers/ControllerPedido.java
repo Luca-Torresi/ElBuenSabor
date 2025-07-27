@@ -37,10 +37,10 @@ public class ControllerPedido {
     //Recibe la información correspondiente a un nuevo pedido
     //@PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'CLIENTE')")
     @PostMapping("/nuevo")
-    public ResponseEntity<Pedido> nuevoPedido(@RequestBody NuevoPedidoDto nuevoPedidoDto) {
+    public ResponseEntity<String> nuevoPedido(@RequestBody NuevoPedidoDto nuevoPedidoDto) {
         String auth0Id = getAuth0IdFromAuthenticatedUser();
-        Pedido pedido = servicePedido.nuevoPedido(auth0Id, nuevoPedidoDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(pedido);
+        servicePedido.nuevoPedido(auth0Id, nuevoPedidoDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body("El pedido se realizó con éxito.");
     }
 
     //Devuelve una lista con todos los pedidos para ser gestionados por el cajero

@@ -49,6 +49,11 @@ public class ServiceArticulo {
         });
     }
 
+    public ArticuloDto obtenerInformacionArticulo(Long idArticulo) {
+        Articulo articulo = repoArticulo.findById(idArticulo).get();
+        return articuloMapper.articuloToArticuloDto(articulo);
+    }
+
     //Actualiza los precios de todos los artículos manufacturados
     @Transactional
     public void actualizarPrecios(){

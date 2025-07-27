@@ -29,6 +29,12 @@ public class ControllerArticulo {
         return serviceArticulo.listarArticulosCatalogo(page, size);
     }
 
+    @GetMapping("/informacion/{idArticulo}")
+    public ResponseEntity<ArticuloDto> obtenerInformacionArticulo(@PathVariable Long idArticulo){
+        ArticuloDto dto = serviceArticulo.obtenerInformacionArticulo(idArticulo);
+        return ResponseEntity.ok(dto);
+    }
+
     //Devuelve una lista con los nombres de todos los artículos
     @GetMapping("/listado")
     public ResponseEntity<List<ArticuloNombreDto>> listaNombresArticulos(){
