@@ -47,7 +47,7 @@ public class MercadoPagoService {
         }
     }
 
-    public String createPreference(List<ItemDTO> items, String externalReference) throws MPException, MPApiException {
+    public String createPreference(List<ItemDTO> items, String externalReference, double costoEnvio) throws MPException, MPApiException {
         try {
             PreferenceClient client = new PreferenceClient();
 
@@ -59,6 +59,14 @@ public class MercadoPagoService {
                         .unitPrice(BigDecimal.valueOf(itemDTO.getUnitPrice()))
                         .build();
                 preferenceItems.add(item);
+            }
+            if (costoEnvio > 0 ) {
+                PreferenceItemRequest envioItem = PreferenceItemRequest.builder()
+                        .title("Costo de envío")
+                        .quantity(1)
+                        .unitPrice(BigDecimal.valueOf(costoEnvio))
+                        .build();
+                preferenceItems.add(envioItem);
             }
 
             PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder()

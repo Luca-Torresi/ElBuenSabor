@@ -1,6 +1,7 @@
 package com.example.demo.Presentation.Controllers;
 
 import com.example.demo.Application.DTO.Generic.ItemDTO;
+import com.example.demo.Application.DTO.Generic.PreferenciaPagoDto;
 import com.example.demo.Domain.Service.MercadoPagoService;
 import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
@@ -23,15 +24,19 @@ public class PagoController {
     private static final Logger logger = LoggerFactory.getLogger(PagoController.class);
 
     @PostMapping("/api/pagos/preferencia")
-    public ResponseEntity<?> generarPreferencia(@RequestBody List<ItemDTO> items) {
+    public ResponseEntity<?> generarPreferencia(@RequestBody PreferenciaPagoDto preferenciaPagoDto) {
         try {
+            List<ItemDTO> items = preferenciaPagoDto.getItems();
+            Double envio = preferenciaPagoDto.getCostoEnvio();
+
             if (items == null || items.isEmpty()) {
                 return ResponseEntity
                         .badRequest()
                         .body(Map.of("error", "La lista de items no puede estar vacía"));
             }
+            double costoEnvio = (envio != null) ? envio : 0.0;
 
-            String initPoint = mercadoPagoService.createPreference(items, null);
+            String initPoint = mercadoPagoService.createPreference(items, null, costoEnvio);
 
             return ResponseEntity.ok(Map.of("init_point", initPoint));
 
