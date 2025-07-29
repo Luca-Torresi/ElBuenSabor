@@ -34,6 +34,21 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
+    @ExceptionHandler(ArticuloDadoDeBajaException.class)
+    public ResponseEntity<String> handleArticuloDadoDeBajaException(ArticuloDadoDeBajaException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+
+    @ExceptionHandler(InsumoNoEncontradoException.class)
+    public ResponseEntity<String> handleInsumoNoEncontradoException(InsumoNoEncontradoException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+
+    @ExceptionHandler(ArticuloNoEncontradoException.class)
+    public ResponseEntity<String> handleArticuloNoEncontradoException(ArticuloNoEncontradoException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+
     @ExceptionHandler(EmpleadoNotFoundException.class)
     public ResponseEntity<String> handleEmpleadoNotFound(EmpleadoNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());

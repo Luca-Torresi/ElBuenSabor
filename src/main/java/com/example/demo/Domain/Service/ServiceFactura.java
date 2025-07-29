@@ -7,6 +7,9 @@ import com.example.demo.Domain.Enums.TipoEnvio;
 import com.example.demo.Domain.Repositories.RepoFactura;
 import com.example.demo.Domain.Repositories.RepoPedido;
 import com.lowagie.text.*;
+import com.lowagie.text.Font;
+import com.lowagie.text.Rectangle;
+import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import jakarta.mail.MessagingException;
@@ -14,6 +17,7 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
+import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -28,7 +32,102 @@ public class ServiceFactura {
     private final RepoPedido repoPedido;
     private final JavaMailSender javaMailSender;
 
+    public byte[] generarFacturaPDF(Long idPedido) {
+        Factura factura = repoFactura.findByIdPedido(idPedido);
+        Pedido pedido = repoPedido.findById(idPedido).orElseThrow();
+
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            Document document = new Document(PageSize.A4, 50, 50, 50, 50);
+            PdfWriter.getInstance(document, byteArrayOutputStream);
+            document.open();
+
+            Font tituloFont = new Font(Font.HELVETICA, 20, Font.BOLD, new Color(10, 50, 100));
+            Font boldFont = new Font(Font.HELVETICA, 12, Font.BOLD);
+            Font normalFont = new Font(Font.HELVETICA, 12, Font.NORMAL);
+            Font smallFont = new Font(Font.HELVETICA, 10);
+            Font totalFont = new Font(Font.HELVETICA, 14, Font.BOLD, new Color(10, 50, 100));
+
+            // Título
+            Paragraph titulo = new Paragraph("Factura\nEl Buen Sabor", tituloFont);
+            titulo.setSpacingAfter(20);
+            document.add(titulo);
+
+            // Datos cliente y factura (en 3 columnas)
+            PdfPTable datosTable = new PdfPTable(3);
+            datosTable.setWidthPercentage(100);
+            datosTable.setWidths(new int[]{3, 3, 3});
+
+            PdfPCell facturarA = new PdfPCell();
+            facturarA.setBorder(Rectangle.NO_BORDER);
+            facturarA.addElement(new Paragraph("FACTURAR A", boldFont));
+            facturarA.addElement(new Paragraph(factura.getPedido().getCliente().getNombre() + " " + factura.getPedido().getCliente().getApellido(), normalFont));
+            facturarA.addElement(new Paragraph(factura.getPedido().getCliente().getEmail(), normalFont));
+            datosTable.addCell(facturarA);
+
+            PdfPCell enviarA = new PdfPCell();
+            enviarA.setBorder(Rectangle.NO_BORDER);
+            enviarA.addElement(new Paragraph("ENVIAR A", boldFont));
+            enviarA.addElement(new Paragraph(factura.getPedido().getCliente().getNombre() + " " + factura.getPedido().getCliente().getApellido(), normalFont));
+            datosTable.addCell(enviarA);
+
+            PdfPCell infoFactura = new PdfPCell();
+            infoFactura.setBorder(Rectangle.NO_BORDER);
+            infoFactura.addElement(new Paragraph("N° DE FACTURA: " + factura.getNroComprobante(), normalFont));
+            infoFactura.addElement(new Paragraph("FECHA: " + factura.getFechaYHora().toLocalDate(), normalFont));
+            infoFactura.addElement(new Paragraph("N° DE PEDIDO: " + String.format("%09d", pedido.getIdPedido()), normalFont));
+            infoFactura.addElement(new Paragraph("FECHA VENCIMIENTO: " + factura.getFechaYHora().toLocalDate(), normalFont));
+            datosTable.addCell(infoFactura);
+
+            document.add(datosTable);
+            document.add(new Paragraph(" "));
+
+            // Tabla de productos
+            PdfPTable tabla = new PdfPTable(4);
+            tabla.setWidthPercentage(100);
+            tabla.setWidths(new float[]{1, 4, 2, 2});
+
+            tabla.addCell(new PdfPCell(new Phrase("CANT.", boldFont)));
+            tabla.addCell(new PdfPCell(new Phrase("DESCRIPCIÓN", boldFont)));
+            tabla.addCell(new PdfPCell(new Phrase("PRECIO UNITARIO", boldFont)));
+            tabla.addCell(new PdfPCell(new Phrase("IMPORTE", boldFont)));
+
+            for (DetalleFactura detalle : factura.getDetalles()) {
+                tabla.addCell(new Phrase(String.valueOf(detalle.getCantidad()), normalFont));
+                tabla.addCell(new Phrase(detalle.getNombreArticulo(), normalFont));
+                tabla.addCell(new Phrase(String.format("$ %.2f", detalle.getPrecioUnitario()), normalFont));
+                tabla.addCell(new Phrase(String.format("$ %.2f", detalle.getSubTotal()), normalFont));
+            }
+
+            document.add(tabla);
+            document.add(new Paragraph(" "));
+
+            // Total
+            Paragraph total = new Paragraph("TOTAL $ " + String.format("%.2f", factura.getTotal()), totalFont);
+            total.setAlignment(Element.ALIGN_RIGHT);
+            document.add(total);
+
+            document.add(new Paragraph(" "));
+            document.add(new Paragraph("Gracias", new Font(Font.HELVETICA, 16, Font.ITALIC, new Color(0, 0, 128))));
+
+            // Pie de página
+            Paragraph derechos = new Paragraph("Derechos reservados a El Buen Sabor", smallFont);
+            derechos.setSpacingBefore(30);
+            document.add(derechos);
+
+            Paragraph direccion = new Paragraph("EL BUEN SABOR\nAristides Villanueva 425\nTodos los derechos reservados.", smallFont);
+            document.add(direccion);
+
+            document.close();
+            return byteArrayOutputStream.toByteArray();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error al generar PDF de factura", e);
+        }
+    }
+
     //Obtiene los datos necesario y genera el PDF correspondiente a la factura
+    /*
     public byte[] generarFacturaPDF(Long idPedido) {
         Factura factura = repoFactura.findByIdPedido(idPedido);
 
@@ -106,6 +205,7 @@ public class ServiceFactura {
             throw new RuntimeException("Error al generar PDF de factura", e);
         }
     }
+    */
 
     //Llama al método anterior para generar la factura y luego es enviada por mail al cliente
     @Transactional(propagation = Propagation.REQUIRES_NEW)

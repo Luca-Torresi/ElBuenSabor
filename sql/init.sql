@@ -212,12 +212,12 @@ BEGIN
     DECLARE _idArticulo INT;
     DECLARE _nombre VARCHAR(255);
     DECLARE _cantArticulo INT;
-    DECLARE _precioVenta DECIMAL(10,2);
+    DECLARE _precioUnitario DECIMAL(10,2);
     DECLARE _subtotal DECIMAL(10,2);
     DECLARE finCursor INT DEFAULT 0;
 
     DECLARE nuevoCursor CURSOR FOR
-        SELECT dp.idArticulo, nombre, cantidad, precioVenta
+        SELECT dp.idArticulo, nombre, cantidad, subtotal
         FROM detallePedido dp
                  INNER JOIN articulo ON articulo.idArticulo = dp.idArticulo
         WHERE idPedido = _idPedido;
@@ -236,15 +236,15 @@ BEGIN
 
     OPEN nuevoCursor;
     bucle: LOOP
-        FETCH nuevoCursor INTO _idArticulo, _nombre, _cantArticulo, _precioVenta;
+        FETCH nuevoCursor INTO _idArticulo, _nombre, _cantArticulo, _subtotal;
         IF finCursor THEN
             LEAVE bucle;
         END IF;
 
-        SET _subtotal = _precioVenta * _cantArticulo;
+        SET _precioUnitario = _subtotal / _cantArticulo;
 
         INSERT INTO detalleFactura(idFactura, idArticulo, nombreArticulo, cantidad, precioUnitario, subtotal)
-        VALUES(_idFactura, _idArticulo, _nombre, _cantArticulo, _precioVenta, _subtotal);
+        VALUES(_idFactura, _idArticulo, _nombre, _cantArticulo, _precioUnitario, _subtotal);
 
     END LOOP;
     CLOSE nuevoCursor;
@@ -272,6 +272,17 @@ BEGIN
         SET precioVenta = ROUND((SELECT costo FROM articuloNoElaborado WHERE idArticulo = _idArticulo) * (1 + margenArticulo(_idArticulo)), -2)
         WHERE idArticulo = _idArticulo;
     END IF;
+END $$
+
+# Desactiva la promoción correspondiente con el artículo que se dio de baja (si es que existe)
+DROP PROCEDURE IF EXISTS desactivarPromocion;
+
+DELIMITER $$
+CREATE PROCEDURE desactivarPromocion(IN _idArticulo INT)
+BEGIN
+    UPDATE promocion
+    SET activo = FALSE
+    WHERE idArticulo = _idArticulo;
 END $$
 
 
@@ -312,6 +323,19 @@ CREATE TRIGGER pedidoEntregado_au
 BEGIN
     IF NEW.estadoPedido = 'ENTREGADO' THEN
         CALL generarNuevaFactura(NEW.idPedido);
+    END IF;
+END $$
+
+# Cuando se da de baja un artículo que está asociado a una promoción, la promoción también se debe dar de baja
+DROP TRIGGER IF EXISTS desactivarPromocion_au;
+
+DELIMITER $$
+CREATE TRIGGER desactivarPromocion_au
+    AFTER UPDATE ON articulo
+    FOR EACH ROW
+BEGIN
+    IF OLD.fechaBaja IS NULL AND NEW.fechaBaja IS NOT NULL THEN
+        CALL desactivarPromocion(OLD.idArticulo);
     END IF;
 END $$
 

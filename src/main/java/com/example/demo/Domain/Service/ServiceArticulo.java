@@ -5,6 +5,7 @@ import com.example.demo.Application.DTO.Articulo.ArticuloNombreDto;
 import com.example.demo.Application.Mapper.ArticuloMapper;
 import com.example.demo.Domain.Entities.Articulo;
 import com.example.demo.Domain.Entities.ArticuloNoElaborado;
+import com.example.demo.Domain.Exceptions.ArticuloNoEncontradoException;
 import com.example.demo.Domain.Repositories.RepoArticulo;
 import com.example.demo.Domain.Repositories.RepoArticuloNoElaborado;
 import com.example.demo.Domain.Exceptions.ActualizacionPreciosException;
@@ -50,7 +51,9 @@ public class ServiceArticulo {
     }
 
     public ArticuloDto obtenerInformacionArticulo(Long idArticulo) {
-        Articulo articulo = repoArticulo.findById(idArticulo).get();
+        Articulo articulo = repoArticulo.findById(idArticulo)
+                .orElseThrow(() -> new ArticuloNoEncontradoException("No se encontró el artículo con ID: " + idArticulo));
+
         return articuloMapper.articuloToArticuloDto(articulo);
     }
 
@@ -68,7 +71,9 @@ public class ServiceArticulo {
     //Dar de alta o baja a un artículo
     @Transactional
     public void darDeAltaBaja(Long idArticulo) {
-        Articulo articulo = repoArticulo.findById(idArticulo).get();
+        Articulo articulo = repoArticulo.findById(idArticulo)
+                .orElseThrow(() -> new ArticuloNoEncontradoException("No se encontró el artículo con ID: " + idArticulo));
+
         articulo.setFechaBaja(
                 articulo.getFechaBaja() != null ? null : LocalDate.now()
         );
@@ -77,7 +82,7 @@ public class ServiceArticulo {
 
     //Obtiene de la base de datos una lista con los nombres de todos los artículos para ser mostrados dentro de un 'select'
     public List<ArticuloNombreDto> listaNombresArticulos(){
-        List<Articulo> articulos = repoArticulo.findAll();
+        List<Articulo> articulos = repoArticulo.findByFechaBajaIsNull();
 
         List<ArticuloNombreDto> lista = new ArrayList<ArticuloNombreDto>();
         for(Articulo articulo : articulos){

@@ -8,6 +8,7 @@ import com.example.demo.Domain.Entities.Articulo;
 import com.example.demo.Domain.Entities.ArticuloManufacturado;
 import com.example.demo.Domain.Entities.Imagen;
 import com.example.demo.Domain.Entities.Promocion;
+import com.example.demo.Domain.Exceptions.ArticuloDadoDeBajaException;
 import com.example.demo.Domain.Repositories.RepoArticulo;
 import com.example.demo.Domain.Repositories.RepoArticuloManufacturado;
 import com.example.demo.Domain.Repositories.RepoPromocion;
@@ -70,7 +71,6 @@ public class ServicePromocion {
         promocion.setActivo(dto.isActivo());
         promocion.setHorarioInicio(dto.getHorarioInicio());
         promocion.setHorarioFin(dto.getHorarioFin());
-        //promocion.setImagen();
         promocion.setArticulo(articulo);
 
         return repoPromocion.save(promocion);
@@ -80,7 +80,13 @@ public class ServicePromocion {
     public void darDeAltaBajaPromocion(Long idPromocion){
         Promocion promocion = repoPromocion.findById(idPromocion).get();
 
-        promocion.setActivo(promocion.isActivo() ? false : true);
+        Articulo articulo = promocion.getArticulo();
+        if(articulo.getFechaBaja() ==  null){
+            promocion.setActivo(promocion.isActivo() ? false : true);
+        } else {
+            throw new ArticuloDadoDeBajaException("El artículo correspondiente a esta promoción se encuentra dado de baja");
+        }
+
         repoPromocion.save(promocion);
     }
 }

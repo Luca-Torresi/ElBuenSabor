@@ -9,12 +9,12 @@ BEGIN
     DECLARE _idArticulo INT;
     DECLARE _nombre VARCHAR(255);
     DECLARE _cantArticulo INT;
-    DECLARE _precioVenta DECIMAL(10,2);
+    DECLARE _precioUnitario DECIMAL(10,2);
     DECLARE _subtotal DECIMAL(10,2);
     DECLARE finCursor INT DEFAULT 0;
 
     DECLARE nuevoCursor CURSOR FOR
-        SELECT dp.idArticulo, nombre, cantidad, precioVenta
+        SELECT dp.idArticulo, nombre, cantidad, subtotal
         FROM detallePedido dp
                  INNER JOIN articulo ON articulo.idArticulo = dp.idArticulo
         WHERE idPedido = _idPedido;
@@ -33,15 +33,15 @@ BEGIN
 
     OPEN nuevoCursor;
     bucle: LOOP
-        FETCH nuevoCursor INTO _idArticulo, _nombre, _cantArticulo, _precioVenta;
+        FETCH nuevoCursor INTO _idArticulo, _nombre, _cantArticulo, _subtotal;
         IF finCursor THEN
             LEAVE bucle;
         END IF;
 
-        SET _subtotal = _precioVenta * _cantArticulo;
+        SET _precioUnitario = _subtotal / _cantArticulo;
 
         INSERT INTO detalleFactura(idFactura, idArticulo, nombreArticulo, cantidad, precioUnitario, subtotal)
-        VALUES(_idFactura, _idArticulo, _nombre, _cantArticulo, _precioVenta, _subtotal);
+        VALUES(_idFactura, _idArticulo, _nombre, _cantArticulo, _precioUnitario, _subtotal);
 
     END LOOP;
     CLOSE nuevoCursor;

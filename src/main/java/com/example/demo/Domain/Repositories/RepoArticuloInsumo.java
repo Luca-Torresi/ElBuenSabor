@@ -16,4 +16,6 @@ public interface RepoArticuloInsumo extends JpaRepository<ArticuloInsumo, Long> 
 
     @Query(value = "SELECT nombre FROM articuloInsumo WHERE idRubroInsumo = :idRubroInsumo", nativeQuery = true)
     List<String> findNombresByIdRubroInsumo(@Param("idRubroInsumo") Long idRubroInsumo);
+
+    List<ArticuloInsumo> findByFechaBajaIsNull();
 }

@@ -83,7 +83,6 @@ public class ServicePedido {
             DetallePedido detallePedido = DetallePedido.builder()
                     .articulo(articulo)
                     .cantidad(detalle.getCantidad())
-                    //.subtotal(articulo.getPrecioVenta() * detalle.getCantidad())
                     .pedido(pedido)
                     .build();
 

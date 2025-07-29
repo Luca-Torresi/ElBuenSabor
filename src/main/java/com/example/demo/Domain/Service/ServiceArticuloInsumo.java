@@ -3,6 +3,8 @@ package com.example.demo.Domain.Service;
 import com.example.demo.Application.DTO.ArticuloInsumo.*;
 import com.example.demo.Application.Mapper.InsumoMapper;
 import com.example.demo.Domain.Entities.*;
+import com.example.demo.Domain.Exceptions.ArticuloNoEncontradoException;
+import com.example.demo.Domain.Exceptions.InsumoNoEncontradoException;
 import com.example.demo.Domain.Repositories.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -51,7 +53,8 @@ public class ServiceArticuloInsumo {
     //Para cada insumo del arreglo se suma al stock actual la cantidad ingresada
     public void recargaDeInsumos(ArregloRecargaInsumoDto arregloRecargaInsumoDto){
         for(RecargaInsumoDto insumo : arregloRecargaInsumoDto.getLista()){
-            ArticuloInsumo articuloInsumo = repoArticuloInsumo.findById(insumo.getIdArticuloInsumo()).get();
+            ArticuloInsumo articuloInsumo = repoArticuloInsumo.findById(insumo.getIdArticuloInsumo())
+                    .orElseThrow(() -> new InsumoNoEncontradoException("No se encontró el insumo con ID: " + insumo.getIdArticuloInsumo()));
 
             articuloInsumo.setStockActual(articuloInsumo.getStockActual() + insumo.getCantidad());
             repoArticuloInsumo.save(articuloInsumo);
@@ -60,7 +63,7 @@ public class ServiceArticuloInsumo {
 
     //Devuelve una lista con todos los nombres de los insumos
     public ArregloInsumoDto listaInsumos(){
-        List<ArticuloInsumo> articulosInsumo = repoArticuloInsumo.findAll();
+        List<ArticuloInsumo> articulosInsumo = repoArticuloInsumo.findByFechaBajaIsNull();
 
         List<InsumoDto> insumos = new ArrayList<>();
         for(ArticuloInsumo insumo : articulosInsumo){
@@ -100,7 +103,9 @@ public class ServiceArticuloInsumo {
         RubroInsumo rubroInsumo = repoRubroInsumo.findById(dto.getIdRubroInsumo()).get();
         UnidadDeMedida unidadDeMedida = repoUnidadDeMedida.findById(dto.getIdUnidadDeMedida()).get();
 
-        ArticuloInsumo articuloInsumo = repoArticuloInsumo.findById(idArticuloInsumo).get();
+        ArticuloInsumo articuloInsumo = repoArticuloInsumo.findById(idArticuloInsumo)
+                .orElseThrow(() -> new ArticuloNoEncontradoException("No se encontró el artículo con ID: " + idArticuloInsumo));
+
         articuloInsumo.setRubroInsumo(rubroInsumo);
         articuloInsumo.setUnidadDeMedida(unidadDeMedida);
         articuloInsumo.setFechaBaja(dto.isDadoDeAlta() ? null : LocalDate.now());
@@ -117,7 +122,8 @@ public class ServiceArticuloInsumo {
 
     //Dar de alta o baja a un insumo
     public void darDeAltaBaja(Long idArticuloInsumo) {
-        ArticuloInsumo articuloInsumo = repoArticuloInsumo.findById(idArticuloInsumo).get();
+        ArticuloInsumo articuloInsumo = repoArticuloInsumo.findById(idArticuloInsumo)
+                .orElseThrow(() -> new ArticuloNoEncontradoException("No se encontró el artículo con ID: " + idArticuloInsumo));
         articuloInsumo.setFechaBaja(
                 articuloInsumo.getFechaBaja() != null ? null : LocalDate.now()
         );
