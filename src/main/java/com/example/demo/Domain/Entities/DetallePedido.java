@@ -17,7 +17,7 @@ public class DetallePedido {
     @ManyToOne @JoinColumn(name = "idArticulo")
     private Articulo articulo;
     private int cantidad;
-    private double subtotal;
+    private Double subtotal;
 
     @ManyToOne @JoinColumn(name = "idPedido")
     @JsonBackReference

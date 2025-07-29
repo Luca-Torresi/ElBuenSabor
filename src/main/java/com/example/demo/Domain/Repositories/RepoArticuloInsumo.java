@@ -13,4 +13,7 @@ import java.util.List;
 public interface RepoArticuloInsumo extends JpaRepository<ArticuloInsumo, Long> {
     @Query(value = "SELECT articulo.nombre, cantidad FROM articuloManufacturadoDetalle amd INNER JOIN articulo ON articulo.idArticulo = amd.idArticulo WHERE idArticuloInsumo = :idArticuloInsumo", nativeQuery = true)
     List<IngredienteDto> contienenDeterminadoInsumo(@Param("idArticuloInsumo") Long idArticuloInsumo);
+
+    @Query(value = "SELECT nombre FROM articuloInsumo WHERE idRubroInsumo = :idRubroInsumo", nativeQuery = true)
+    List<String> findNombresByIdRubroInsumo(@Param("idRubroInsumo") Long idRubroInsumo);
 }

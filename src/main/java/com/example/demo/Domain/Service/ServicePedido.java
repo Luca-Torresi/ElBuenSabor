@@ -18,7 +18,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
@@ -35,6 +39,7 @@ public class ServicePedido {
     private final RepoArticuloNoElaborado repoArticuloNoElaborado;
     private final RepoDireccion repoDireccion;
     private final SimpMessagingTemplate messagingTemplate;
+    private final RepoPromocion repoPromocion;
 
     //Luego de verificar que existan insumos suficientes para su elaboración, se persiste el pedido en la base de datos
     public Pedido nuevoPedido(String _cliente, NuevoPedidoDto nuevoPedidoDto) {
@@ -78,9 +83,29 @@ public class ServicePedido {
             DetallePedido detallePedido = DetallePedido.builder()
                     .articulo(articulo)
                     .cantidad(detalle.getCantidad())
-                    .subtotal(articulo.getPrecioVenta() * detalle.getCantidad())
+                    //.subtotal(articulo.getPrecioVenta() * detalle.getCantidad())
                     .pedido(pedido)
                     .build();
+
+            List<Promocion> promociones = repoPromocion.findByActivoTrue();
+            for(Promocion promocion : promociones){
+                if(promocion.getArticulo().getIdArticulo() == articulo.getIdArticulo()){
+                    LocalTime horaActual = LocalTime.now();
+                    if(!horaActual.isBefore(promocion.getHorarioInicio()) && !horaActual.isAfter(promocion.getHorarioFin())){
+                        detallePedido.setSubtotal(articulo.getPrecioVenta() * (1 - promocion.getDescuento()) * detalle.getCantidad());
+
+                        double subtotalCalculado = articulo.getPrecioVenta() * (1 - promocion.getDescuento()) * detalle.getCantidad();
+                        BigDecimal subtotalRedondeado = BigDecimal.valueOf(subtotalCalculado)
+                                .setScale(1, RoundingMode.HALF_UP);
+
+                        detallePedido.setSubtotal(subtotalRedondeado.doubleValue());
+                    }
+                }
+            }
+
+            if(detallePedido.getSubtotal() == null){
+                detallePedido.setSubtotal(articulo.getPrecioVenta() * detalle.getCantidad());
+            }
             detalles.add(detallePedido);
 
             total += detallePedido.getSubtotal();

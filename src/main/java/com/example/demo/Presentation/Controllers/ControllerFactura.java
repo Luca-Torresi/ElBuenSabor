@@ -1,6 +1,7 @@
 package com.example.demo.Presentation.Controllers;
 
 import com.example.demo.Domain.Service.ServiceFactura;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -10,13 +11,10 @@ import org.springframework.http.HttpHeaders;
 
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/factura")
 public class ControllerFactura {
-    private ServiceFactura serviceFactura;
-
-    public ControllerFactura(ServiceFactura serviceFactura) {
-        this.serviceFactura = serviceFactura;
-    }
+    private final ServiceFactura serviceFactura;
 
     //Método para generar el PDF correspondiente y descargar la factura
     @GetMapping("/descargar/{idPedido}")

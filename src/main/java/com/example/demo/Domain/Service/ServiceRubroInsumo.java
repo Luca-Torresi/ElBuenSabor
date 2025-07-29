@@ -2,8 +2,10 @@ package com.example.demo.Domain.Service;
 
 import com.example.demo.Application.DTO.RubroInsumo.*;
 import com.example.demo.Application.Mapper.RubroInsumoMapper;
+import com.example.demo.Domain.Entities.ArticuloInsumo;
 import com.example.demo.Domain.Entities.Categoria;
 import com.example.demo.Domain.Entities.RubroInsumo;
+import com.example.demo.Domain.Repositories.RepoArticuloInsumo;
 import com.example.demo.Domain.Repositories.RepoRubroInsumo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import java.util.List;
 public class ServiceRubroInsumo {
     private final RepoRubroInsumo repoRubroInsumo;
     private final RubroInsumoMapper rubroInsumoMapper;
+    private final RepoArticuloInsumo repoArticuloInsumo;
 
     //Persiste en la base de datos un nuevo Rubro Insumo
     public RubroInsumo nuevoRubro(NuevoRubroInsumoDto dto) {
@@ -36,9 +39,7 @@ public class ServiceRubroInsumo {
     }
 
     //Devuelve un arreglo con los nombres de los rubros insumo
-    public ArregloRubroInsumoDto listarRubrosInsumo(){
-        ArregloRubroInsumoDto arreglo = new ArregloRubroInsumoDto();
-
+    public List<RubroInsumoDto> listarRubrosInsumo(){
         List<RubroInsumoDto> rubrosDto = new ArrayList<>();
 
         List<RubroInsumo> rubros = repoRubroInsumo.findAll();
@@ -49,24 +50,26 @@ public class ServiceRubroInsumo {
 
             rubrosDto.add(rubroDto);
         }
-        arreglo.setArregloRubros(rubrosDto);
-        return arreglo;
+        return rubrosDto;
     }
 
     //Devuelve todos los rubro insumo para ser mostrados en el ABM
-    public ArregloRubroInsumoCompletoDto abmRubrosInsumo(){
+    public List<RubroInsumoCompletoDto> abmRubrosInsumo(){
         List<RubroInsumo> rubros = repoRubroInsumo.findAll();
 
-        List<RubroInsumoCompletoDto> rubrosCompletos = new ArrayList<>();
+        List<RubroInsumoCompletoDto> lista = new ArrayList<>();
 
         for(RubroInsumo rubro: rubros){
             RubroInsumoCompletoDto dto = rubroInsumoMapper.rubroInsumoToRubroInsumoCompletoDto(rubro);
             dto.setDadoDeAlta(rubro.getFechaBaja() != null ? false : true);
-            rubrosCompletos.add(dto);
+
+            List<String> insumos = repoArticuloInsumo.findNombresByIdRubroInsumo(rubro.getIdRubroInsumo());
+            dto.setInsumos(insumos);
+            dto.setCantInsumos(insumos.size());
+
+            lista.add(dto);
         }
-        ArregloRubroInsumoCompletoDto arreglo = new ArregloRubroInsumoCompletoDto();
-        arreglo.setRubrosDto(rubrosCompletos);
-        return arreglo;
+        return lista;
     }
 
     //Dar de alta o baja a un rubro insumo
