@@ -6,6 +6,7 @@ import com.example.demo.Domain.Service.ServiceCliente;
 import com.example.demo.Domain.Service.ServiceImagen;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -154,6 +155,12 @@ public class ControllerCliente {
         return serviceCliente.obtenerClientePorId(id)
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado."));
+    }
+
+    @GetMapping("/lista")
+    public Page<InformacionClienteDto> obtenerListaCLientes(@RequestParam(defaultValue = "0") int page,
+                                                             @RequestParam(defaultValue = "9") int size){
+        return serviceCliente.obtenerlistaClientes(page,size)   ;
     }
 
 }

@@ -2,35 +2,41 @@ package com.example.demo.Domain.Service;
 
 import com.auth0.exception.Auth0Exception;
 import com.auth0.json.mgmt.users.User;
+import com.example.demo.Application.DTO.Pedido.PedidoCajeroDto;
 import com.example.demo.Application.DTO.Usuario.ClienteRegistroDto;
+import com.example.demo.Application.DTO.Usuario.InformacionClienteDto;
 import com.example.demo.Application.DTO.Usuario.PasswordChangeDto;
 import com.example.demo.Application.DTO.Usuario.UsuarioDTO;
 import com.example.demo.Domain.Entities.Cliente;
+import com.example.demo.Domain.Entities.Pedido;
 import com.example.demo.Domain.Entities.Rol;
 import com.example.demo.Domain.Repositories.RepoCliente;
 import com.example.demo.Domain.Repositories.RepoImagen;
+import com.example.demo.Domain.Repositories.RepoPedido;
 import com.example.demo.Domain.Repositories.RepoRol;
 import com.example.demo.Domain.Service.Auth.UserAuth0Service;
 import com.example.demo.Domain.Service.Auth.UserBBDDService;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class ServiceCliente extends ServiceUsuario<Cliente> {
 
     private final RepoCliente repoCliente;
+    private final RepoPedido repoPedido;
 
     public ServiceCliente(RepoCliente repoCliente,
                           RepoRol repoRol,
                           UserAuth0Service userAuth0Service,
-                          UserBBDDService userBBDDService, RepoImagen repoImagen) {
+                          UserBBDDService userBBDDService, RepoImagen repoImagen, RepoPedido repoPedido) {
         super(userAuth0Service, userBBDDService, repoRol, repoImagen);
         this.repoCliente = repoCliente;
+        this.repoPedido = repoPedido;
     }
 
     /**
@@ -166,5 +172,25 @@ public class ServiceCliente extends ServiceUsuario<Cliente> {
 
     public Optional<Cliente> obtenerClientePorId(Long id) {
         return repoCliente.findById(id);
+    }
+
+    public Page<InformacionClienteDto> obtenerlistaClientes(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Cliente> clientes = repoCliente.findAll(pageable);
+
+        return clientes.map(cliente -> {
+            String nombreYApellido = cliente.getNombre() + " " + cliente.getApellido();
+
+            Integer cantidadPedidos = repoPedido.obtenerCantidadDePedidosPorCliente(cliente.getIdUsuario());
+
+            InformacionClienteDto dto = InformacionClienteDto.builder()
+                    .idUsuario(cliente.getIdUsuario())
+                    .nombreYApellido(nombreYApellido)
+                    .email(cliente.getEmail())
+                    .telefono(cliente.getTelefono())
+                    .cantidadPedidos(cantidadPedidos)
+                    .build();
+            return dto;
+        });
     }
 }

@@ -1,20 +1,14 @@
 package com.example.demo.Domain.Service;
 
-import com.example.demo.Application.DTO.Generic.ImagenModel;
 import com.example.demo.Application.DTO.Promocion.*;
-import com.example.demo.Application.Mapper.ImagenMapperImpl;
 import com.example.demo.Application.Mapper.PromocionMapper;
 import com.example.demo.Domain.Entities.Articulo;
-import com.example.demo.Domain.Entities.ArticuloManufacturado;
-import com.example.demo.Domain.Entities.Imagen;
 import com.example.demo.Domain.Entities.Promocion;
 import com.example.demo.Domain.Exceptions.ArticuloDadoDeBajaException;
 import com.example.demo.Domain.Repositories.RepoArticulo;
-import com.example.demo.Domain.Repositories.RepoArticuloManufacturado;
 import com.example.demo.Domain.Repositories.RepoPromocion;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 

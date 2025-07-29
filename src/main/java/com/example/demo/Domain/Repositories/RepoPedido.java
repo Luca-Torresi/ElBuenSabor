@@ -23,5 +23,6 @@ public interface RepoPedido extends JpaRepository<Pedido, Long> {
 
     Page<Pedido> findByCliente_IdUsuarioAndEstadoPedidoIn(Long idCliente, List<EstadoPedido> estados, Pageable pageable);
 
-
+    @Query(value = "SELECT COUNT(*) FROM pedido WHERE idCliente = :idCliente", nativeQuery = true)
+    Integer obtenerCantidadDePedidosPorCliente(@Param("idCliente") Long idCliente);
 }
