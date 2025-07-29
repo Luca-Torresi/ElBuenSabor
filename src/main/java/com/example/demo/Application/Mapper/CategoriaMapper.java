@@ -6,12 +6,10 @@ import com.example.demo.Domain.Entities.Categoria;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = ImagenMapper.class)
+@Mapper(componentModel = "spring")
 public interface CategoriaMapper {
-    @Mapping(source = "imagenModel", target = "imagen")
     Categoria nuevaCategoriaDtoToCategoria(NuevaCategoriaDto nuevaCategoriaDto);
 
-    @Mapping(source = "imagen", target = "imagenModel")
     @Mapping(source = "categoriaPadre.idCategoria", target = "idCategoriaPadre")
     CategoriaDto categoriaToCategoriaDto(Categoria categoria);
 }

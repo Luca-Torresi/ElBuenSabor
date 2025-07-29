@@ -77,8 +77,6 @@ public class ServiceCategoria {
             categoria.setCategoriaPadre(null);
         }
 
-        categoria.setImagen(categoriaMapper.nuevaCategoriaDtoToCategoria(dto).getImagen());
-
         return repoCategoria.save(categoria);
     }
 
