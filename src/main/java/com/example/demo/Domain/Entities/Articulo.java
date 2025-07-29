@@ -1,6 +1,7 @@
 package com.example.demo.Domain.Entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,6 +21,7 @@ public class Articulo {
     private LocalDate fechaBaja;
     private boolean esManufacturado;
 
+    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idImagen")
     private Imagen imagen;
