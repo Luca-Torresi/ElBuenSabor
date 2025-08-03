@@ -8,6 +8,6 @@ import lombok.experimental.SuperBuilder;
 @Data @SuperBuilder @AllArgsConstructor @NoArgsConstructor
 @Entity @Table
 public class ArticuloNoElaborado extends Articulo {
-    private double costo;
-    private int stock;
+    private Double costo;
+    private Integer stock;
 }

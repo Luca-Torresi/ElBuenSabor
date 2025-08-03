@@ -13,7 +13,7 @@ public class ActualizacionCosto {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idActualizacionCosto;
-    private double costo;
+    private Double costo;
     private LocalDateTime fechaActualizacion;
 
     @ManyToOne

@@ -7,16 +7,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
 @Entity @Table
 public class Promocion {
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idPromocion;
     private String titulo;
     private String descripcion;
-    private double descuento;
-    private boolean activo;
+    private Double precio;
+    private Boolean activo;
     private LocalTime horarioInicio;
     private LocalTime horarioFin;
 
@@ -24,7 +26,6 @@ public class Promocion {
     @JoinColumn(name = "idImagen")
     private Imagen imagen;
 
-    @ManyToOne
-    @JoinColumn(name = "idArticulo")
-    private Articulo articulo;
+    @OneToMany(mappedBy = "promocion", cascade = CascadeType.ALL)
+    private List<DetallePromocion> detalles;
 }

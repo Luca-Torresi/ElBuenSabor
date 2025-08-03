@@ -1,6 +1,8 @@
 # Según si el pedido fue confirmado o cancelado, se realizan los cambios correspondientes en el stock
+DROP PROCEDURE IF EXISTS actualizarStock;
+
 DELIMITER $$
-CREATE PROCEDURE actualizarStock(IN _idArticulo INT, IN _cantArticulo INT, IN _pedidoCancelado BOOLEAN)
+CREATE PROCEDURE actualizarStock(IN _idArticulo INT, IN _cantArticulo INT, IN _pedidoConfirmado BOOLEAN)
 BEGIN
     DECLARE _esManufacturado BOOLEAN;
     DECLARE _idInsumo INT;
@@ -20,27 +22,27 @@ BEGIN
 
     IF _esManufacturado THEN
         OPEN nuevoCursor;
-        bucle: LOOP
-            FETCH nuevoCursor INTO _idInsumo, _cantInsumo;
-            IF finCursor THEN
-                LEAVE bucle;
-            END IF;
+            bucle: LOOP
+                FETCH nuevoCursor INTO _idInsumo, _cantInsumo;
+                IF finCursor THEN
+                    LEAVE bucle;
+                END IF;
 
-            IF NOT _pedidoCancelado THEN
-                UPDATE ArticuloInsumo
-                SET stockActual = (stockActual - _cantInsumo * _cantArticulo)
-                WHERE idArticuloInsumo = _idInsumo;
-            ELSE
-                UPDATE ArticuloInsumo
-                SET stockActual = (stockActual + _cantInsumo * _cantArticulo)
-                WHERE idArticuloInsumo = _idInsumo;
-            END IF;
+                IF _pedidoConfirmado THEN
+                    UPDATE ArticuloInsumo
+                    SET stockActual = (stockActual - _cantInsumo * _cantArticulo)
+                    WHERE idArticuloInsumo = _idInsumo;
+                ELSE
+                    UPDATE ArticuloInsumo
+                    SET stockActual = (stockActual + _cantInsumo * _cantArticulo)
+                    WHERE idArticuloInsumo = _idInsumo;
+                END IF;
 
-        END LOOP;
+            END LOOP;
         CLOSE nuevoCursor;
 
     ELSE
-        IF NOT _pedidoCancelado THEN
+        IF _pedidoConfirmado THEN
             UPDATE ArticuloNoElaborado
             SET stock = (stock - _cantArticulo)
             WHERE idArticulo = _idArticulo;

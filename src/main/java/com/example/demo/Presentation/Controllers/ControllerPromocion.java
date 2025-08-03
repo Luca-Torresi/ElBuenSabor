@@ -26,6 +26,8 @@ public class ControllerPromocion {
     private final ServicePromocion servicePromocion;
     private final ServiceImagen serviceImagen;
 
+    /*
+
     //Recibe los datos necesarios para la creación de una nueva promoción
     //@PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
     @PostMapping(value = "/nueva", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -95,5 +97,5 @@ public class ControllerPromocion {
         servicePromocion.darDeAltaBajaPromocion(idPromocion);
         return ResponseEntity.ok().build();
     }
-
+*/
 }

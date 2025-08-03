@@ -15,9 +15,9 @@ public class ArticuloInsumo {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idArticuloInsumo;
     private String nombre;
-    private double stockActual;
-    private double stockMinimo;
-    private double stockMaximo;
+    private Double stockActual;
+    private Double stockMinimo;
+    private Double stockMaximo;
     private LocalDate fechaBaja;
 
     @ManyToOne

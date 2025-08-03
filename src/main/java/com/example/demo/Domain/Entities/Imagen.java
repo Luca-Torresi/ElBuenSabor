@@ -10,6 +10,7 @@ import java.util.UUID;
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
 @Entity @Table
 public class Imagen {
+
     @Id @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 

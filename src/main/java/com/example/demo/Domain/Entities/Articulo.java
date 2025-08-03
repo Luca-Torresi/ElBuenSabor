@@ -17,9 +17,9 @@ public class Articulo {
     private Long idArticulo;
     private String nombre;
     private String descripcion;
-    private double precioVenta;
+    private Double precioVenta;
     private LocalDate fechaBaja;
-    private boolean esManufacturado;
+    private Boolean esManufacturado;
 
     @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)

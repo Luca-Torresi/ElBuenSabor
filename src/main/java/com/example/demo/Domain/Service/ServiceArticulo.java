@@ -38,7 +38,7 @@ public class ServiceArticulo {
         return paginaArticulos.map(articulo -> {
             ArticuloDto dto = articuloMapper.articuloToArticuloDto(articulo);
 
-            if (articulo.isEsManufacturado()) {
+            if (articulo.getEsManufacturado()) {
                 dto.setPuedeElaborarse(repoArticulo.sePuedeElaborar(articulo.getIdArticulo()));
             } else {
                 Optional<ArticuloNoElaborado> optional = repoArticuloNoElaborado.findById(articulo.getIdArticulo());

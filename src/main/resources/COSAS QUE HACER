@@ -1,0 +1,13 @@
+  --- MÉTODOS PARA CORREGIR ---
+
+.evaluarStock()
+
+Para los siguientes métodos hay que corregir los DTO
+.mostrarPedidosCajero()
+.mostrarPedidosCocinero()
+.mostrarPedidosRepartidor()
+
+
+Falta hacer la lógica para establecer el tiempo de preparación de un pedido
+
+

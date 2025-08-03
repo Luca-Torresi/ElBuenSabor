@@ -13,6 +13,7 @@ import java.util.List;
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
 @Entity @Table
 public class Factura {
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idFactura;
     private String nroComprobante;
@@ -26,7 +27,6 @@ public class Factura {
     @Enumerated(EnumType.STRING)
     private MetodoDePago metodoDePago;
 
-    @OneToOne
-    @JoinColumn(name = "idPedido")
+    @OneToOne @JoinColumn(name = "idPedido")
     private Pedido pedido;
 }

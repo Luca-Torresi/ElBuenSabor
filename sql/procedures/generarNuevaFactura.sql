@@ -1,4 +1,6 @@
 # Genera los registros correspondientes en las tablas 'factura' y 'detalleFactura' asociados al pedido
+DROP PROCEDURE IF EXISTS generarNuevaFactura;
+
 DELIMITER $$
 CREATE PROCEDURE generarNuevaFactura(IN _idPedido INT)
 BEGIN
@@ -7,16 +9,15 @@ BEGIN
     DECLARE _tipoEnvio VARCHAR(255);
     DECLARE _total DECIMAL(10,2) DEFAULT 0;
     DECLARE _idArticulo INT;
-    DECLARE _nombre VARCHAR(255);
-    DECLARE _cantArticulo INT;
+    DECLARE _idPromocion INT;
+    DECLARE _cantidad INT;
     DECLARE _precioUnitario DECIMAL(10,2);
     DECLARE _subtotal DECIMAL(10,2);
     DECLARE finCursor INT DEFAULT 0;
 
     DECLARE nuevoCursor CURSOR FOR
-        SELECT dp.idArticulo, nombre, cantidad, subtotal
-        FROM detallePedido dp
-                 INNER JOIN articulo ON articulo.idArticulo = dp.idArticulo
+        SELECT idArticulo, idPromocion, cantidad, subtotal
+        FROM detallePedido
         WHERE idPedido = _idPedido;
 
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET finCursor = 1;
@@ -32,17 +33,17 @@ BEGIN
     SET _idFactura = LAST_INSERT_ID();
 
     OPEN nuevoCursor;
-    bucle: LOOP
-        FETCH nuevoCursor INTO _idArticulo, _nombre, _cantArticulo, _subtotal;
-        IF finCursor THEN
-            LEAVE bucle;
-        END IF;
+        bucle: LOOP
+            FETCH nuevoCursor INTO _idArticulo, _idPromocion, _cantidad, _subtotal;
+            IF finCursor THEN
+                LEAVE bucle;
+            END IF;
 
-        SET _precioUnitario = _subtotal / _cantArticulo;
+            SET _precioUnitario = _subtotal / _cantidad;
 
-        INSERT INTO detalleFactura(idFactura, idArticulo, nombreArticulo, cantidad, precioUnitario, subtotal)
-        VALUES(_idFactura, _idArticulo, _nombre, _cantArticulo, _precioUnitario, _subtotal);
+            INSERT INTO detalleFactura(idFactura, idArticulo, idPromocion, cantidad, precioUnitario, subtotal)
+            VALUES(_idFactura, _idArticulo, _idPromocion, _cantidad, _precioUnitario, _subtotal);
 
-    END LOOP;
+        END LOOP;
     CLOSE nuevoCursor;
 END $$

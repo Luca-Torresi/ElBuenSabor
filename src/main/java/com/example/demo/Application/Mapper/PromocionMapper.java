@@ -15,10 +15,8 @@ public interface PromocionMapper {
     Promocion promocionDtoToPromocion(NuevaPromocionDto nuevaPromocionDto);
 
     @Mapping(source = "imagen.url", target = "url")
-    @Mapping(source = "articulo.idArticulo", target = "idArticulo")
     PromocionCatalogoDto promocionToPromocionCatalogoDto(Promocion promocion);
 
     @Mapping(source = "imagen.url", target = "url")
-    @Mapping(source = "articulo.nombre", target = "nombreArticulo")
     PromocionAbmDto promocionToPromocionAbmDto(Promocion promocion);
 }

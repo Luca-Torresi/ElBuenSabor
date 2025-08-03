@@ -1,4 +1,6 @@
 # Devuelve el costo total de un artículo en base a sus ingredientes
+DROP FUNCTION IF EXISTS costoTotalArticulo;
+
 DELIMITER $$
 CREATE FUNCTION costoTotalArticulo(_idArticulo INT)
     RETURNS DECIMAL(10,2)

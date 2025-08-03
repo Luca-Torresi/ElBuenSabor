@@ -13,11 +13,14 @@ public class DetallePedido {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idDetallePedido;
+    private Integer cantidad;
+    private Double subtotal;
 
     @ManyToOne @JoinColumn(name = "idArticulo")
     private Articulo articulo;
-    private int cantidad;
-    private Double subtotal;
+
+    @ManyToOne @JoinColumn(name = "idPromocion")
+    private Promocion promocion;
 
     @ManyToOne @JoinColumn(name = "idPedido")
     @JsonBackReference

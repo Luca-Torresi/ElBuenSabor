@@ -18,7 +18,7 @@ public class Direccion {
     private String numero;
     private String piso;
     private String dpto;
-    private boolean activo;
+    private Boolean activo;
 
     @ManyToOne @JoinColumn(name = "idDepartamento")
     private Departamento departamento;

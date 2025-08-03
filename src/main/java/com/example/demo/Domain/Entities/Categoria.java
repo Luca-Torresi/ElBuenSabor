@@ -16,14 +16,13 @@ public class Categoria {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idCategoria;
     private String nombre;
-    private double margenGanancia;
+    private Double margenGanancia;
     private LocalDate fechaBaja;
 
     @OneToMany(mappedBy = "categoria")
     @JsonManagedReference
     private List<Articulo> articulos;
 
-    @ManyToOne
-    @JoinColumn(name = "idCategoriaPadre")
+    @ManyToOne @JoinColumn(name = "idCategoriaPadre")
     private Categoria categoriaPadre;
 }

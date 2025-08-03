@@ -1,4 +1,6 @@
 # Actualiza el precio de venta de un artículo teniendo en cuenta su costo y el margen de ganancia de su categoría
+DROP PROCEDURE IF EXISTS modificarPrecioVenta;
+
 DELIMITER $$
 CREATE PROCEDURE modificarPrecioVenta(IN _idArticulo INT)
 BEGIN

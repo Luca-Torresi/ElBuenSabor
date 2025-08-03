@@ -19,12 +19,14 @@ public class ServicePromocion {
     private final PromocionMapper promocionMapper;
     private final RepoArticulo repoArticulo;
 
+    /*
+
     //Cargar nueva promoción
     public Long nuevaPromocion(NuevaPromocionDto nuevaPromocionDto) {
         Promocion promocion = promocionMapper.promocionDtoToPromocion(nuevaPromocionDto);
 
         Articulo articulo = repoArticulo.findById(nuevaPromocionDto.getIdArticulo()).get();
-        promocion.setArticulo(articulo);
+        //promocion.setArticulo(articulo);
 
         promocion = repoPromocion.save(promocion);
         return promocion.getIdPromocion();
@@ -61,11 +63,11 @@ public class ServicePromocion {
 
         promocion.setTitulo(dto.getTitulo());
         promocion.setDescripcion(dto.getDescripcion());
-        promocion.setDescuento(dto.getDescuento());
+        //promocion.setDescuento(dto.getDescuento());
         promocion.setActivo(dto.isActivo());
         promocion.setHorarioInicio(dto.getHorarioInicio());
         promocion.setHorarioFin(dto.getHorarioFin());
-        promocion.setArticulo(articulo);
+        //promocion.setArticulo(articulo);
 
         return repoPromocion.save(promocion);
     }
@@ -83,4 +85,5 @@ public class ServicePromocion {
 
         repoPromocion.save(promocion);
     }
+    */
 }
