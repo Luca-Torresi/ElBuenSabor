@@ -21,11 +21,12 @@ public class Promocion {
     private Boolean activo;
     private LocalTime horarioInicio;
     private LocalTime horarioFin;
+    private Integer tiempoDeCocina;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "idImagen")
     private Imagen imagen;
 
-    @OneToMany(mappedBy = "promocion", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "promocion", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetallePromocion> detalles;
 }

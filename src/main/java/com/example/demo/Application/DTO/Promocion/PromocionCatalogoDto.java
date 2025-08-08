@@ -5,15 +5,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalTime;
+import java.util.List;
 
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
 public class PromocionCatalogoDto {
     private Long idPromocion;
     private String titulo;
     private String descripcion;
-    private Long idArticulo;
-    private double descuento;
     private String url;
     private LocalTime horarioInicio;
     private LocalTime horarioFin;
+    private List<DetallePromocionDto> detalles;
 }

@@ -7,6 +7,6 @@ CREATE TRIGGER pedidoConfirmado_au
     FOR EACH ROW
 BEGIN
     IF NEW.estadoPedido = 'EN_PREPARACION' THEN
-        CALL recorrerDetallePedido(NEW.idPedido, TRUE);
+        CALL recorrerDetallesPedido(NEW.idPedido, TRUE);
     END IF;
 END $$

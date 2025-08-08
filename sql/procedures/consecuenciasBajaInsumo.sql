@@ -1,8 +1,8 @@
 # Se da de baja a los artículos manufacturados que tienen determinado insumo
-DROP PROCEDURE IF EXISTS desactivarArticulos;
+DROP PROCEDURE IF EXISTS consecuenciasBajaInsumo;
 
 DELIMITER $$
-CREATE PROCEDURE desactivarArticulos(IN _idInsumo INT)
+CREATE PROCEDURE consecuenciasBajaInsumo(IN _idInsumo INT)
 BEGIN
     DECLARE _idArticulo INT;
     DECLARE _fechaBaja DATETIME;

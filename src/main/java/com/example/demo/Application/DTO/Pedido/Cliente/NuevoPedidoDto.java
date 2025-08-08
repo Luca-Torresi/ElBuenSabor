@@ -1,4 +1,4 @@
-package com.example.demo.Application.DTO.Pedido;
+package com.example.demo.Application.DTO.Pedido.Cliente;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

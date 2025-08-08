@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.List;
 
 @RestController
@@ -25,8 +24,6 @@ import java.util.List;
 public class ControllerPromocion {
     private final ServicePromocion servicePromocion;
     private final ServiceImagen serviceImagen;
-
-    /*
 
     //Recibe los datos necesarios para la creación de una nueva promoción
     //@PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
@@ -97,5 +94,4 @@ public class ControllerPromocion {
         servicePromocion.darDeAltaBajaPromocion(idPromocion);
         return ResponseEntity.ok().build();
     }
-*/
 }

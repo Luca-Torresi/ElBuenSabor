@@ -2,13 +2,11 @@ package com.example.demo.Domain.Service;
 
 import com.auth0.exception.Auth0Exception;
 import com.auth0.json.mgmt.users.User;
-import com.example.demo.Application.DTO.Pedido.PedidoCajeroDto;
 import com.example.demo.Application.DTO.Usuario.ClienteRegistroDto;
 import com.example.demo.Application.DTO.Usuario.InformacionClienteDto;
 import com.example.demo.Application.DTO.Usuario.PasswordChangeDto;
 import com.example.demo.Application.DTO.Usuario.UsuarioDTO;
 import com.example.demo.Domain.Entities.Cliente;
-import com.example.demo.Domain.Entities.Pedido;
 import com.example.demo.Domain.Entities.Rol;
 import com.example.demo.Domain.Repositories.RepoCliente;
 import com.example.demo.Domain.Repositories.RepoImagen;

@@ -1,4 +1,4 @@
-package com.example.demo.Application.DTO.Pedido;
+package com.example.demo.Application.DTO.Pedido.Cliente;
 
 import com.example.demo.Application.DTO.Direccion.DireccionDto;
 import com.example.demo.Application.DTO.Usuario.RepartidorDto;
@@ -13,10 +13,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Data @Builder @AllArgsConstructor @NoArgsConstructor
 public class PedidoClienteDto {
     private Long idPedido;
     private LocalDateTime fechaYHora;
@@ -24,9 +21,7 @@ public class PedidoClienteDto {
     private EstadoPedido estadoPedido;
     private TipoEnvio tipoEnvio;
     private MetodoDePago metodoDePago;
-
     private List<DetallePedidoClienteDto> detalles;
     private DireccionDto direccion;
-
     private RepartidorDto Repartidor;
 }

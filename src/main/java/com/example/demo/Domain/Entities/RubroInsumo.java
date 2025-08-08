@@ -22,6 +22,6 @@ public class RubroInsumo {
     @JsonManagedReference
     private List<ArticuloInsumo> insumos;
 
-    @ManyToOne @JoinColumn(name = "idRubroIsumoPadre")
+    @ManyToOne @JoinColumn(name = "idRubroInsumoPadre")
     private RubroInsumo rubroInsumoPadre;
 }

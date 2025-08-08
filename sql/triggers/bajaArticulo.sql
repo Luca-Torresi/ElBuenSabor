@@ -1,8 +1,8 @@
 # Cuando un artículo es dado de baja, se deben desactivar todas las promociones que contengan dicho artículo
-DROP TRIGGER IF EXISTS articuloDadoDeBaja_au;
+DROP TRIGGER IF EXISTS bajaArticulo_au;
 
 DELIMITER $$
-CREATE TRIGGER articuloDadoDeBaja_au
+CREATE TRIGGER bajaArticulo_au
     AFTER UPDATE ON articulo
     FOR EACH ROW
 BEGIN

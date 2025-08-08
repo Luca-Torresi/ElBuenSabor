@@ -1,6 +1,12 @@
 package com.example.demo.Domain.Service;
 
 import com.example.demo.Application.DTO.Pedido.*;
+import com.example.demo.Application.DTO.Pedido.Cajero.PedidoCajeroDto;
+import com.example.demo.Application.DTO.Pedido.Cliente.NuevoDetallePedidoDto;
+import com.example.demo.Application.DTO.Pedido.Cliente.NuevoPedidoDto;
+import com.example.demo.Application.DTO.Pedido.Cliente.PedidoClienteDto;
+import com.example.demo.Application.DTO.Pedido.Cocinero.PedidoCocinaDto;
+import com.example.demo.Application.DTO.Pedido.Repartidor.PedidoRepartidorDto;
 import com.example.demo.Application.Mapper.PedidoMapper;
 import com.example.demo.Domain.Entities.*;
 import com.example.demo.Domain.Enums.EstadoPedido;
@@ -10,19 +16,13 @@ import com.example.demo.Domain.Exceptions.ClienteNoEncontradoException;
 import com.example.demo.Domain.Repositories.*;
 import com.example.demo.Domain.Exceptions.InsumosInsuficientesException;
 import com.example.demo.Domain.Exceptions.PedidoNoEncontradoException;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
@@ -67,6 +67,8 @@ public class ServicePedido {
         }
 
         Double total = 0.0;
+        Integer demora = 0, max = 0, suma = 0, tiempo = 0;
+        Double penalizacion = 0.3;
 
         List<DetallePedido> detalles = new ArrayList<>();
         for (NuevoDetallePedidoDto detalle : nuevoPedidoDto.getDetalles()) {
@@ -81,6 +83,13 @@ public class ServicePedido {
                         .build();
                 detalles.add(detallePedido);
 
+                if(articulo.getEsManufacturado()){
+                    ArticuloManufacturado articuloManufacturado = repoArticuloManufacturado.findById(detalle.getIdArticulo()).get();
+                    tiempo = articuloManufacturado.getTiempoDeCocina();
+
+                    suma += tiempo;
+                }
+
                 total += detallePedido.getSubtotal();
 
             } else if(detalle.getIdArticulo() == null){
@@ -94,7 +103,14 @@ public class ServicePedido {
                         .build();
                 detalles.add(detallePedido);
 
+                tiempo = promocion.getTiempoDeCocina();
+                suma += tiempo;
+
                 total += detallePedido.getSubtotal();
+            }
+
+            if(tiempo > max){
+                max = tiempo;
             }
         }
         pedido.setDetalles(detalles);
@@ -104,15 +120,13 @@ public class ServicePedido {
         }
         pedido.setTotal(total);
 
-        /*
-        //Establecemos el horario de entrega del pedido
         //Si el tipo de envío es DELIVERY se suman 15 minutos a la demora
+        demora = (int) Math.round((max + suma * penalizacion) / 2.0);
         if(pedido.getTipoEnvio().equals(TipoEnvio.DELIVERY)){
             pedido.setHoraEntrega(pedido.getFechaYHora().plusMinutes(demora + 15));
         } else{
             pedido.setHoraEntrega(pedido.getFechaYHora().plusMinutes(demora));
         }
-        */
 
         Pedido savedPedido = repoPedido.save(pedido);
 
@@ -136,40 +150,63 @@ public class ServicePedido {
 
     //Evalua si hay stock suficiente para la elaboración del pedido
     public boolean evaluarStock(NuevoPedidoDto nuevoPedidoDto) {
-        Map<ArticuloInsumo, Double> stockDisponible = new HashMap<>();
+        Map<ArticuloInsumo, Double> stockInsumo = new HashMap<>();
         for (ArticuloInsumo insumo : repoArticuloInsumo.findAll()) {
-            stockDisponible.put(insumo, insumo.getStockActual());
+            stockInsumo.put(insumo, insumo.getStockActual());
         }
 
+        Map<ArticuloNoElaborado, Integer> stockNoElaborado = new HashMap<>();
+        for(ArticuloNoElaborado articuloNoElaborado: repoArticuloNoElaborado.findAll()){
+            stockNoElaborado.put(articuloNoElaborado, articuloNoElaborado.getStock());
+        }
+
+        boolean valor;
         for (NuevoDetallePedidoDto detallePedido : nuevoPedidoDto.getDetalles()) {
             if(detallePedido.getIdPromocion() == null){
-                Articulo articulo = repoArticulo.findById(detallePedido.getIdArticulo()).get();
+                valor = evaluarStock2(detallePedido.getIdArticulo(), detallePedido.getCantidad(), stockInsumo, stockNoElaborado);
+                if(valor == false){
+                    return false;
+                }
+            } else {
+                Promocion promocion = repoPromocion.findById(detallePedido.getIdPromocion()).get();
 
-                if (articulo.getEsManufacturado()) {
-                    ArticuloManufacturado articuloManufacturado = repoArticuloManufacturado.findById(detallePedido.getIdArticulo()).get();
-
-                    for (ArticuloManufacturadoDetalle detalle : articuloManufacturado.getDetalles()) {
-                        ArticuloInsumo insumo = detalle.getArticuloInsumo();
-                        Double nuevoStock = stockDisponible.get(insumo) - detalle.getCantidad() * detallePedido.getCantidad();
-
-                        if (nuevoStock < 0) {
-                            return false;
-                        } else {
-                            stockDisponible.put(insumo, nuevoStock);
-                        }
-                    }
-
-                } else {
-                    ArticuloNoElaborado articuloNoElaborado = repoArticuloNoElaborado.findById(detallePedido.getIdArticulo()).get();
-                    if (articuloNoElaborado.getStock() - detallePedido.getCantidad() < 0) {
+                for(DetallePromocion detalles: promocion.getDetalles()){
+                    valor = evaluarStock2(detalles.getArticulo().getIdArticulo(), detalles.getCantidad(), stockInsumo, stockNoElaborado);
+                    if(valor == false){
                         return false;
                     }
                 }
-            } else {
-              //Lógica para evaluar el stock de las promociones
+            }
+        }
+        return true;
+    }
+
+    public boolean evaluarStock2(Long idArticulo, Integer cantidad, Map<ArticuloInsumo, Double> stockInsumo, Map<ArticuloNoElaborado, Integer> stockNoElaborado){
+        Articulo articulo = repoArticulo.findById(idArticulo).get();
+
+        if (articulo.getEsManufacturado()) {
+            ArticuloManufacturado articuloManufacturado = repoArticuloManufacturado.findById(idArticulo).get();
+
+            for (ArticuloManufacturadoDetalle detalle : articuloManufacturado.getDetalles()) {
+                ArticuloInsumo insumo = detalle.getArticuloInsumo();
+                Double nuevoStock = stockInsumo.get(insumo) - detalle.getCantidad() * cantidad;
+
+                if (nuevoStock < 0) {
+                    return false;
+                } else {
+                    stockInsumo.put(insumo, nuevoStock);
+                }
             }
 
-            return true;
+        } else {
+            ArticuloNoElaborado articuloNoElaborado = repoArticuloNoElaborado.findById(idArticulo).get();
+
+            Integer nuevoStock = stockNoElaborado.get(articuloNoElaborado) - cantidad;
+            if(nuevoStock < 0){
+                return false;
+            } else {
+                stockNoElaborado.put(articuloNoElaborado, nuevoStock);
+            }
         }
         return true;
     }
@@ -186,33 +223,19 @@ public class ServicePedido {
     }
 
     //Obtiene de la base de datos todos los pedidos que se encuentran en preparación o listos para la entrega
-    public ArregloPedidosCocinaDto mostrarPedidosCocinero() {
-        List<EstadoPedido> estados = List.of(EstadoPedido.EN_PREPARACION, EstadoPedido.LISTO);
-        List<Pedido> pedidos = repoPedido.findByEstadoPedidoIn(estados);
-
-        ArregloPedidosCocinaDto arregloPedidosCocinaDto = new ArregloPedidosCocinaDto();
-        List<PedidoCocinaDto> pedidosDto = new ArrayList<>();
-        for (Pedido pedido : pedidos) {
-            PedidoCocinaDto dto = pedidoMapper.pedidoToPedidoCocinaDto(pedido);
-            pedidosDto.add(dto);
-        }
-        arregloPedidosCocinaDto.setPedidos(pedidosDto);
-        return arregloPedidosCocinaDto;
+    public List<PedidoCocinaDto> mostrarPedidosCocinero() {
+        return repoPedido.findByEstadoPedidoIn(List.of(EstadoPedido.EN_PREPARACION, EstadoPedido.LISTO))
+                .stream()
+                .map(pedidoMapper::pedidoToPedidoCocinaDto)
+                .toList();
     }
 
     //Obtiene los pedidos correspondientes para el repartidor
-    public ArregloPedidosRepartidorDto mostrarPedidosRepartidor(){
-        List<EstadoPedido> estados = List.of(EstadoPedido.LISTO, EstadoPedido.EN_CAMINO);
-        List<Pedido> pedidos = repoPedido.findByEstadoPedidoInAndTipoEnvio(estados, TipoEnvio.DELIVERY);
-
-        ArregloPedidosRepartidorDto arregloPedidosRepartidorDto = new ArregloPedidosRepartidorDto();
-        List<PedidoRepartidorDto> pedidosDto = new ArrayList<>();
-        for (Pedido pedido : pedidos) {
-            PedidoRepartidorDto dto = pedidoMapper.pedidoToPedidoRepartidorDto(pedido);
-            pedidosDto.add(dto);
-        }
-        arregloPedidosRepartidorDto.setPedidos(pedidosDto);
-        return arregloPedidosRepartidorDto;
+    public List<PedidoRepartidorDto> mostrarPedidosRepartidor(){
+        return repoPedido.findByEstadoPedidoIn(List.of(EstadoPedido.LISTO, EstadoPedido.EN_CAMINO))
+                .stream()
+                .map(pedidoMapper::pedidoToPedidoRepartidorDto)
+                .toList();
     }
 
     //El cliente cancela el pedido
@@ -370,18 +393,11 @@ public class ServicePedido {
     }
 
     //Devuelve un arreglo con todos los pedidos realizados por el cliente
-    public HistorialDePedidosDto mostrarHistorialDePedidos(Long idCliente) {
-        HistorialDePedidosDto historialDePedidosDto = new HistorialDePedidosDto();
-        List<PedidoClienteDto> pedidosRealizados = new ArrayList<>();
-
-        List<Pedido> pedidos = repoPedido.findPedidosByIdCliente(idCliente);
-        for (Pedido pedido : pedidos) {
-            PedidoClienteDto nuevoPedidoDto = pedidoMapper.pedidoToPedidoClienteDto(pedido);
-            pedidosRealizados.add(nuevoPedidoDto);
-        }
-        historialDePedidosDto.setPedidos(pedidosRealizados);
-
-        return historialDePedidosDto;
+    public List<PedidoClienteDto> mostrarHistorialDePedidos(Long idCliente) {
+        return repoPedido.findPedidosByIdCliente(idCliente)
+                .stream()
+                .map(pedidoMapper::pedidoToPedidoClienteDto)
+                .toList();
     }
 
     public Page<PedidoClienteDto> mostrarPedidosEnCursoCliente(String idAuth0, int page, int size) {

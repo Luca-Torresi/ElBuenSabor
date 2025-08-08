@@ -1,7 +1,10 @@
 package com.example.demo.Presentation.Controllers;
 
-import com.example.demo.Application.DTO.Pedido.*;
-import com.example.demo.Domain.Entities.Pedido;
+import com.example.demo.Application.DTO.Pedido.Cajero.PedidoCajeroDto;
+import com.example.demo.Application.DTO.Pedido.Cliente.NuevoPedidoDto;
+import com.example.demo.Application.DTO.Pedido.Cliente.PedidoClienteDto;
+import com.example.demo.Application.DTO.Pedido.Cocinero.PedidoCocinaDto;
+import com.example.demo.Application.DTO.Pedido.Repartidor.PedidoRepartidorDto;
 import com.example.demo.Domain.Service.ServiceFactura;
 import com.example.demo.Domain.Service.ServicePedido;
 import lombok.RequiredArgsConstructor;
@@ -10,9 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
@@ -54,14 +55,14 @@ public class ControllerPedido {
     //Devuelve un arreglo con todos los pedidos EN_PREPARACION y LISTO para ser gestionados por el cocinero
     //@PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'COCINERO')")
     @GetMapping("/cocinero")
-    public ResponseEntity<ArregloPedidosCocinaDto> mostrarPedidosCocinero(){
+    public ResponseEntity<List<PedidoCocinaDto>> mostrarPedidosCocinero(){
         return ResponseEntity.ok(servicePedido.mostrarPedidosCocinero());
     }
 
     //Devuelve un arreglo con todos los pedidos correspondientes para el repartidor
     //@PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'REPARTIDOR')")
     @GetMapping("/repartidor")
-    public ResponseEntity<ArregloPedidosRepartidorDto> mostrarPedidosRepartidor(){
+    public ResponseEntity<List<PedidoRepartidorDto>> mostrarPedidosRepartidor(){
         return ResponseEntity.ok(servicePedido.mostrarPedidosRepartidor());
     }
 
@@ -125,10 +126,10 @@ public class ControllerPedido {
     //Devuelve el historial de pedidos realizados por un cliente
     @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'CLIENTE')")
     @GetMapping("/historialCliente/{idCliente}")
-    public ResponseEntity<HistorialDePedidosDto> pedidosRealizados(@PathVariable Long idCliente){
-        HistorialDePedidosDto historialDePedidosDto = servicePedido.mostrarHistorialDePedidos(idCliente);
+    public ResponseEntity<List<PedidoClienteDto>> pedidosRealizados(@PathVariable Long idCliente){
+        List<PedidoClienteDto> lista = servicePedido.mostrarHistorialDePedidos(idCliente);
 
-        return ResponseEntity.ok(historialDePedidosDto);
+        return ResponseEntity.ok(lista);
     }
 
     @GetMapping("/cliente/curso")

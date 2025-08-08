@@ -5,13 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Data @Builder @AllArgsConstructor @NoArgsConstructor
 public class PedidoStatusUpdateDto {
     private Long idPedido;
     private EstadoPedido estadoPedido;

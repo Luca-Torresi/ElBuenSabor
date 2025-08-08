@@ -1,6 +1,10 @@
 package com.example.demo.Application.Mapper;
 
-import com.example.demo.Application.DTO.Pedido.*;
+import com.example.demo.Application.DTO.Pedido.Cajero.PedidoCajeroDto;
+import com.example.demo.Application.DTO.Pedido.Cliente.NuevoPedidoDto;
+import com.example.demo.Application.DTO.Pedido.Cliente.PedidoClienteDto;
+import com.example.demo.Application.DTO.Pedido.Cocinero.PedidoCocinaDto;
+import com.example.demo.Application.DTO.Pedido.Repartidor.PedidoRepartidorDto;
 import com.example.demo.Domain.Entities.Pedido;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
