@@ -57,7 +57,7 @@ public class ServicePromocion {
     //Dar de alta o baja una promoción
     public void darDeAltaBajaPromocion(Long idPromocion){
         Promocion promocion = repoPromocion.findById(idPromocion).get();
-        List<DetallePromocion> detalles = repoDetallePromocion.findByPromocionId(idPromocion);
+        List<DetallePromocion> detalles = repoDetallePromocion.findByPromocionIdPromocion(idPromocion);
 
         for (DetallePromocion detalle : detalles) {
             if(detalle.getArticulo().getFechaBaja() != null){

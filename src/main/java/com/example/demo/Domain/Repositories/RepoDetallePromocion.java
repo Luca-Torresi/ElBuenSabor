@@ -8,5 +8,6 @@ import java.util.List;
 @Repository
 public interface RepoDetallePromocion extends JpaRepository<DetallePromocion, Long> {
 
-    List<DetallePromocion> findByPromocionId(Long idPromocion);
+    List<DetallePromocion> findByPromocionIdPromocion(Long idPromocion);
+
 }
