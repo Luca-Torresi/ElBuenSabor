@@ -58,6 +58,7 @@ public class ControllerArticuloInsumo {
     }
 
     //Dar de alta o baja a un artículo insumo
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @PutMapping("/altaBaja/{idArticuloInsumo}")
     public ResponseEntity darDeAltaBajaLogica(@PathVariable Long idArticuloInsumo){
         serviceArticuloInsumo.darDeAltaBaja(idArticuloInsumo);

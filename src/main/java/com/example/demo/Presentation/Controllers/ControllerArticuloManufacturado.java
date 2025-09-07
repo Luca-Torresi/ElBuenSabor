@@ -57,10 +57,10 @@ public class ControllerArticuloManufacturado {
             serviceImagen.uploadArticleImage(file, id);
         } else if (dto.getImagenUrl() != null && !dto.getImagenUrl().isBlank()) {
             serviceImagen.saveImageUrl(dto.getImagenUrl(), id);
-        } else {
+        } else if (dto.isEliminarImagen()) {
+            // Borrar imagen existente
             serviceImagen.deleteArticleImage(id);
         }
-
         return ResponseEntity.noContent().build();
     }
 

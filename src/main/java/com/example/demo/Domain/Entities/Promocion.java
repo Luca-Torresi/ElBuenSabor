@@ -1,11 +1,8 @@
 package com.example.demo.Domain.Entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import java.time.LocalDate;
+import lombok.*;
+
 import java.time.LocalTime;
 import java.util.List;
 
@@ -15,13 +12,22 @@ public class Promocion {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idPromocion;
+
     private String titulo;
     private String descripcion;
-    private Double precio;
-    private Boolean activo;
+
+    // Precio definido por el admin (ej: combo pizza + gaseosa $3000)
+    private Double precioPromocion;
+
+    // Horarios en la base de datos tipo TIME
+    @Getter @Setter
     private LocalTime horarioInicio;
+    @Getter @Setter
     private LocalTime horarioFin;
-    private Integer tiempoDeCocina;
+
+    private Boolean activo;
+
+    private Integer tiempoDeCocina; // opcional
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "idImagen")
@@ -29,4 +35,8 @@ public class Promocion {
 
     @OneToMany(mappedBy = "promocion", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetallePromocion> detalles;
+
+    public void setPrecio(Double precio) {
+        this.precioPromocion = precio;
+    }
 }

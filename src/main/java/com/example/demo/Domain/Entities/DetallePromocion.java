@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @Entity @Table
 public class DetallePromocion {
 
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idDetallePromocion;
 
@@ -19,4 +20,6 @@ public class DetallePromocion {
 
     @ManyToOne @JoinColumn(name = "idPromocion")
     private Promocion promocion;
+
+
 }

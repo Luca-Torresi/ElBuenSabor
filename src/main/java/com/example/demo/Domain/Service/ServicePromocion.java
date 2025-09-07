@@ -6,6 +6,7 @@ import com.example.demo.Domain.Entities.Articulo;
 import com.example.demo.Domain.Entities.DetallePromocion;
 import com.example.demo.Domain.Entities.Promocion;
 import com.example.demo.Domain.Exceptions.ArticuloDadoDeBajaException;
+import com.example.demo.Domain.Exceptions.ArticuloNoEncontradoException;
 import com.example.demo.Domain.Repositories.RepoArticulo;
 import com.example.demo.Domain.Repositories.RepoDetallePromocion;
 import com.example.demo.Domain.Repositories.RepoPromocion;
@@ -36,6 +37,11 @@ public class ServicePromocion {
                 .stream()
                 .map(promocionMapper::promocionToPromocionCatalogoDto)
                 .toList();
+    }
+
+    public Promocion obtenerPromocionByID(Long idPromocion) {
+        return repoPromocion.findById(idPromocion)
+                .orElseThrow(() -> new ArticuloNoEncontradoException("No se encontró la promocion con ID: " + idPromocion));
     }
 
     //Obtiene de la base de datos todas las promociones para ser mostradas en el ABM
@@ -69,5 +75,32 @@ public class ServicePromocion {
                 promocion.getActivo() == true ? false : true
         );
         repoPromocion.save(promocion);
+    }
+
+    // Devuelve el precio total sumado de los artículos
+    public Double calcularPrecioSugerido(List<NuevoDetallePromocionDto> detalles) {
+        return detalles.stream()
+                .mapToDouble(d -> {
+                    Articulo articulo = repoArticulo.findById(d.getIdArticulo())
+                            .orElseThrow(() -> new RuntimeException(
+                                    "Artículo con id " + d.getIdArticulo() + " no encontrado"));
+                    return articulo.getPrecioVenta() * d.getCantidad();
+                })
+                .sum();
+    }
+
+    // Devuelve un resumen con el precio base y lo que se ahorra con el promocional
+    public PromocionResumenDto calcularResumenPromocion(Long idPromocion) {
+        Promocion promocion = repoPromocion.findById(idPromocion)
+                .orElseThrow(() -> new RuntimeException("Promoción no encontrada"));
+
+        double precioBase = promocion.getDetalles().stream()
+                .mapToDouble(d -> d.getArticulo().getPrecioVenta() * d.getCantidad())
+                .sum();
+
+        double precioPromo = promocion.getPrecioPromocion();
+        double ahorro = precioBase - precioPromo;
+
+        return new PromocionResumenDto(precioBase, precioPromo, ahorro);
     }
 }

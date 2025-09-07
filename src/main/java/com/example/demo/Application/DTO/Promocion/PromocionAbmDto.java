@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -16,5 +19,6 @@ public class PromocionAbmDto {
     private LocalTime horarioFin;
     private boolean activo;
     private String url;
+    private Double precioPromocion;
     private List<DetallePromocionDto> detalles;
 }
