@@ -28,13 +28,16 @@ public class ControllerCategoria {
         return ResponseEntity.status(HttpStatus.CREATED).body(categoria);
     }
 
-    //Dar de alta o baja a una categoría
-    //@PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @PostMapping("/altaBaja/{idCategoria}")
-    public ResponseEntity darDeAltaBajaLogica(@PathVariable Long idCategoria){
-        serviceCategoria.darDeAltaBaja(idCategoria);
-
-        return ResponseEntity.ok().build();
+    public ResponseEntity darDeAltaBajaLogica(@PathVariable Long idCategoria) {
+        System.out.println("ID recibido: " + idCategoria);
+        try {
+            serviceCategoria.darDeAltaBaja(idCategoria);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace(); // imprime la causa exacta
+            return ResponseEntity.status(500).body("Error al cambiar estado de categoría: " + e.getMessage());
+        }
     }
 
     //Mostrar categorías en el catálogo

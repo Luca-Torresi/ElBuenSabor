@@ -1,9 +1,6 @@
 package com.example.demo.Application.DTO.ArticuloNoElaborado;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 //Envía y recibe los datos necesarios para el ABM
 @Data @Builder @AllArgsConstructor @NoArgsConstructor
@@ -18,4 +15,9 @@ public class InformacionArticuloNoElaboradoDto {
     private String nombreCategoria;
     private String imagenUrl;
     private int stock;
+    @Getter
+    private boolean eliminarImagen;
 }
+
+
+

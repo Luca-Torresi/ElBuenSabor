@@ -98,7 +98,7 @@ public class ServicePedido {
                 DetallePedido detallePedido = DetallePedido.builder()
                         .promocion(promocion)
                         .cantidad(detalle.getCantidad())
-                        .subtotal(promocion.getPrecio() * detalle.getCantidad())
+                        .subtotal(promocion.getPrecioPromocion() * detalle.getCantidad())
                         .pedido(pedido)
                         .build();
                 detalles.add(detallePedido);

@@ -1,9 +1,7 @@
 package com.example.demo.Application.DTO.ArticuloManufacturado;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import java.util.List;
 
 //Envía y recibe la información necesaria de un artículo manufacturado para ser modificado
@@ -22,4 +20,7 @@ public class InformacionArticuloManufacturadoDto {
     private String nombreCategoria;
     private String imagenUrl;
     private List<InformacionDetalleDto> detalles;
+    @Getter
+    private boolean eliminarImagen;
+
 }

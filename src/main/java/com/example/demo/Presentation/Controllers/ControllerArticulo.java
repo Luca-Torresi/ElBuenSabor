@@ -2,6 +2,8 @@ package com.example.demo.Presentation.Controllers;
 
 import com.example.demo.Application.DTO.Articulo.ArticuloDto;
 import com.example.demo.Application.DTO.Articulo.ArticuloNombreDto;
+import com.example.demo.Application.DTO.Articulo.ArticuloPromocionDto;
+import com.example.demo.Domain.Entities.Articulo;
 import com.example.demo.Domain.Service.ServiceArticulo;
 import com.example.demo.Domain.Service.ServiceImagen;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +32,13 @@ public class ControllerArticulo {
         return serviceArticulo.listarArticulosCatalogo(page, size);
     }
 
+    //Devuelve artículos con información completa para promociones
+    @GetMapping("/listado-promociones")
+    public ResponseEntity<List<ArticuloPromocionDto>> listarArticulosParaPromociones(){
+        List<ArticuloPromocionDto> lista = serviceArticulo.listarArticulosParaPromociones();
+        return ResponseEntity.ok(lista);
+    }
+
     @GetMapping("/informacion/{idArticulo}")
     public ResponseEntity<ArticuloDto> obtenerInformacionArticulo(@PathVariable Long idArticulo){
         ArticuloDto dto = serviceArticulo.obtenerInformacionArticulo(idArticulo);
@@ -39,17 +49,37 @@ public class ControllerArticulo {
     @GetMapping("/listado")
     public ResponseEntity<List<ArticuloNombreDto>> listaNombresArticulos(){
         List<ArticuloNombreDto> lista = serviceArticulo.listaNombresArticulos();
-
         return ResponseEntity.ok(lista);
     }
 
     //Dar de alta o baja un artículo
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
-    @PostMapping("/altaBaja/{idArticulo}")
+    @PutMapping("/altaBaja/{idArticulo}")
     public ResponseEntity<Void> darDeAltaBajaLogica(@PathVariable Long idArticulo) {
         serviceArticulo.darDeAltaBaja(idArticulo);
 
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{idArticulo}/estado")
+    public ResponseEntity<Map<String, Boolean>> estadoArticulo(@PathVariable Long idArticulo) {
+        Articulo articulo = serviceArticulo.obtenerArticuloPorId(idArticulo);
+        boolean activo = articulo.getFechaBaja() == null;
+        return ResponseEntity.ok(Map.of("activo", activo));
+    }
+
+    @GetMapping("/{idArticulo}/disponibilidad")
+    public ResponseEntity<Map<String, Object>> disponibilidadArticulo(@PathVariable Long idArticulo) {
+        Articulo articulo = serviceArticulo.obtenerArticuloPorId(idArticulo);
+        boolean activo = articulo.getFechaBaja() == null;
+        boolean puedeElaborarse = serviceArticulo.puedeElaborarse(idArticulo);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("activo", activo);
+        response.put("puedeElaborarse", puedeElaborarse);
+        response.put("disponible", activo && puedeElaborarse);
+
+        return ResponseEntity.ok(response);
     }
 
     //Ejecuta el procedimiento almacenado de la base de datos el cual actualiza los precios de todos los artículos

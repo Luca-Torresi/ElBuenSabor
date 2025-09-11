@@ -52,19 +52,27 @@ public class ControllerArticuloNoElaborado {
             @RequestParam("articulo") String informacionArticuloNoElaboradoDtoJson,
             @RequestParam(value = "file", required = false) MultipartFile file) throws JsonProcessingException {
 
-        InformacionArticuloNoElaboradoDto dto = new ObjectMapper().readValue(informacionArticuloNoElaboradoDtoJson, InformacionArticuloNoElaboradoDto.class);
+        InformacionArticuloNoElaboradoDto dto = new ObjectMapper()
+                .readValue(informacionArticuloNoElaboradoDtoJson, InformacionArticuloNoElaboradoDto.class);
+
         serviceArticuloNoElaborado.actualizarArticulo(id, dto);
 
+        // Lógica de manejo de imagen
         if (file != null && !file.isEmpty()) {
+            // Subir nueva imagen
             serviceImagen.uploadArticleImage(file, id);
         } else if (dto.getImagenUrl() != null && !dto.getImagenUrl().isBlank()) {
+            // Guardar URL de imagen externa
             serviceImagen.saveImageUrl(dto.getImagenUrl(), id);
-        } else {
+        } else if (dto.isEliminarImagen()) {
+            // Borrar imagen existente
             serviceImagen.deleteArticleImage(id);
         }
+        // Si no hay archivo, ni URL, ni eliminarImagen, no hacemos nada (mantener la imagen actual)
 
         return ResponseEntity.noContent().build();
     }
+
 
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @GetMapping("/abm")
@@ -73,7 +81,7 @@ public class ControllerArticuloNoElaborado {
             @RequestParam(defaultValue = "12") int size) {
         return serviceArticuloNoElaborado.mostrarArticulosAbm(page, size);
     }
-
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @PutMapping("/recargaStock")
     public ResponseEntity<Void> recargaStock(@RequestBody ArregloRecargaNoElaboradoDto arregloDto){
         serviceArticuloNoElaborado.recargaStock(arregloDto);

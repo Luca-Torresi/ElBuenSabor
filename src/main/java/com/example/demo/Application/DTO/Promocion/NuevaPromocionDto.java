@@ -1,9 +1,9 @@
 package com.example.demo.Application.DTO.Promocion;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -11,9 +11,11 @@ import java.util.List;
 public class NuevaPromocionDto {
     private String titulo;
     private String descripcion;
-    private Double precio;
-    private LocalTime horarioInicio;
-    private LocalTime horarioFin;
+    private Double precioPromocional;
+    private String horarioInicio;
+    private String horarioFin;
     private Boolean activo;
-    private List<NuevoDetallePromocionDto> detalles;
+    private List<DetallePromocionDto> detalles;
+    @Getter
+    private boolean eliminarImagen;
 }

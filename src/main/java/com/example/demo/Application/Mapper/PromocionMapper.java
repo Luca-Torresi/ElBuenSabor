@@ -22,4 +22,6 @@ public interface PromocionMapper {
 
     @Mapping(source = "imagen.url", target = "url")
     PromocionAbmDto promocionToPromocionAbmDto(Promocion promocion);
+
+
 }

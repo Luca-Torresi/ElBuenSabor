@@ -2,6 +2,7 @@ package com.example.demo.Domain.Service;
 
 import com.example.demo.Application.DTO.Articulo.ArticuloDto;
 import com.example.demo.Application.DTO.Articulo.ArticuloNombreDto;
+import com.example.demo.Application.DTO.Articulo.ArticuloPromocionDto;
 import com.example.demo.Application.Mapper.ArticuloMapper;
 import com.example.demo.Domain.Entities.Articulo;
 import com.example.demo.Domain.Entities.ArticuloNoElaborado;
@@ -21,6 +22,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +50,11 @@ public class ServiceArticulo {
 
             return dto;
         });
+    }
+
+    public Articulo obtenerArticuloPorId(Long idArticulo) {
+        return repoArticulo.findById(idArticulo)
+                .orElseThrow(() -> new ArticuloNoEncontradoException("No se encontró el artículo con ID: " + idArticulo));
     }
 
     public ArticuloDto obtenerInformacionArticulo(Long idArticulo) {
@@ -79,6 +86,33 @@ public class ServiceArticulo {
         );
         repoArticulo.save(articulo);
     }
+    //Para ver los articulos en las promociones
+    public List<ArticuloPromocionDto> listarArticulosParaPromociones() {
+        List<Articulo> articulos = repoArticulo.findAll();
+
+        return articulos.stream().map(articulo -> {
+            boolean activo = articulo.getFechaBaja() == null;
+            boolean puedeElaborarse = false;
+
+            try {
+                puedeElaborarse = puedeElaborarse(articulo.getIdArticulo());
+            } catch (Exception e) {
+                // Log del error y continuar con false
+                System.err.println("Error al verificar si puede elaborarse el artículo " +
+                        articulo.getIdArticulo() + ": " + e.getMessage());
+                puedeElaborarse = false;
+            }
+
+            return ArticuloPromocionDto.builder()
+                    .idArticulo(articulo.getIdArticulo())
+                    .nombre(articulo.getNombre())
+                    .precioVenta(articulo.getPrecioVenta())
+                    .activo(activo)
+                    .puedeElaborarse(puedeElaborarse)
+                    .disponible(activo && puedeElaborarse)
+                    .build();
+        }).collect(Collectors.toList());
+    }
 
     //Obtiene de la base de datos una lista con los nombres de todos los artículos para ser mostrados dentro de un 'select'
     public List<ArticuloNombreDto> listaNombresArticulos(){
@@ -91,4 +125,35 @@ public class ServiceArticulo {
         }
         return lista;
     }
+
+
+
+    public boolean puedeElaborarse(Long idArticulo) {
+        Articulo articulo = obtenerArticuloPorId(idArticulo);
+
+        // Si está dado de baja, no se puede elaborar
+        if (articulo.getFechaBaja() != null) {
+            return false;
+        }
+
+        // Verificar si esManufacturado es null y manejarlo
+        Boolean esManufacturado = articulo.getEsManufacturado();
+
+        // Si es null, asumir que no es manufacturado (o manejar según tu lógica de negocio)
+        if (esManufacturado == null) {
+            esManufacturado = false; // o true, según tu lógica
+        }
+
+        // Si es manufacturado, verificar insumos
+        if (esManufacturado) {
+            return repoArticulo.sePuedeElaborar(idArticulo);
+        }
+        // Si no es manufacturado, verificar stock directo
+        else {
+            Optional<ArticuloNoElaborado> noElaborado = repoArticuloNoElaborado.findById(idArticulo);
+            return noElaborado.map(art -> art.getStock() >= 1).orElse(false);
+        }
+    }
+
+
 }
