@@ -6,6 +6,7 @@ import com.example.demo.Application.DTO.Usuario.NuevoEmpleadoDto;
 import com.example.demo.Domain.Service.ServiceEmpleado;
 import com.example.demo.Domain.Service.ServiceImagen;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -50,10 +51,12 @@ public class ControllerEmpleado {
     }
 
     // Obtener todos los empleados (considera añadir PreAuthorize si no es público)
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')") // Ejemplo
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
     @GetMapping
-    public List<EmpleadoResponseDto> listarEmpleados() {
-        return serviceEmpleado.obtenerEmpleadosFormateados();
+    public Page<EmpleadoResponseDto> listarEmpleados(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size ) {
+        return serviceEmpleado.obtenerEmpleadosFormateados(page, size);
     }
 
     // Obtener un empleado por ID (considera añadir PreAuthorize)

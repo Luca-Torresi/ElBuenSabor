@@ -163,4 +163,9 @@ public class ControllerCliente {
         return serviceCliente.obtenerlistaClientes(page,size)   ;
     }
 
+    @GetMapping("/todos")
+    public List<InformacionClienteDto> obtenerTodosCLientes(){
+        return serviceCliente.obtenerTodosClientes();
+    }
+
 }

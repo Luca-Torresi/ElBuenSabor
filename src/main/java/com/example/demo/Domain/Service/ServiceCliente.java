@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ServiceCliente extends ServiceUsuario<Cliente> {
@@ -190,5 +191,25 @@ public class ServiceCliente extends ServiceUsuario<Cliente> {
                     .build();
             return dto;
         });
+    }
+    public List<InformacionClienteDto> obtenerTodosClientes() {
+
+        List<Cliente> clientes = repoCliente.findAll();
+
+        return clientes.stream().map(cliente -> {
+            String nombreYApellido = cliente.getNombre() + " " + cliente.getApellido();
+
+            Integer cantidadPedidos = repoPedido.obtenerCantidadDePedidosPorCliente(cliente.getIdUsuario());
+
+            InformacionClienteDto dto = InformacionClienteDto.builder()
+                    .idUsuario(cliente.getIdUsuario())
+                    .nombreYApellido(nombreYApellido)
+                    .email(cliente.getEmail())
+                    .telefono(cliente.getTelefono())
+                    .cantidadPedidos(cantidadPedidos)
+                    .build();
+            return dto;
+        })
+        .collect(Collectors.toList());
     }
 }

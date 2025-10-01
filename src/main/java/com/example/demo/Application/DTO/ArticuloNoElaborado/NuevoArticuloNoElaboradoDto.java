@@ -14,4 +14,6 @@ public class NuevoArticuloNoElaboradoDto {
     private boolean dadoDeAlta;
     private Long idCategoria;
     private String imagenUrl;
+    private double costo;
+    private int stock;
 }

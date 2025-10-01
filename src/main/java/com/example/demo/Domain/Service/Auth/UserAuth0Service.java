@@ -72,10 +72,11 @@ public class UserAuth0Service {
     public void deleteUser(String auth0Id) throws Exception {
         managementAPI.users().delete(auth0Id).execute();
     }
-    // Método para bloquear/desbloquear un usuario en Auth0
+    // Metodo para bloquear/desbloquear un usuario en Auth0
     public User blockUser(String userIdAuth0, boolean blockStatus) throws Exception {
         User user = new User();
         user.setBlocked(blockStatus);
+        user.setConnection(auth0Connection);
         return managementAPI.users().update(userIdAuth0, user).execute();
     }
 
