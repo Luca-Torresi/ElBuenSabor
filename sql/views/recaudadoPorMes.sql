@@ -7,5 +7,10 @@ SELECT
     COUNT(*) AS cantVentas,
     SUM(total) AS totalRecaudado
 FROM factura
-GROUP BY YEAR(fechaYHora), MONTH(fechaYHora)
-ORDER BY YEAR(fechaYHora) ASC, MONTH(fechaYHora) ASC;
+GROUP BY
+    DATE_FORMAT(fechaYHora, '%M %Y'),
+    YEAR(fechaYHora),
+    MONTH(fechaYHora)
+ORDER BY
+    YEAR(fechaYHora) ASC,
+    MONTH(fechaYHora) ASC;

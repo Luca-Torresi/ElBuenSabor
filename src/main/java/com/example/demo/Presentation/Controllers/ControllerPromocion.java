@@ -48,7 +48,6 @@ public class ControllerPromocion {
     }
 
     //Devuelve las promociones para ser mostradas en el catálogo
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'CLIENTE')")
     @GetMapping("/catalogo")
     public ResponseEntity<List<PromocionCatalogoDto>> promocionesCatalogo(){
         List<PromocionCatalogoDto> lista = servicePromocion.promocionesCatalogo();
@@ -56,7 +55,7 @@ public class ControllerPromocion {
     }
 
     //Devuelve las promociones para ser mostradas en el ABM
-    //@PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
     @GetMapping("/abm")
     public ResponseEntity<List<PromocionAbmDto>> promocionesAbm() {
         try {
@@ -101,9 +100,9 @@ public class ControllerPromocion {
     }
 
     @GetMapping("detalle/{idPromocion}")
-    public ResponseEntity<Promocion> estadoPromocion(@PathVariable Long idPromocion) {
-        Promocion promocion = servicePromocion.obtenerPromocionByID(idPromocion);
-        return ResponseEntity.ok(promocion);
+    public ResponseEntity<PromocionCarritoDto> estadoPromocion(@PathVariable Long idPromocion) {
+        PromocionCarritoDto detalles  = servicePromocion.obtenerPromocionByID(idPromocion);
+        return ResponseEntity.ok(detalles);
     }
 
     // Calcula el precio sugerido de una promoción en base a los artículos seleccionados

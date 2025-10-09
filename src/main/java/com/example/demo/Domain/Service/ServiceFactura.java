@@ -91,9 +91,22 @@ public class ServiceFactura {
             tabla.addCell(new PdfPCell(new Phrase("PRECIO UNITARIO", boldFont)));
             tabla.addCell(new PdfPCell(new Phrase("IMPORTE", boldFont)));
 
+
+
+
             for (DetalleFactura detalle : factura.getDetalles()) {
+                String descripcion;
+                if (detalle.getPromocion() != null &&
+                        detalle.getPromocion().getTitulo() != null &&
+                        !detalle.getPromocion().getTitulo().trim().isEmpty()) {
+
+                    descripcion = detalle.getPromocion().getTitulo();
+                } else {
+                    descripcion = detalle.getArticulo().getNombre();
+                }
                 tabla.addCell(new Phrase(String.valueOf(detalle.getCantidad()), normalFont));
-                tabla.addCell(new Phrase(detalle.getNombreArticulo(), normalFont));
+
+                tabla.addCell(new Phrase(descripcion, normalFont));
                 tabla.addCell(new Phrase(String.format("$ %.2f", detalle.getPrecioUnitario()), normalFont));
                 tabla.addCell(new Phrase(String.format("$ %.2f", detalle.getSubTotal()), normalFont));
             }
@@ -101,6 +114,19 @@ public class ServiceFactura {
             document.add(tabla);
             document.add(new Paragraph(" "));
 
+
+            if (pedido.getTipoEnvio().equals(TipoEnvio.DELIVERY)) {
+                // Si el tipo de envío es 'DELIVERY', crea el párrafo del costo
+                Paragraph delivery = new Paragraph("Delivery $ " + String.format("%.2f", 2000.00), normalFont);
+
+                // Alinea el párrafo
+                delivery.setAlignment(Element.ALIGN_LEFT);
+
+                // Añade el párrafo al documento
+                document.add(delivery);
+            }
+
+            document.add(new Paragraph(" "));
             // Total
             Paragraph total = new Paragraph("TOTAL $ " + String.format("%.2f", factura.getTotal()), totalFont);
             total.setAlignment(Element.ALIGN_RIGHT);

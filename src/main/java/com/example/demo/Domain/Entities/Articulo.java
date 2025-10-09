@@ -3,11 +3,10 @@ package com.example.demo.Domain.Entities;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data @SuperBuilder @AllArgsConstructor @NoArgsConstructor
 @Entity @Table @Inheritance(strategy = InheritanceType.JOINED)
@@ -30,4 +29,11 @@ public class Articulo {
     @JoinColumn(name = "idCategoria")
     @JsonBackReference
     private Categoria categoria;
+
+    @OneToMany(mappedBy = "articulo", fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @JsonBackReference
+    @JsonIgnore
+    private List<DetallePromocion> detallesPromocion;
 }

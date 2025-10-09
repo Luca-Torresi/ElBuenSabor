@@ -37,6 +37,7 @@ public class ServiceArticuloManufacturado {
         ArticuloManufacturado articuloManufacturado = manufacturadoMapper.nuevoArticuloManufacturadoDtoToArticuloManufacturado(nuevoArticulomanufacturadoDto);
         articuloManufacturado.setCategoria(categoria);
         articuloManufacturado.setFechaBaja(nuevoArticulomanufacturadoDto.isDadoDeAlta() ? null : LocalDate.now());
+        articuloManufacturado.setEsManufacturado(true);
 
         List<ArticuloManufacturadoDetalle> detalles = new ArrayList<>();
         for(ArticuloManufacturadoDetalleDto detalle : nuevoArticulomanufacturadoDto.getDetalles()){
@@ -102,6 +103,7 @@ public class ServiceArticuloManufacturado {
 
             articulo.getDetalles().add(detalle);
         }
+        articulo.setPrecioVenta(dto.getPrecioVenta());
 
         articulo = repoArticuloManufacturado.save(articulo);
 

@@ -19,4 +19,6 @@ public class NuevoArticuloManufacturadoDto {
     private Long idCategoria;
     private List<ArticuloManufacturadoDetalleDto> detalles;
     private String imagenUrl;
+//    private double costo;
+//    private int stock;
 }

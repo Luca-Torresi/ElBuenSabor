@@ -34,6 +34,7 @@ public class ServiceArticuloNoElaborado {
         ArticuloNoElaborado articulo = noElaboradoMapper.nuevoArticuloNoElaboradoDtoToArticuloNoElaborado(nuevoArticuloDto);
         articulo.setCategoria(categoria);
         articulo.setFechaBaja(nuevoArticuloDto.isDadoDeAlta() ? null : LocalDate.now());
+        articulo.setEsManufacturado(false);
 
         articulo = repoArticuloNoElaborado.save(articulo);
 
@@ -58,6 +59,9 @@ public class ServiceArticuloNoElaborado {
         Categoria categoria = repoCategoria.findById(dto.getIdCategoria())
                 .orElseThrow(() -> new RuntimeException("Categoría no encontrada para el artículo no elaborado: " + dto.getIdCategoria()));
         articulo.setCategoria(categoria);
+
+        articulo.setStock(dto.getStock());
+        articulo.setCosto(dto.getCosto() == 0 ? null : dto.getCosto());
 
         articulo = repoArticuloNoElaborado.save(articulo);
 

@@ -9,8 +9,10 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", uses = PromocionItemMapper.class)
 public interface DetallePedidoMapper {
 
+    @Mapping(source = "articulo.idArticulo", target = "idArticulo")
     @Mapping(source = "articulo.nombre", target = "nombreArticulo")
     @Mapping(source = "promocion.titulo", target = "tituloPromocion")
+    @Mapping(source = "promocion.idPromocion", target = "idPromocion")
     DetallePedidoCajeroDto detallePedidoToDetallePedidoDto(DetallePedido detallePedido);
 
     @Mapping(source = "articulo.nombre", target = "nombreArticulo")

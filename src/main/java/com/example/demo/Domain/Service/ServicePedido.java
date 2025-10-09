@@ -232,7 +232,11 @@ public class ServicePedido {
 
     //Obtiene los pedidos correspondientes para el repartidor
     public List<PedidoRepartidorDto> mostrarPedidosRepartidor(){
-        return repoPedido.findByEstadoPedidoIn(List.of(EstadoPedido.LISTO, EstadoPedido.EN_CAMINO))
+        List<EstadoPedido> estadosRepartidor = List.of(
+                EstadoPedido.LISTO,
+                EstadoPedido.EN_CAMINO
+        );
+        return repoPedido.findByEstadoPedidoInAndTipoEnvio(estadosRepartidor, TipoEnvio.DELIVERY)
                 .stream()
                 .map(pedidoMapper::pedidoToPedidoRepartidorDto)
                 .toList();

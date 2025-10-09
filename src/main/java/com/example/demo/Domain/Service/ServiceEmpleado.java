@@ -6,6 +6,9 @@ import com.example.demo.Domain.Entities.*;
 import com.example.demo.Domain.Repositories.*;
 import com.example.demo.Domain.Service.Auth.UserAuth0Service;
 import com.example.demo.Domain.Service.Auth.UserBBDDService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -89,17 +92,17 @@ public class ServiceEmpleado extends ServiceUsuario<Empleado> {
 
         empleado.setFechaBaja(activo ? LocalDate.now() : null);
 
-        repoEmpleado.save(empleado);
-
         // Bloquear/desbloquear usuario en Auth0 (usa método del padre)
-        // userAuth0Service.blockUser(empleado.getIdAuth0(), !activo);
+        userAuth0Service.blockUser(empleado.getIdAuth0(), activo);
+        repoEmpleado.save(empleado);
     }
 
     // Métodos para obtener DTOs para la UI, sin tocar lógica Auth0
     @Transactional(readOnly = true)
-    public List<EmpleadoResponseDto> obtenerEmpleadosFormateados() {
-        List<Empleado> empleados = repoEmpleado.findAll();
-        return empleados.stream()
+    public Page<EmpleadoResponseDto> obtenerEmpleadosFormateados(int page, int size) {
+        Pageable pageable = PageRequest.of(page,size);
+        Page<Empleado> empleados = repoEmpleado.findAll(pageable);
+        return empleados
                 .map(empleado -> {
                     // --- Forzar la inicialización de relaciones LAZY aquí ---
                     // Imagen:
@@ -112,8 +115,7 @@ public class ServiceEmpleado extends ServiceUsuario<Empleado> {
                     }
                     // ----------------------------------------------------
                     return usuarioMapper.empleadoToEmpleadoResponseDto(empleado);
-                })
-                .collect(Collectors.toList());
+                });
     }
 
     public EmpleadoResponseDto obtenerEmpleadoFormateadoPorId(Long id) {

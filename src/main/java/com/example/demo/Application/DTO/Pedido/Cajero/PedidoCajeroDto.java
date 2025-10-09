@@ -13,6 +13,7 @@ import java.util.List;
 public class PedidoCajeroDto {
     private Long idPedido;
     private LocalDateTime fechaYHora;
+    private LocalDateTime horaEntrega;
     private String tipoEnvio;
     private String metodoDePago;
     private Double total;

@@ -59,10 +59,23 @@ public class ControllerCliente {
 
     @PreAuthorize("hasAuthority('CLIENTE')")
     @PutMapping("/actualizar/telefono")
-    public ResponseEntity<Cliente> actualizarTelefono(@Valid @RequestBody TelefonoUpdateDto telefonoDto) {
+    public ResponseEntity<ClienteDto> actualizarTelefono(@Valid @RequestBody TelefonoUpdateDto telefonoDto) {
         String auth0Id = getAuth0IdFromAuthenticatedUser();
         Cliente clienteActualizado = serviceCliente.actualizarTelefono(auth0Id, telefonoDto.getTelefono());
-        return ResponseEntity.ok(clienteActualizado);
+
+        // 2. ¡Mapeamos la entidad a un DTO antes de devolverla!
+        ClienteDto dto = new ClienteDto();
+        dto.setIdUsuario(clienteActualizado.getIdUsuario());
+        dto.setAuth0Id(clienteActualizado.getIdAuth0());
+        dto.setNombre(clienteActualizado.getNombre());
+        dto.setApellido(clienteActualizado.getApellido());
+        dto.setEmail(clienteActualizado.getEmail());
+        dto.setTelefono(clienteActualizado.getTelefono());
+        // Incluye otros campos que necesites, como la URL de la imagen si está cargada
+        dto.setImagen(clienteActualizado.getImagen() != null ? clienteActualizado.getImagen().getUrl() : null);
+
+        // 3. Devolvemos el DTO
+        return ResponseEntity.ok(dto);
     }
 
     @PreAuthorize("hasAuthority('CLIENTE')")
@@ -161,6 +174,11 @@ public class ControllerCliente {
     public Page<InformacionClienteDto> obtenerListaCLientes(@RequestParam(defaultValue = "0") int page,
                                                              @RequestParam(defaultValue = "9") int size){
         return serviceCliente.obtenerlistaClientes(page,size)   ;
+    }
+
+    @GetMapping("/todos")
+    public List<InformacionClienteDto> obtenerTodosCLientes(){
+        return serviceCliente.obtenerTodosClientes();
     }
 
 }

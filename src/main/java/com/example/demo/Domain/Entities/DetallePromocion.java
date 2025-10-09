@@ -1,5 +1,6 @@
 package com.example.demo.Domain.Entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +15,7 @@ public class DetallePromocion {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idDetallePromocion;
 
-    @ManyToOne @JoinColumn(name = "idArticulo")
+    @ManyToOne @JoinColumn(name = "idArticulo") @JsonManagedReference
     private Articulo articulo;
     private Integer cantidad;
 

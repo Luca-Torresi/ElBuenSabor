@@ -15,6 +15,7 @@ public class InformacionArticuloNoElaboradoDto {
     private String nombreCategoria;
     private String imagenUrl;
     private int stock;
+    private double costo;
     @Getter
     private boolean eliminarImagen;
 }
