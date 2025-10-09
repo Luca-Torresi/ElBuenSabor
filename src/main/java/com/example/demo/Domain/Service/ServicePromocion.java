@@ -1,19 +1,23 @@
 package com.example.demo.Domain.Service;
 
 import com.example.demo.Application.DTO.Promocion.*;
+import com.example.demo.Application.Mapper.DetallePromocionMapper;
 import com.example.demo.Application.Mapper.PromocionMapper;
 import com.example.demo.Domain.Entities.Articulo;
+import com.example.demo.Domain.Entities.ArticuloManufacturado;
 import com.example.demo.Domain.Entities.DetallePromocion;
 import com.example.demo.Domain.Entities.Promocion;
 import com.example.demo.Domain.Exceptions.ArticuloDadoDeBajaException;
 import com.example.demo.Domain.Exceptions.ArticuloNoEncontradoException;
 import com.example.demo.Domain.Repositories.RepoArticulo;
+import com.example.demo.Domain.Repositories.RepoArticuloManufacturado;
 import com.example.demo.Domain.Repositories.RepoDetallePromocion;
 import com.example.demo.Domain.Repositories.RepoPromocion;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,11 +26,41 @@ public class ServicePromocion {
     private final PromocionMapper promocionMapper;
     private final RepoDetallePromocion repoDetallePromocion;
     private final RepoArticulo repoArticulo;
+    private final RepoArticuloManufacturado repoArticuloManufacturado;
+    private final DetallePromocionMapper detallePromocionMapper;
 
     //Cargar nueva promoción
     public Long nuevaPromocion(NuevaPromocionDto nuevaPromocionDto) {
         Promocion promocion = promocionMapper.promocionDtoToPromocion(nuevaPromocionDto);
+        List<DetallePromocion> detallesPromocion = new ArrayList<>();
+        int tiempoMaximo = 0;
 
+        for (DetallePromocionDto detalleDto : nuevaPromocionDto.getDetalles()) {
+            Articulo articulo = repoArticulo.findById(detalleDto.getIdArticulo())
+                    .orElseThrow(() -> new ArticuloNoEncontradoException("No se encontró el artículo con ID: " + detalleDto.getIdArticulo()));
+
+            if(articulo.getEsManufacturado()) {
+                Optional<ArticuloManufacturado> articuloManufacturadoOpt = repoArticuloManufacturado.findById(detalleDto.getIdArticulo());
+
+                if (articuloManufacturadoOpt.isPresent()) {
+                    ArticuloManufacturado am = articuloManufacturadoOpt.get();
+
+                    if (am.getTiempoDeCocina() > tiempoMaximo) {
+                        tiempoMaximo = am.getTiempoDeCocina();
+                    }
+                }
+            }
+
+            DetallePromocion detalle = new DetallePromocion();
+            detalle.setCantidad(detalleDto.getCantidad());
+            detalle.setArticulo(articulo);
+            detalle.setPromocion(promocion);
+
+            detallesPromocion.add(detalle);
+        }
+
+        promocion.setTiempoDeCocina(tiempoMaximo);
+        promocion.setDetalles(detallesPromocion);
         promocion = repoPromocion.save(promocion);
         return promocion.getIdPromocion();
     }
@@ -39,9 +73,29 @@ public class ServicePromocion {
                 .toList();
     }
 
-    public Promocion obtenerPromocionByID(Long idPromocion) {
-        return repoPromocion.findById(idPromocion)
+    public PromocionCarritoDto obtenerPromocionByID(Long idPromocion) {
+        Promocion promocion = repoPromocion.findById(idPromocion)
                 .orElseThrow(() -> new ArticuloNoEncontradoException("No se encontró la promocion con ID: " + idPromocion));
+
+
+        List<DetallePromocionDto> detallesDto = promocion.getDetalles().stream()
+                .map(detallePromocionMapper::detallePromocionToDetallePromocionDto)
+                .toList();
+        PromocionResumenDto promocionResumenDto = calcularResumenPromocion(promocion.getIdPromocion());
+        PromocionCarritoDto promocionCarritoDto = new PromocionCarritoDto(
+                promocion.getIdPromocion(),
+                promocion.getTitulo(),
+                promocion.getDescripcion(),
+                promocion.getImagen().getUrl(),
+                promocion.getHorarioInicio(),
+                promocion.getHorarioFin(),
+                detallesDto,
+                promocionResumenDto.getPrecioBase(),
+                promocionResumenDto.getPrecioPromocional(),
+                promocionResumenDto.getAhorro()
+        );
+
+        return promocionCarritoDto;
     }
 
     //Obtiene de la base de datos todas las promociones para ser mostradas en el ABM
@@ -56,7 +110,37 @@ public class ServicePromocion {
     public Promocion modificarPromocion(Long idPromocion, NuevaPromocionDto dto) {
         Promocion promocion = repoPromocion.findById(idPromocion).get();
         promocionMapper.updateFromDto(dto, promocion);
+        int tiempoMaximo = 0;
 
+        if (promocion.getDetalles() != null) {
+            promocion.getDetalles().clear();
+        } else {
+            promocion.setDetalles(new ArrayList<>());
+        }
+
+        for (DetallePromocionDto detalleDto : dto.getDetalles()) {
+            Articulo articulo = repoArticulo.findById(detalleDto.getIdArticulo())
+                    .orElseThrow(() -> new ArticuloNoEncontradoException("No se encontró el artículo con ID: " + detalleDto.getIdArticulo()));
+
+            if(articulo.getEsManufacturado()) {
+                Optional<ArticuloManufacturado> articuloManufacturadoOpt = repoArticuloManufacturado.findById(detalleDto.getIdArticulo());
+                if (articuloManufacturadoOpt.isPresent()) {
+                    ArticuloManufacturado am = articuloManufacturadoOpt.get();
+
+                    if (am.getTiempoDeCocina() > tiempoMaximo) {
+                        tiempoMaximo = am.getTiempoDeCocina();
+                    }
+                }
+            }
+
+            DetallePromocion detalle = new DetallePromocion();
+            detalle.setCantidad(detalleDto.getCantidad());
+            detalle.setArticulo(articulo);
+            detalle.setPromocion(promocion);
+
+            promocion.getDetalles().add(detalle);
+        }
+        promocion.setTiempoDeCocina(tiempoMaximo);
         return repoPromocion.save(promocion);
     }
 

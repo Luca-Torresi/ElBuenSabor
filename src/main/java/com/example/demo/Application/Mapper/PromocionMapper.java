@@ -13,8 +13,10 @@ import org.mapstruct.Named;
 @Mapper(componentModel = "spring", uses = {DetallePromocionMapper.class, ImagenMapper.class})
 public interface PromocionMapper {
 
+    @Mapping(source = "precioPromocional", target = "precioPromocion")
     Promocion promocionDtoToPromocion(NuevaPromocionDto nuevaPromocionDto);
 
+    @Mapping(source = "precioPromocional", target = "precioPromocion")
     void updateFromDto(NuevaPromocionDto dto, @MappingTarget Promocion entidad);
 
     @Mapping(source = "imagen.url", target = "url")

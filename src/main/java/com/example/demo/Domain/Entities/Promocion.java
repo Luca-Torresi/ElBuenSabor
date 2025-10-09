@@ -11,6 +11,7 @@ import java.util.List;
 public class Promocion {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "idPromocion")
     private Long idPromocion;
 
     private String titulo;
@@ -35,8 +36,4 @@ public class Promocion {
 
     @OneToMany(mappedBy = "promocion", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetallePromocion> detalles;
-
-    public void setPrecio(Double precio) {
-        this.precioPromocion = precio;
-    }
 }

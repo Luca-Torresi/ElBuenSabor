@@ -11,5 +11,8 @@ FROM detallePedido
          INNER JOIN articulo ON articulo.idArticulo = detallePedido.idArticulo
          INNER JOIN categoria ON categoria.idCategoria = articulo.idCategoria
 WHERE estadoPedido = 'ENTREGADO'
-GROUP BY nombreArticulo
-ORDER BY cantVendido DESC;
+GROUP BY
+    articulo.nombre,
+    categoria.nombre
+ORDER BY
+    cantVendido DESC;
